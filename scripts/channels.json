@@ -1,0 +1,236 @@
+{
+  "metadata": {
+    "description": "PodcastIQ curated channel list — 28 channels across 6 genres",
+    "target_episodes_total": 270,
+    "default_episodes_per_channel": 10,
+    "date_range": "2022-01-01 to 2026-02-20",
+    "min_duration_minutes": 10,
+    "max_duration_minutes": 240
+  },
+  "channels": [
+    {
+      "channel_id": "UCSHZKyawb77ixDdsGog4iWA",
+      "name": "Lex Fridman Podcast",
+      "handle": "@lexfridman",
+      "genre": "Technology & AI",
+      "target_episodes": 10,
+      "notes": "Focus on AI/tech guests, skip history/philosophy-only eps"
+    },
+    {
+      "channel_id": "UCESLZhusAkFfsNsApnjF_Cg",
+      "name": "All-In Podcast",
+      "handle": "@allinpodcast",
+      "genre": "Technology & AI",
+      "target_episodes": 10,
+      "notes": "4 speakers — great for multi-speaker testing"
+    },
+    {
+      "channel_id": "UCnMn36GT_H0X-w5_ckLtlgQ",
+      "name": "No Priors",
+      "handle": "@NoPriorsPodcast",
+      "genre": "Technology & AI",
+      "target_episodes": 10,
+      "notes": "Shorter episodes, AI/startup focused"
+    },
+    {
+      "channel_id": "UC_AyBNyGEk-ZsQDQXLsWYJw",
+      "name": "Acquired Podcast",
+      "handle": "@AcquiredFM",
+      "genre": "Technology & AI",
+      "target_episodes": 10,
+      "notes": "Long deep-dives on company histories"
+    },
+    {
+      "channel_id": "UCVhQ2NnY5Rskt6UjCUkJ_DA",
+      "name": "a16z Podcast",
+      "handle": "@a16z",
+      "genre": "Technology & AI",
+      "target_episodes": 10,
+      "notes": "Varied formats, shorter episodes"
+    },
+    {
+      "channel_id": "UCLwbJEQkUL7apXqShXXmm1Q",
+      "name": "Hard Fork (NYT)",
+      "handle": "@hardfork",
+      "genre": "Technology & AI",
+      "target_episodes": 10,
+      "notes": "Mainstream tech journalism perspective"
+    },
+    {
+      "channel_id": "UCOKwXGK3VLaZ6FjPdQjfZdQ",
+      "name": "The Cognitive Revolution",
+      "handle": "@CognitiveRevolutionPodcast",
+      "genre": "Technology & AI",
+      "target_episodes": 10,
+      "notes": "Niche but highly knowledge-dense AI discussions"
+    },
+    {
+      "channel_id": "UCznv7Vf9nBdJYvBagFdAHWw",
+      "name": "The Tim Ferriss Show",
+      "handle": "@timferriss",
+      "genre": "Business & Entrepreneurship",
+      "target_episodes": 10,
+      "notes": "Long-form with world-class performers"
+    },
+    {
+      "channel_id": "UCLgjxoGnZOdOCasBbangMgg",
+      "name": "My First Million",
+      "handle": "@MyFirstMillionPod",
+      "genre": "Business & Entrepreneurship",
+      "target_episodes": 10,
+      "notes": "Business ideas, trend analysis"
+    },
+    {
+      "channel_id": "UCyHhB0B1FNRpJnq4LTfJMhA",
+      "name": "Lenny's Podcast",
+      "handle": "@LennysPodcast",
+      "genre": "Business & Entrepreneurship",
+      "target_episodes": 10,
+      "notes": "Product management focused"
+    },
+    {
+      "channel_id": "UCKoa50kMBpVOAN7z_dOzI_A",
+      "name": "How I Built This",
+      "handle": "@HowIBuiltThis",
+      "genre": "Business & Entrepreneurship",
+      "target_episodes": 10,
+      "notes": "NPR production, founder stories"
+    },
+    {
+      "channel_id": "UCcefcZRL2oaA_uBNleo9Kgw",
+      "name": "Y Combinator",
+      "handle": "@ycombinator",
+      "genre": "Business & Entrepreneurship",
+      "target_episodes": 10,
+      "notes": "Startup advice from top accelerator"
+    },
+    {
+      "channel_id": "UCVfwlh9a73oIHqfqKKhPNSA",
+      "name": "The Knowledge Project",
+      "handle": "@TheKnowledgeProject",
+      "genre": "Business & Entrepreneurship",
+      "target_episodes": 10,
+      "notes": "Mental models, decision-making"
+    },
+    {
+      "channel_id": "UC2D2CMWXMOVWx7giW1n3LIg",
+      "name": "Huberman Lab",
+      "handle": "@hubermanlab",
+      "genre": "Science & Health",
+      "target_episodes": 10,
+      "notes": "Long episodes (2-3 hrs) — great chunking test"
+    },
+    {
+      "channel_id": "UC8kGsMa0LygSX9nkBcBH1Sg",
+      "name": "The Peter Attia Drive",
+      "handle": "@PeterAttiaMD",
+      "genre": "Science & Health",
+      "target_episodes": 10,
+      "notes": "Deep medical/scientific discussions"
+    },
+    {
+      "channel_id": "UCWF2ZBNk4wHpMZLmJJBxIkA",
+      "name": "FoundMyFitness",
+      "handle": "@FoundMyFitness",
+      "genre": "Science & Health",
+      "target_episodes": 10,
+      "notes": "Nutrition, genetics, aging research"
+    },
+    {
+      "channel_id": "UCvjgXvBlbQiAffgfP__9GBQ",
+      "name": "StarTalk",
+      "handle": "@StarTalk",
+      "genre": "Science & Health",
+      "target_episodes": 10,
+      "notes": "Science + comedy, broad appeal"
+    },
+    {
+      "channel_id": "UCAJ-9GFXI0MqqrbIXFN_F0g",
+      "name": "Radiolab",
+      "handle": "@radiolab",
+      "genre": "Science & Health",
+      "target_episodes": 10,
+      "notes": "Narrative science storytelling"
+    },
+    {
+      "channel_id": "UCnYMOamNKLGVlJgRUbamveA",
+      "name": "Impact Theory",
+      "handle": "@TomBilyeu",
+      "genre": "Education & Self-Improvement",
+      "target_episodes": 10,
+      "notes": "Mindset, entrepreneurship, personal growth"
+    },
+    {
+      "channel_id": "UCoOae5nYA7VqaXzerajD0lg",
+      "name": "Deep Dive with Ali Abdaal",
+      "handle": "@aliabdaal",
+      "genre": "Education & Self-Improvement",
+      "target_episodes": 10,
+      "notes": "Productivity, learning, life design"
+    },
+    {
+      "channel_id": "UCGq-a57w-aPwyi3pW7XLiHw",
+      "name": "The Diary of a CEO",
+      "handle": "@TheDiaryOfACEO",
+      "genre": "Education & Self-Improvement",
+      "target_episodes": 10,
+      "notes": "Fastest-growing podcast, diverse topics"
+    },
+    {
+      "channel_id": "UCIhjxjJTD3S_JilNh-OFgag",
+      "name": "Founders Podcast",
+      "handle": "@FoundersPodcast",
+      "genre": "Education & Self-Improvement",
+      "target_episodes": 10,
+      "notes": "Solo deep-dives on founder bios — clean transcripts"
+    },
+    {
+      "channel_id": "UCnHMsqDkEhqQeFfEwKgI6Jg",
+      "name": "Modern Wisdom",
+      "handle": "@ChrisWillx",
+      "genre": "Education & Self-Improvement",
+      "target_episodes": 10,
+      "notes": "Psychology, fitness, philosophy"
+    },
+    {
+      "channel_id": "UCVZ5rp0Jn3pWBiTnBut8Ekw",
+      "name": "20VC with Harry Stebbings",
+      "handle": "@20VC",
+      "genre": "Startup & VC Focused",
+      "target_episodes": 8,
+      "notes": "Short episodes, high signal VC/founder interviews"
+    },
+    {
+      "channel_id": "UCK1RLJvYJnAGDlySr-uJ0sg",
+      "name": "Masters of Scale",
+      "handle": "@MastersofScale",
+      "genre": "Startup & VC Focused",
+      "target_episodes": 8,
+      "notes": "Narrative interviews on scaling companies"
+    },
+    {
+      "channel_id": "UCJplp5SWAUxFC88-en7Vkag",
+      "name": "The Pitch",
+      "handle": "@thepitch",
+      "genre": "Startup & VC Focused",
+      "target_episodes": 8,
+      "notes": "Real startup pitches — optional if limited YouTube content"
+    },
+    {
+      "channel_id": "UCzQUP1qoWDoEbmsQxvdjxgQ",
+      "name": "Joe Rogan Experience",
+      "handle": "@joerogan",
+      "genre": "Cross-Disciplinary",
+      "target_episodes": 10,
+      "notes": "Cherry-pick tech/science/business guests ONLY"
+    },
+    {
+      "channel_id": "UCAuUUnT6oDeKwE6v1NGQxug",
+      "name": "TED Talks",
+      "handle": "@TED",
+      "genre": "Cross-Disciplinary",
+      "target_episodes": 6,
+      "notes": "Short standalone talks (10-20 min), NOT interview format"
+    }
+  ]
+}

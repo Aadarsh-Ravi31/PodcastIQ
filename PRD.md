@@ -83,8 +83,8 @@ An intelligent search platform that:
 ### 3.1 Data Ingestion & Processing
 
 **FR-1: YouTube Transcript Extraction**
-- Extract transcripts from 100 YouTube-based podcast episodes
-- Target 10 channels (~10 episodes per channel)
+- Extract transcripts from 300 YouTube-based podcast episodes
+- Target 10-15 channels (~20-30 episodes per channel)
 - Support auto-generated and manual captions
 - Filter for English-language content only
 - Validate minimum transcript length (>100 words)
@@ -190,7 +190,7 @@ An intelligent search platform that:
 ### 3.5 User Interface
 
 **FR-17: Search Interface (Streamlit)**
-- Clean search bar with placeholder "Search 100+ podcast episodes..."
+- Clean search bar with placeholder "Search 300+ podcast episodes..."
 - Auto-suggest topics as user types (optional stretch)
 - Support multi-line queries (advanced use cases)
 - "Search" button and Enter key submit
@@ -325,8 +325,8 @@ An intelligent search platform that:
 
 | Metric | Target | Measurement |
 |--------|--------|-------------|
-| Episodes Indexed | 100+ | `SELECT COUNT(*) FROM curated.curated_episodes` |
-| Searchable Segments | 6,000+ | `SELECT COUNT(*) FROM curated.curated_segments` |
+| Episodes Indexed | 300+ | `SELECT COUNT(*) FROM curated.curated_episodes` |
+| Searchable Segments | 18,000+ | `SELECT COUNT(*) FROM curated.curated_segments` |
 | Embedding Coverage | 100% | All segments have embeddings in `semantic.embeddings` |
 | Search Latency (p95) | <5 seconds | Monitor Streamlit query times |
 | Search Relevance | >80% top-3 accuracy | Manual evaluation on 20 test queries |

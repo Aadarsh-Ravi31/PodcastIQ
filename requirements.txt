@@ -1,0 +1,29 @@
+# PodcastIQ Dependencies
+# Python 3.13 | Last Updated: February 19, 2026
+
+# Data Source
+youtube-transcript-api>=1.2.4
+
+# Snowflake
+snowflake-connector-python>=4.3.0
+
+# Orchestration (Astro CLI handles Airflow, but these might be needed for tests/scripts)
+# apache-airflow>=2.10.0
+# apache-airflow-providers-snowflake>=5.6.0
+
+# Transformation
+dbt-snowflake>=1.8.0
+
+# Agent Framework
+langgraph>=0.2.28
+langchain>=0.3.0
+langchain-core>=0.3.0
+
+# Frontend
+streamlit>=1.38.0
+
+# Utilities
+pandas>=2.2.0
+python-dotenv>=1.0.0
+mcp>=0.1.0
+google-api-python-client>=2.150.0

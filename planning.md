@@ -20,7 +20,7 @@
 ## High-Level Architecture
 
 ```
-YouTube Transcripts (100 episodes from 10 channels)
+YouTube Transcripts (300 episodes from 10-15 channels)
           ↓
    Apache Airflow (ETL Orchestration)
           ↓
@@ -105,7 +105,7 @@ YouTube Transcripts (100 episodes from 10 channels)
 - `app.user_preferences` - Saved episodes and favorite topics
 - `app.recommendation_scores` - Pre-computed personalized rankings
 
-**Estimated Storage:** <100MB for 100 episodes (well within free tier)
+**Estimated Storage:** <300MB for 300 episodes (well within free tier)
 
 ---
 
@@ -298,11 +298,11 @@ app = workflow.compile()
 
 ---
 
-### Week 2: Full ETL Pipeline (100 Episodes)
-**Goal:** Automate extraction of 100 episodes from 10 channels (~10 episodes per channel)
+### Week 2: Full ETL Pipeline (300 Episodes)
+**Goal:** Automate extraction of 300 episodes from 10-15 channels
 
 **Tasks:**
-- Finalize channel list (10 tech/AI podcasts with English transcripts) - **Present to user for approval before finalizing**
+- Finalize channel list (10-15 tech/AI podcasts with English transcripts) - **Present to user for approval before finalizing**
 - Build `youtube_extract_dag.py` with error handling
 - Implement incremental loading (MERGE statement)
 - Create DBT project structure
@@ -311,7 +311,7 @@ app = workflow.compile()
 
 **Deliverable for Professor:**
 - Airflow UI screenshot showing successful DAG run
-- SQL query: `SELECT COUNT(*) FROM curated.curated_episodes` (target: 100+)
+- SQL query: `SELECT COUNT(*) FROM curated.curated_episodes` (target: 300+)
 - CSV export of loaded episodes with channel distribution
 
 **Candidate Podcasts (to be confirmed with user):**
@@ -325,9 +325,9 @@ app = workflow.compile()
 1. Present candidate list to user for approval
 2. Validate each channel has English transcripts available
 3. Test extraction with 1-2 episodes per channel
-4. Finalize list of 10 channels before full extraction
+4. Finalize list of 10-15 channels before full extraction
 
-**Risk Mitigation:** If <30 episodes loaded due to missing transcripts, manually curate additional videos with confirmed captions.
+**Risk Mitigation:** If <100 episodes loaded due to missing transcripts, manually curate additional videos with confirmed captions.
 
 ---
 
@@ -338,7 +338,7 @@ app = workflow.compile()
 - Implement `curated_segments.sql` with 60s/15s overlap chunking
 - Verify chunking: Check avg segments per episode (~60)
 - Write `embeddings.sql` using Cortex EMBED_TEXT_768
-- Run full embedding generation (estimated 6,000 segments × 768 dims)
+- Run full embedding generation (estimated 18,000 segments × 768 dims)
 - Create Cortex Search service
 - Test basic semantic search query
 
@@ -348,7 +348,7 @@ app = workflow.compile()
 - Screenshot showing embedding coverage: `SELECT COUNT(*) FROM semantic.embeddings`
 
 **Performance Target:**
-- Embedding generation: <3 hours on SMALL warehouse
+- Embedding generation: <6 hours on SMALL warehouse
 - Search query latency: <2 seconds
 
 ---
@@ -394,7 +394,7 @@ app = workflow.compile()
   - Topic filter active (e.g., only show "AI" episodes)
 
 **UI Features:**
-- Search bar with placeholder "Search 100+ podcast episodes..."
+- Search bar with placeholder "Search 300+ podcast episodes..."
 - Results display: Episode title, channel name, segment text preview, timestamp link, relevance score
 - Topic tags: Color-coded badges showing extracted topics
 - Sidebar filters: Channel, topic, date range
@@ -469,7 +469,7 @@ Contradictions:
 - Implement Streamlit caching (`@st.cache_data`) to reduce query load
 - Write README.md with architecture diagram
 - Create user guide for Streamlit app
-- Monitor Snowflake credit usage (should be <100 credits used)
+- Monitor Snowflake credit usage (should be <300 credits total)
 
 **Deliverable for Professor:**
 - Documentation PDF containing:
@@ -525,9 +525,9 @@ Contradictions:
 5. **Recommendations:** Show "You might also like these episodes" panel
 
 **Success Metrics:**
-- ✅ 50+ episodes indexed
+- ✅ 300+ episodes indexed
 - ✅ <5 second search latency
-- ✅ <$200 in Snowflake credits used
+- ✅ <$400 in Snowflake credits used
 - ✅ 6 agents functional (even if simple implementations)
 
 ---
@@ -603,7 +603,7 @@ Contradictions:
 **Rationale:**
 - Zero cost (no cloud infrastructure bills)
 - Full control for learning and debugging
-- Sufficient for 100 episodes (not production scale)
+- Sufficient for 300 episodes (not production scale)
 - Easy to migrate to Astronomer cloud later if needed
 - Alternative (GitHub Actions) considered but Airflow is more industry-standard
 
@@ -747,23 +747,23 @@ podcastiq/
 
 **Free Tier:** $400 in credits (200 credits × $2/credit)
 
-**Projected 8-Week Usage (100 Episodes):**
+**Projected 8-Week Usage (300 Episodes):**
 | Activity | Warehouse | Credits/Hour | Total Hours | Total Credits |
 |----------|-----------|--------------|-------------|---------------|
-| Initial data load (100 episodes) | SMALL | 2 | 2 | 4 |
-| Daily incremental loads | X-SMALL | 1 | 1.2 | 8.4 |
-| DBT transformations (2x data) | SMALL | 2 | 24 | 48 |
-| Embedding generation (12K segments) | SMALL | 2 | 6 | 12 |
-| Search queries (testing) | X-SMALL | 1 | 10 | 10 |
-| Development/exploration | X-SMALL | 1 | 45 | 45 |
-| **Total Estimated** | | | | **127.4 credits** |
+| Initial data load (300 episodes) | SMALL | 2 | 4 | 8 |
+| Daily incremental loads | X-SMALL | 1 | 2 | 20 |
+| DBT transformations (2x data) | SMALL | 2 | 40 | 80 |
+| Embedding generation (18K segments) | SMALL | 2 | 10 | 20 |
+| Search queries (testing) | X-SMALL | 1 | 20 | 20 |
+| Development/exploration | X-SMALL | 1 | 100 | 100 |
+| **Total Estimated** | | | | **248 credits** |
 
-**Estimated Cost:** 127.4 credits × $2 = **$254.80** (well within $400 budget, 36% buffer remaining)
+**Estimated Cost:** 248 credits × $2 = **$496.00** (slightly over $400 budget, but team has 3 accounts total = 600 credits available)
 
 ### Cost Optimization Strategies
 
 1. **Aggressive Auto-Suspend:** All warehouses suspend after 60-300 seconds of inactivity
-2. **Use X-SMALL Warehouses:** Sufficient for <10K rows (our dataset is ~6K segments)
+2. **Use X-SMALL Warehouses:** Sufficient for <10K rows (our dataset is ~18K segments)
 3. **Query Optimization:** Use LIMIT during development, add indexes for production
 4. **Result Caching:** Snowflake caches identical queries for 24 hours (free)
 5. **Incremental DBT Models:** Only process new data (reduces Cortex API calls)
@@ -790,15 +790,15 @@ GROUP BY WAREHOUSE_NAME;
 |------|--------|------------|
 | **Learning curve for 4+ new technologies** | HIGH | - Focus on MVP features first<br>- Week 1 entirely for setup<br>- Use official quickstart guides<br>- Join Snowflake/DBT community Slack |
 | **Transcript quality issues (auto-captions ~90% accurate)** | MEDIUM | - Pre-filter: Only use channels with clear audio<br>- Add quality_score heuristic in DBT<br>- Display disclaimer in UI |
-| **Snowflake credits exceeding budget** | MEDIUM | - Monitor weekly credit usage<br>- Set resource monitor at 150 credits<br>- Use X-SMALL warehouses<br>- Cache aggressively |
-| **Time constraints (8 weeks, solo)** | HIGH | - Strict MVP prioritization (3 agents in Week 4)<br>- Reduce scope to 50 episodes if needed<br>- Timebox features: >4 hours → defer to "future work" |
+| **Snowflake credits exceeding budget** | MEDIUM | - Monitor weekly credit usage<br>- Set resource monitor at 400 credits across team<br>- Use X-SMALL warehouses<br>- Cache aggressively |
+| **Time constraints (8 weeks, solo)** | HIGH | - Strict MVP prioritization (3 agents in Week 4)<br>- Reduce scope to 150 episodes if needed<br>- Timebox features: >4 hours → defer to "future work" |
 | **Scope creep (6 agents is ambitious)** | MEDIUM | - Week 4 checkpoint: Only 3 agents required<br>- Weeks 5-6: Add agents incrementally<br>- If behind, cut Comparison/Recommendation |
-| **Missing transcripts for some videos** | LOW | - Accept 70-80% success rate as normal<br>- Target 50 episodes from 75 attempts<br>- Choose popular channels (more likely to have transcripts) |
+| **Missing transcripts for some videos** | LOW | - Accept 70-80% success rate as normal<br>- Target 300 episodes from 400 attempts<br>- Choose popular channels (more likely to have transcripts) |
 
 **Contingency Plan (If Behind Schedule by Week 4):**
 - Cut to 4 agents total (drop Comparison and Recommendation)
 - Simplify UI to basic search box + results list (no visualizations)
-- Use 30 high-quality episodes instead of 50 mediocre ones
+- Use 100 high-quality episodes instead of 150 mediocre ones
 
 ---
 

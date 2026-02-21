@@ -16,15 +16,18 @@ import json
 import logging
 import os
 import re
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
+import subprocess
+import tempfile
+
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from youtube_transcript_api import YouTubeTranscriptApi
 
 
 class QuotaExhaustedError(Exception):
@@ -46,6 +49,7 @@ logger = logging.getLogger(__name__)
 BASE_DIR = Path("data/raw")
 CHANNELS_CONFIG = Path("scripts/channels.json")
 PROGRESS_FILE = Path("data/extraction_progress.json")
+COOKIES_PATH = Path("scripts/www.youtube.com_cookies.txt")
 
 # Rate limiting: YouTube API quota is 10,000 units/day
 # search.list = 100 units, videos.list = 1 unit, playlistItems.list = 1 unit
@@ -147,7 +151,23 @@ def fetch_channel_videos(
     Returns:
         List of video metadata dicts, sorted by view count descending.
     """
-    playlist_id = get_uploads_playlist_id(channel_id)
+    # Fetch the correct uploads playlist ID from channel metadata
+    try:
+        channel_response = youtube.channels().list(
+            part="contentDetails",
+            id=channel_id
+        ).execute()
+        time.sleep(API_DELAY_SECONDS)
+        
+        if not channel_response.get("items"):
+            logger.error(f"Channel {channel_id} not found.")
+            return []
+            
+        playlist_id = channel_response["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+    except Exception as e:
+        logger.warning(f"Failed to fetch uploads playlist via API for {channel_id}, falling back to derivation: {e}")
+        playlist_id = get_uploads_playlist_id(channel_id)
+
     videos = []
     next_page_token = None
     date_cutoff = datetime.strptime(date_after, "%Y-%m-%d")
@@ -225,39 +245,146 @@ def fetch_channel_videos(
     return videos[:max_results]
 
 
-def extract_transcript(
-    transcript_api: YouTubeTranscriptApi, video_id: str
-) -> Optional[list[dict]]:
+def parse_vtt_to_segments(vtt_content: str) -> list[dict]:
     """
-    Fetch English transcript for a YouTube video.
+    Parse WebVTT subtitle content into transcript segments.
 
     Args:
-        transcript_api: YouTubeTranscriptApi instance.
+        vtt_content: Raw WebVTT file content.
+
+    Returns:
+        List of dicts with 'text', 'start', and 'duration' keys.
+    """
+    segments = []
+    blocks = vtt_content.strip().split("\n\n")
+
+    for block in blocks:
+        lines = block.strip().split("\n")
+        # Find the timestamp line (contains ' --> ')
+        timestamp_line = None
+        text_lines = []
+        for line in lines:
+            if " --> " in line:
+                timestamp_line = line
+            elif timestamp_line is not None and line.strip():
+                text_lines.append(line.strip())
+
+        if not timestamp_line or not text_lines:
+            continue
+
+        # Parse timestamps: "00:01:23.456 --> 00:01:27.890"
+        parts = timestamp_line.split(" --> ")
+        start_str = parts[0].strip()
+        end_str = parts[1].strip().split(" ")[0]  # Remove positioning info
+
+        start_sec = _vtt_time_to_seconds(start_str)
+        end_sec = _vtt_time_to_seconds(end_str)
+
+        # Clean text: remove VTT tags like <c> and duplicate lines
+        text = " ".join(text_lines)
+        text = re.sub(r"<[^>]+>", "", text)  # Remove HTML/VTT tags
+        text = text.strip()
+
+        if text and (not segments or text != segments[-1]["text"]):
+            segments.append({
+                "text": text,
+                "start": round(start_sec, 3),
+                "duration": round(end_sec - start_sec, 3),
+            })
+
+    return segments
+
+
+def _vtt_time_to_seconds(time_str: str) -> float:
+    """Convert VTT timestamp (HH:MM:SS.mmm or MM:SS.mmm) to seconds."""
+    parts = time_str.split(":")
+    if len(parts) == 3:
+        h, m, s = parts
+        return int(h) * 3600 + int(m) * 60 + float(s)
+    elif len(parts) == 2:
+        m, s = parts
+        return int(m) * 60 + float(s)
+    return 0.0
+
+
+def extract_transcript(video_id: str) -> Optional[list[dict]]:
+    """
+    Fetch English transcript for a YouTube video using yt-dlp.
+
+    Uses browser cookies to bypass IP rate limiting.
+
+    Args:
         video_id: YouTube video ID.
 
     Returns:
         List of transcript segment dicts, or None if unavailable.
     """
-    try:
-        transcript = transcript_api.fetch(video_id, languages=["en"])
-        segments = [
-            {"text": s.text, "start": s.start, "duration": s.duration}
-            for s in transcript
+    url = f"https://www.youtube.com/watch?v={video_id}"
+
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        output_template = os.path.join(tmp_dir, "%(id)s")
+        
+        # Use yt-dlp from the same Scripts/bin directory as the current python executable if possible
+        yt_dlp_executable = "yt-dlp"
+        python_exe = Path(sys.executable)
+        if python_exe.parent.name in ("Scripts", "bin"):
+            potential_yt_dlp = python_exe.parent / ("yt-dlp.exe" if os.name == "nt" else "yt-dlp")
+            if potential_yt_dlp.exists():
+                yt_dlp_executable = str(potential_yt_dlp)
+
+        cmd = [
+            yt_dlp_executable,
+            "--write-auto-sub",
+            "--write-sub",
+            "--sub-lang", "en",
+            "--skip-download",
+            "--ignore-no-formats-error",
+            "--impersonate", "chrome",
+            "--output", output_template,
+            "--no-warnings",
         ]
-        # Quality check: reject very short transcripts
-        total_words = sum(len(s["text"].split()) for s in segments)
-        if total_words < 100:
-            logger.warning(f"Transcript too short for {video_id}: {total_words} words")
+
+        if COOKIES_PATH.exists():
+            cmd.extend(["--cookies", str(COOKIES_PATH)])
+
+        cmd.append(url)
+
+        try:
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=30
+            )
+
+            if result.returncode != 0:
+                logger.warning(f"yt-dlp failed for {video_id}: {result.stderr.strip()}")
+                return None
+
+            # Look for the downloaded subtitle file
+            vtt_files = list(Path(tmp_dir).glob("*.vtt"))
+            if not vtt_files:
+                logger.warning(f"No subtitle file found for {video_id}")
+                return None
+
+            vtt_content = vtt_files[0].read_text(encoding="utf-8")
+            segments = parse_vtt_to_segments(vtt_content)
+
+            # Quality check: reject very short transcripts
+            total_words = sum(len(s["text"].split()) for s in segments)
+            if total_words < 100:
+                logger.warning(f"Transcript too short for {video_id}: {total_words} words")
+                return None
+
+            return segments
+
+        except subprocess.TimeoutExpired:
+            logger.warning(f"yt-dlp timed out for {video_id}")
             return None
-        return segments
-    except Exception as e:
-        logger.warning(f"No transcript for {video_id}: {e}")
-        return None
+        except Exception as e:
+            logger.warning(f"No transcript for {video_id}: {e}")
+            return None
 
 
 def extract_channel(
     youtube,
-    transcript_api: YouTubeTranscriptApi,
     channel_config: dict,
     config_metadata: dict,
     progress: dict,
@@ -269,7 +396,6 @@ def extract_channel(
 
     Args:
         youtube: YouTube API client.
-        transcript_api: YouTubeTranscriptApi instance.
         channel_config: Channel entry from channels.json.
         config_metadata: Global config metadata (date range, duration limits).
         progress: Progress tracking dict.
@@ -345,7 +471,7 @@ def extract_channel(
         logger.info(f"  [{summary['succeeded']+1}/{target_eps}] {video['title'][:60]}...")
 
         if validate_only:
-            transcript = extract_transcript(transcript_api, vid)
+            transcript = extract_transcript(vid)
             status = "available" if transcript else "unavailable"
             logger.info(f"    Transcript: {status}")
             if transcript:
@@ -356,7 +482,7 @@ def extract_channel(
             continue
 
         # Extract transcript
-        transcript = extract_transcript(transcript_api, vid)
+        transcript = extract_transcript(vid)
         time.sleep(TRANSCRIPT_DELAY_SECONDS)
 
         if not transcript:
@@ -440,7 +566,11 @@ def main() -> None:
     config = load_channels_config()
     progress = load_progress()
     youtube = get_youtube_client()
-    transcript_api = YouTubeTranscriptApi()
+
+    if COOKIES_PATH.exists():
+        logger.info(f"Using browser cookies from {COOKIES_PATH}")
+    else:
+        logger.warning("No cookies.txt found — transcript requests may be IP-blocked.")
 
     channels = config["channels"]
     if args.channel:
@@ -456,7 +586,7 @@ def main() -> None:
     for channel_config in channels:
         try:
             result = extract_channel(
-                youtube, transcript_api, channel_config,
+                youtube, channel_config,
                 config["metadata"], progress,
                 dry_run=args.dry_run,
                 validate_only=args.validate_only,

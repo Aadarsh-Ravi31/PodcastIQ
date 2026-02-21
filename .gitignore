@@ -171,6 +171,10 @@ snowflake_results/
 # MCP server configs (may contain API keys)
 mcp-config.json
 
+# Browser cookies (contains session tokens)
+cookies.txt
+*_cookies.txt
+
 # API keys and secrets
 secrets/
 credentials/

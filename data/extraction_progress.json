@@ -1,0 +1,380 @@
+{
+  "channels": {
+    "Lex Fridman Podcast": {
+      "downloaded_ids": [
+        "f_lRdkH_QoY",
+        "DyoVVSggPjY",
+        "DcWqzZ3I2cY",
+        "tdv7r2JSokI",
+        "qCbfTN-caFI",
+        "NMHiLvirCb0",
+        "ZPUtA3W-7_I",
+        "tYrdMjVXyNg",
+        "u321m25rKXc",
+        "AzzE7GOvYz8"
+      ],
+      "last_downloaded": "2026-02-20T18:14:16.295894"
+    },
+    "No Priors": {
+      "downloaded_ids": [
+        "k-xtmISBCNE",
+        "SYisFbhR7xs",
+        "7MOsEtyKqXw",
+        "0DDS8jWqEPg",
+        "OScO1It9V5g",
+        "hw7EnjC68Fw",
+        "hM_h0UA7upI",
+        "vGhlJqnECd0",
+        "TOsNrV3bXtQ",
+        "4-VzXoZqAH0"
+      ],
+      "last_downloaded": "2026-02-20T18:15:08.557069"
+    },
+    "Acquired Podcast": {
+      "downloaded_ids": [
+        "2KjW4BqNFy0",
+        "V_fYfdXpkx4",
+        "w6qRb171cog",
+        "FZItbr4ZJnc",
+        "atMrnp_EVcI",
+        "A0fvX-wV70Y",
+        "AR_1IPhzAtU",
+        "9PxxtJVWRrg",
+        "y6NfxiemvHg",
+        "QciJ9ubeLQk"
+      ],
+      "last_downloaded": "2026-02-20T18:16:33.722726"
+    },
+    "a16z Podcast": {
+      "downloaded_ids": [
+        "Uho2GupZSgU",
+        "YnV8pgHtO5Y",
+        "uDuQKsdYfZw",
+        "JfE1Wun9xkk",
+        "xRh2sVcNXQ8",
+        "vvlE8-MzxyA",
+        "5ze3ZNvOdRY",
+        "3XVDtPU8xKE",
+        "Kdql4I-NJ0M",
+        "Y7dwbJ0AtUA"
+      ],
+      "last_downloaded": "2026-02-20T18:17:21.628664"
+    },
+    "Hard Fork (NYT)": {
+      "downloaded_ids": [
+        "HDfr8PvfoOw",
+        "jdNwzYMtPN8",
+        "YhGUSIvsn_Y",
+        "nG_jGZuRBxs",
+        "20r_SrWfJL8",
+        "KUzuQpMdQZo",
+        "U3d2OKEibQ4",
+        "KKN0E3a2Yzs",
+        "cT63mvqN54o",
+        "XpIXRgMlPo4"
+      ],
+      "last_downloaded": "2026-02-20T18:18:19.735439"
+    },
+    "The Cognitive Revolution": {
+      "downloaded_ids": [
+        "hyQ_yG5tvLs",
+        "395Aa3otZe8",
+        "ut83GEcKOGU",
+        "Ap8YSyUdafM",
+        "-2NpyIkDuAc",
+        "XlHspWeFIZ8",
+        "y2eRWkVJeNU",
+        "ILMVUSJDF40",
+        "Kr3vNRHE-Fo",
+        "I3ivZaAfDFg"
+      ],
+      "last_downloaded": "2026-02-20T18:19:06.798753"
+    },
+    "The Tim Ferriss Show": {
+      "downloaded_ids": [
+        "o96LNLaiDsc",
+        "BnFzjcPTSsc",
+        "wIgI_DiwZh4",
+        "jIBo69EsAzw",
+        "T2FV1Ir344A",
+        "8ixRrg7qNKY",
+        "eCp6ixlzyh0",
+        "yhc1sM2NnQY",
+        "2bZSzObqAjE",
+        "rjSesMsQTxk"
+      ],
+      "last_downloaded": "2026-02-20T18:19:58.611693"
+    },
+    "My First Million": {
+      "downloaded_ids": [
+        "rdChG9FPs80",
+        "FKTavjfqPuA",
+        "WR4vSnnlLew",
+        "7D_AGAb_A-4",
+        "TAXPyRnWwI0",
+        "qlr8qGFeeb4",
+        "cxvwSLSRpfU",
+        "gVhc8BE6pKo",
+        "cWntNpgDCZk",
+        "zdpFZFyGlnA"
+      ],
+      "last_downloaded": "2026-02-20T18:20:49.421657"
+    },
+    "Lenny's Podcast": {
+      "downloaded_ids": [
+        "iT7kq-R3Gjc",
+        "87Pm0SGTtN8",
+        "DKrBGOFs0GY",
+        "WyJV6VwEGA8",
+        "Ctjiatnd6Xk",
+        "L9KvV_UOs3A",
+        "KPxTekxQjzc",
+        "ixY2PvQJ0To",
+        "qImgGtnNbx0",
+        "WWoyWNhx2XU"
+      ],
+      "last_downloaded": "2026-02-20T18:21:41.265502"
+    },
+    "Y Combinator": {
+      "downloaded_ids": [
+        "ASABxNenD_U",
+        "V979Wd1gmTU",
+        "cFIlta1GkiE",
+        "DL82mGde6wo",
+        "K4s6Cgicw_A",
+        "LCEmiRjPEtQ",
+        "ShYKkPPhOoc",
+        "RNJCfif1dPY",
+        "5noIKN8t69U",
+        "xXCBz_8hM9w"
+      ],
+      "last_downloaded": "2026-02-20T18:22:30.310200"
+    },
+    "The Knowledge Project": {
+      "downloaded_ids": [
+        "xpvOhgoKrg4",
+        "YrMiKxPV_Ig",
+        "zEx_IGVfi7Y",
+        "vM_1G1LCotU",
+        "JNB3xRLnMTg",
+        "hS-xso4Nmo4",
+        "E50ix2Y62y4",
+        "U-FlqVzbj0s",
+        "_TREQI5G7v0",
+        "iSGkxcEL_lM"
+      ],
+      "last_downloaded": "2026-02-20T18:23:18.338596"
+    },
+    "Huberman Lab": {
+      "downloaded_ids": [
+        "CLbVW3Pj46A",
+        "h_1zlead9ZU",
+        "LAwBdRR4wQk",
+        "Ibj1k3IZTNU",
+        "KBkl3I645c8",
+        "qzXU390N3vs",
+        "WwRc2SEo-VI",
+        "rcAyjg-oy84",
+        "D61jJJPIQeo",
+        "XeN6eGO6FVQ"
+      ],
+      "last_downloaded": "2026-02-20T18:24:05.319270"
+    },
+    "The Peter Attia Drive": {
+      "downloaded_ids": [
+        "AVOKWvYJM-c",
+        "-wkQA_oxOwA",
+        "W0XW6av2wLQ",
+        "vYQaLV3Fm00",
+        "m9yjbJJBjHU",
+        "ac0Nm71GpOY",
+        "VhbpSc6pKRQ",
+        "VhkxTq-fxJc",
+        "Yz0W-P0UaKE",
+        "htF_GapzU_c"
+      ],
+      "last_downloaded": "2026-02-20T18:25:43.789621"
+    },
+    "FoundMyFitness": {
+      "downloaded_ids": [
+        "bhkxidN2M9Q",
+        "SUy6HwOhT3U",
+        "G8FhKbsGhWU",
+        "gMyosH19G24",
+        "vgrV9rjqQyA",
+        "anzG6tVdjkQ",
+        "r8DSpOd0NZc",
+        "ICsO-EHI_vM",
+        "GrhLT9P61Z8",
+        "Dyid7vWO0zI"
+      ],
+      "last_downloaded": "2026-02-20T18:26:54.938961"
+    },
+    "StarTalk": {
+      "downloaded_ids": [
+        "qmfR2aXHLtg",
+        "6hRjKCrTVrQ",
+        "mvsU4p0Gsas",
+        "tpWaAESy6RE",
+        "qec-t77FUDs",
+        "kjFMnWjo6D4",
+        "zyPS2Rg4qug",
+        "7DEWW1yUN74",
+        "O35KGzkS4VA",
+        "o6UdRXloqGc"
+      ],
+      "last_downloaded": "2026-02-20T18:28:16.232439"
+    },
+    "Impact Theory": {
+      "downloaded_ids": [
+        "TSA23nmkGyU",
+        "dcgCdIZjL-Y",
+        "C2aNFej-cJ4",
+        "rABNuFAtbso",
+        "2bbSgSIQsac",
+        "Y1rDIYRYrmM",
+        "L44XBd1JA50",
+        "lXUClNfDBWE",
+        "VvwZ1MDw3qk",
+        "l40wglG1RKA"
+      ],
+      "last_downloaded": "2026-02-20T18:29:03.702485"
+    },
+    "Deep Dive with Ali Abdaal": {
+      "downloaded_ids": [
+        "BBAuhqvT_ds",
+        "Lt54CX9DmS4",
+        "XpopyNZKYKw",
+        "tU_AXrvQjpo",
+        "bjCDZWE-VHo",
+        "ZazwqwjDY6M",
+        "FeLNpX1GljM",
+        "meMJdfytNI0",
+        "KvDHMeJJ_cY",
+        "8zaKVFC9Eu4"
+      ],
+      "last_downloaded": "2026-02-20T18:30:22.365737"
+    },
+    "The Diary of a CEO": {
+      "downloaded_ids": [
+        "gryta3KZKU4",
+        "qgeQ5kMVwRA",
+        "yfEQRqFo2bI",
+        "fu6bYPTp_kE",
+        "S9a1nLw70p0",
+        "W0vTZrZny6A",
+        "wQJlGHVmdrA",
+        "49RT6SQ8n0Y",
+        "yUNoJ32eLBc",
+        "UclrVWafRAI"
+      ],
+      "last_downloaded": "2026-02-20T18:31:23.872805"
+    },
+    "Founders Podcast": {
+      "downloaded_ids": [
+        "aStHTTPxlis",
+        "zGEOQ6I2Sv4",
+        "zt9e6vVBdP4",
+        "Sywq2Ua4GXw",
+        "IMXm123V3Co",
+        "Q5WIv9vGKpA",
+        "hagy0fhiPpY",
+        "z__KpHVSglE",
+        "M_TiZJapSLw",
+        "8TnhiapOfpE"
+      ],
+      "last_downloaded": "2026-02-20T18:32:14.257262"
+    },
+    "Modern Wisdom": {
+      "downloaded_ids": [
+        "u4odAXoqRT8",
+        "w6PNOlTVFlM",
+        "YvWU4Zd-IMc",
+        "oOIEIEXH_f4",
+        "qqwACiteZRA",
+        "4hibdmZkOIE",
+        "h9Bp7AuUh_E",
+        "oiT0bF3brHw",
+        "A9V2guHfR5E",
+        "PMmObJYglbo"
+      ],
+      "last_downloaded": "2026-02-20T18:33:13.589161"
+    },
+    "20VC with Harry Stebbings": {
+      "downloaded_ids": [
+        "whVdDLtkiKs",
+        "P7vIRAFSXmk",
+        "rT74mF6_NhQ",
+        "oyGs8J2rB0Q",
+        "ujuUUduQXgQ",
+        "Od6I6ObZEbs",
+        "ziqsNe1sLHw",
+        "VfIK5LFGnlk",
+        "EkAWWgrr8aI",
+        "FzftvxA84z8"
+      ],
+      "last_downloaded": "2026-02-20T18:34:13.065679"
+    },
+    "Masters of Scale": {
+      "downloaded_ids": [
+        "CGpyq-XXG90",
+        "LVpHTDCjPIo",
+        "pRiP6O-c_KI",
+        "WaU1xx5-gtY",
+        "WuT_gvSIs6Y",
+        "kgUeDQ-NcBo",
+        "esvDaTjdyW0",
+        "5VVWxZHCkZU",
+        "TyWfYpq4h5k",
+        "_dS9triW14s"
+      ],
+      "last_downloaded": "2026-02-20T18:35:13.495546"
+    },
+    "Joe Rogan Experience": {
+      "downloaded_ids": [
+        "TZqADzuu73g",
+        "sJ4Ho4ccuFg",
+        "uB8BcRimf78",
+        "AVEZBy1uAk8",
+        "3hptKYix4X8",
+        "6djZKYdz5ig",
+        "sRj5pxG2JPk",
+        "GqsA7DYn5BA",
+        "O4wBUysNe2k",
+        "0loSsJ1mHVE"
+      ],
+      "last_downloaded": "2026-02-20T18:36:03.700451"
+    },
+    "Wondery (How I Built This)": {
+      "downloaded_ids": [
+        "t7OsQVLyzP4",
+        "IsuUaSdBzYQ",
+        "AooLqo8wmwc",
+        "BBnGVrReMBA",
+        "lD-uvcsbg7M",
+        "H9rH1Q8koas",
+        "H2Gi9MqrMMI",
+        "_oXKX5_iVDY",
+        "_xYv7EEXs-8",
+        "eCvH6GnN0C8"
+      ],
+      "last_downloaded": "2026-02-20T18:37:15.137849"
+    },
+    "All-In Podcast": {
+      "downloaded_ids": [
+        "6uYEPfiBMAE",
+        "bhpd4NeTbCI",
+        "yEb2DX0TzKM",
+        "Uxi6LVKanuY",
+        "1X6xwxQRXlY",
+        "qeZqZBRA-6Q",
+        "2unsXpoi97I",
+        "y2NeAef6d30",
+        "G0GuHkUbuEY",
+        "Kr3Sh2PKA8Y"
+      ],
+      "last_downloaded": "2026-02-20T18:44:11.374707"
+    }
+  },
+  "last_updated": "2026-02-20T18:44:11.374721"
+}

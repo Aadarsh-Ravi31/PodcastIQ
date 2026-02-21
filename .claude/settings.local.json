@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./venv/Scripts/python:*)"
+      "Bash(./venv/Scripts/python:*)",
+      "Bash(source:*)",
+      "Bash(python scripts/channel_extraction.py:*)",
+      "Bash(pip show:*)",
+      "Bash(python:*)",
+      "Bash(yt-dlp:*)",
+      "WebFetch(domain:vidiq.com)",
+      "WebFetch(domain:glasp.co)",
+      "WebFetch(domain:us.youtubers.me)"
     ]
   }
 }

@@ -1,7 +1,7 @@
 # PodcastIQ - Detailed Implementation Tasks
 
 **Project Timeline:** 8 Weeks (February - April 2026)
-**Last Updated:** February 19, 2026
+**Last Updated:** February 20, 2026
 **Team Size:** 3 Members
 **Target Scope:** 300+ Episodes | 18,000+ Segments
 
@@ -11,8 +11,8 @@
 
 | Week | Stage | Focus | Status |
 |------|-------|-------|--------|
-| 1 | 0 & 1 | Environment Setup + POC Extraction | [/] In Progress |
-| 2 | 2 & 3 | ETL Pipeline & DBT (300 Episodes) | [ ] Not Started |
+| 1 | 0 & 1 | Environment Setup + POC Extraction | [x] Completed |
+| 2 | 2 & 3 | ETL Pipeline & DBT (300 Episodes) | [/] In Progress |
 | 3 | 4 | Semantic enrichment (Embeddings + Cortex Search) | [ ] Not Started |
 | 4 | 5 (MVP) | LangGraph Agents (Router, Search, Summary) | [ ] Not Started |
 | 5 | 7 | Streamlit UI + Topic Extraction | [ ] Not Started |
@@ -58,7 +58,7 @@
 - [x] Finalize list of 28 channels across 6 genres (~270 episodes)
 - [x] Create `scripts/channels.json` with channel IDs and configs
 - [x] Create `scripts/channel_extraction.py` for batch extraction
-- [ ] Document final channel list in `PRD.md`
+- [x] Document final channel list (Verified 26 channels, 240+ transcripts)
 
 ---
 
@@ -163,9 +163,9 @@
 
 ---
 
-## 📝 Current Focus: Week 1
-**Goal:** Environment Setup & 5-Episode POC
+## 📝 Current Focus: Week 2
+**Goal:** Data Loading & Transformer Setup
 
 **Blockers:** None
 
-**Notes:** Team agreed to use one primary Snowflake account for the shared data pipeline to avoid sync issues.
+**Notes:** Batch extraction of 26 channels is complete. Raw JSON transcripts are stored in `data/raw/`. Ready to begin loading into Snowflake.

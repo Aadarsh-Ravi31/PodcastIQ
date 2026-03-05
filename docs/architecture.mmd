@@ -1,0 +1,241 @@
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#1a1a2e',
+    'primaryTextColor': '#e0e0e0',
+    'primaryBorderColor': '#4a90d9',
+    'lineColor': '#4a90d9',
+    'secondaryColor': '#16213e',
+    'tertiaryColor': '#0f3460',
+    'background': '#0d1117',
+    'mainBkg': '#1a1a2e',
+    'nodeBorder': '#4a90d9',
+    'clusterBkg': '#161b22',
+    'clusterBorder': '#30363d',
+    'titleColor': '#e0e0e0',
+    'edgeLabelBackground': '#1a1a2e',
+    'fontSize': '14px'
+  }
+}}%%
+
+flowchart TB
+    %% ============================================================
+    %% DATA SOURCES
+    %% ============================================================
+    subgraph SOURCES["DATA SOURCES"]
+        direction LR
+        YT_API["YouTube Data API v3\n─────────────\nVideo Metadata\nChannel Info\nView/Like Counts"]
+        YT_TRANSCRIPT["yt-dlp\n─────────────\nAuto-Captions\nTimestamped Text\nEN Language Filter"]
+    end
+
+    %% ============================================================
+    %% STEP 1: EXTRACTION
+    %% ============================================================
+    subgraph EXTRACT["STEP 1 · EXTRACT — Python"]
+        direction LR
+        CH_CONFIG["channels.json\n26 Channels\n6 Genres"]
+        EXTRACTOR["channel_extraction.py\n─────────────\nBatch Processing\nResume Capability\nError Handling"]
+        JSON_OUT["Local JSON Files\n─────────────\n250+ Episodes\n*_metadata.json\n*_transcript.json"]
+        CH_CONFIG --> EXTRACTOR --> JSON_OUT
+    end
+
+    %% ============================================================
+    %% STEP 2: PROFILING
+    %% ============================================================
+    subgraph PROFILE["STEP 2 · PROFILE — Python"]
+        direction LR
+        PROFILER["advanced_profile.py\n─────────────\nydata-profiling\nCompleteness Check\nDistribution Analysis"]
+        REPORT["HTML Report\n─────────────\nNull Rates\nWord Count Stats\nCoverage %\nArtifact Detection"]
+        PROFILER --> REPORT
+    end
+
+    %% ============================================================
+    %% SNOWFLAKE DATA WAREHOUSE
+    %% ============================================================
+    subgraph SNOWFLAKE["SNOWFLAKE DATA WAREHOUSE"]
+        direction TB
+
+        %% STEP 3-4: STAGE & LOAD
+        subgraph INGEST["STEPS 3-4 · STAGE & LOAD"]
+            direction LR
+            STAGE["Internal Stage\n@JSON_STAGE\n─────────────\nPUT Command\nJSON Files"]
+            RAW["RAW Schema\n─────────────\nraw_youtube_metadata\nraw_transcripts\nVARIANT Columns"]
+            STAGE -->|"COPY INTO"| RAW
+        end
+
+        %% STEP 5-8: DBT TRANSFORMATION LAYERS
+        subgraph DBT_LAYERS["STEPS 5-8 · dbt TRANSFORMATION PIPELINE"]
+            direction LR
+            STG["STAGING\n─────────────\nstg_youtube_metadata\nstg_transcripts\n─────────────\nParse JSON\nFix Text\nRemove Noise\nDedup"]
+            INT["INTERMEDIATE\n─────────────\nint_episodes\nint_transcript_lines\n─────────────\nJoin Tables\nType Casting\nGuest Names\nSentence Boundaries"]
+            CUR["CURATED\n─────────────\ncur_episodes\ncur_segments\n─────────────\n120s Chunks\nSentence-Aligned\nYouTube Deep Links\nContext Links"]
+            SEM["SEMANTIC\n─────────────\nsem_embeddings\nsem_topics_entities\nsem_episode_summaries\n─────────────\n768-dim Vectors\nNER Extraction\nMulti-level Summaries"]
+            STG -->|"dbt run"| INT -->|"dbt run"| CUR -->|"dbt run"| SEM
+        end
+
+        %% CORTEX AI SERVICES
+        subgraph CORTEX["SNOWFLAKE CORTEX AI"]
+            direction LR
+            EMBED_FN["EMBED_TEXT_768\n─────────────\nsnowflake-arctic-\nembed-m\n768 Dimensions"]
+            LLM_FN["CORTEX COMPLETE\n─────────────\nllama3.1-405b\nSummarization\nEntity Extraction\nQuery Classification"]
+            SEARCH_SVC["CORTEX SEARCH\n─────────────\npodcast_search\nHybrid Search\nVector + Keyword\n+ LLM Re-Ranking"]
+        end
+
+        %% STEP 9-10: INDEX & VALIDATE
+        subgraph QUALITY["STEPS 9-10 · INDEX & VALIDATE"]
+            direction LR
+            INDEX_SVC["Cortex Search\nService Setup\n─────────────\nHybrid Index\nTARGET_LAG 2min\nAuto-Refresh"]
+            DBT_TEST["dbt test\n─────────────\nnot_null · unique\nrelationships\nembedding coverage\ntimestamp ordering"]
+        end
+
+        %% APP LAYER
+        subgraph APP_LAYER["APP SCHEMA"]
+            direction LR
+            SEARCH_HIST["search_history\n─────────────\nQuery Logs\nLatency Tracking"]
+            USER_PREFS["user_preferences\n─────────────\nSaved Episodes\nFavorite Topics"]
+        end
+    end
+
+    %% ============================================================
+    %% MULTI-AGENT SYSTEM (LangGraph + Cortex LLM)
+    %% ============================================================
+    subgraph AGENTS["LANGGRAPH MULTI-AGENT ORCHESTRATION · Powered by Cortex LLM"]
+        direction TB
+        STATE["PodcastIQState\n─────────────\nuser_query · query_type\nsearch_results · summary\nmessages · context"]
+
+        subgraph AGENT_CORE["MVP AGENTS — Week 4"]
+            direction LR
+            ROUTER["Router Agent\n─────────────\nCortex COMPLETE\nQuery Classification\nIntent → Agent Routing"]
+            SEARCH_AG["Search Agent\n─────────────\nCortex Search API\nContext Retrieval\nAdjacent Segments"]
+            SUMMARY_AG["Summarization Agent\n─────────────\nCortex COMPLETE\nLLM Synthesis\nCitation + YT Links"]
+        end
+
+        subgraph AGENT_STRETCH["STRETCH AGENTS — Week 6"]
+            direction LR
+            TOPIC_AG["Topic Extraction\nAgent\n─────────────\nCortex COMPLETE\nNER Analysis"]
+            COMPARE_AG["Comparison Agent\n─────────────\nCortex COMPLETE\nCross-Podcast\nPerspective Analysis"]
+            RECOMMEND_AG["Recommendation\nAgent\n─────────────\nCortex COMPLETE\nContent-Based Filtering"]
+        end
+
+        STATE --> AGENT_CORE
+        STATE --> AGENT_STRETCH
+        ROUTER -->|"SEARCH"| SEARCH_AG -->|"results"| SUMMARY_AG
+        ROUTER -->|"COMPARE"| COMPARE_AG
+        ROUTER -->|"RECOMMEND"| RECOMMEND_AG
+        ROUTER -->|"TOPICS"| TOPIC_AG
+    end
+
+    %% ============================================================
+    %% ORCHESTRATION
+    %% ============================================================
+    subgraph AIRFLOW["APACHE AIRFLOW — PIPELINE ORCHESTRATION · Week 7"]
+        direction LR
+        DAG1["podcast_pipeline_dag\n─────────────\nExtract → Stage →\nLoad → dbt run →\ndbt test\nFull Pipeline"]
+        DAG2["embedding_refresh_dag\n─────────────\nWeekly Schedule\nNew Segments Only\nCortex Search\nIndex Refresh"]
+        DAG1 -->|"on success"| DAG2
+    end
+
+    %% ============================================================
+    %% FRONTEND
+    %% ============================================================
+    subgraph UI["STREAMLIT — USER INTERFACE · Week 5"]
+        direction LR
+        SEARCH_BAR["Search Bar\n─────────────\nNatural Language\nQuery Input"]
+        FILTERS["Sidebar Filters\n─────────────\nChannel · Topic\nDate Range"]
+        RESULTS["Results Display\n─────────────\nSegment Cards\nRelevance Scores\nTopic Tags"]
+        YT_LINKS["YouTube Links\n─────────────\nClick-to-Play\nTimestamp Deep Links\nContext Expansion"]
+        SEARCH_BAR --> RESULTS
+        FILTERS --> RESULTS
+        RESULTS --> YT_LINKS
+    end
+
+    %% ============================================================
+    %% COMPUTE RESOURCES
+    %% ============================================================
+    subgraph COMPUTE["SNOWFLAKE WAREHOUSES · Cost-Optimized"]
+        direction LR
+        WH1["LOADING_WH\nX-SMALL\nAuto-Suspend 60s"]
+        WH2["TRANSFORM_WH\nSMALL\nAuto-Suspend 300s"]
+        WH3["SEARCH_WH\nX-SMALL\nAuto-Suspend 60s"]
+    end
+
+    %% ============================================================
+    %% CONNECTIONS — DATA FLOW
+    %% ============================================================
+
+    %% Sources → Extraction
+    YT_API --> EXTRACTOR
+    YT_TRANSCRIPT --> EXTRACTOR
+
+    %% Extraction → Profiling
+    JSON_OUT --> PROFILER
+
+    %% Extraction → Staging
+    JSON_OUT -->|"PUT"| STAGE
+
+    %% dbt ↔ Cortex AI (Cortex functions called within dbt models)
+    CUR -->|"segment text"| EMBED_FN
+    CUR -->|"segment text"| LLM_FN
+    EMBED_FN -->|"vectors"| SEM
+    LLM_FN -->|"topics, summaries"| SEM
+
+    %% Semantic → Index & Validate
+    SEM --> INDEX_SVC
+    SEM --> DBT_TEST
+    CUR --> DBT_TEST
+    INDEX_SVC --> SEARCH_SVC
+
+    %% Agents ↔ Cortex (all agents use Cortex as backend)
+    SEARCH_SVC -->|"hybrid results"| SEARCH_AG
+    LLM_FN -.->|"inference"| ROUTER
+    LLM_FN -.->|"inference"| SUMMARY_AG
+    LLM_FN -.->|"inference"| COMPARE_AG
+    LLM_FN -.->|"inference"| TOPIC_AG
+    LLM_FN -.->|"inference"| RECOMMEND_AG
+    SUMMARY_AG -->|"log queries"| SEARCH_HIST
+
+    %% Agents ↔ UI
+    SUMMARY_AG -->|"response"| RESULTS
+    COMPARE_AG -->|"analysis"| RESULTS
+    RECOMMEND_AG -->|"suggestions"| RESULTS
+    TOPIC_AG -->|"entities"| FILTERS
+    SEARCH_BAR -->|"user query"| ROUTER
+
+    %% Airflow orchestrates data pipeline
+    AIRFLOW -.->|"orchestrates"| EXTRACT
+    AIRFLOW -.->|"orchestrates"| DBT_LAYERS
+    AIRFLOW -.->|"orchestrates"| QUALITY
+
+    %% Warehouses power layers
+    WH1 -.->|"powers"| INGEST
+    WH2 -.->|"powers"| DBT_LAYERS
+    WH2 -.->|"powers"| CORTEX
+    WH3 -.->|"powers"| SEARCH_SVC
+
+    %% ============================================================
+    %% STYLING
+    %% ============================================================
+    classDef sourceStyle fill:#1e3a5f,stroke:#4a90d9,stroke-width:2px,color:#e0e0e0
+    classDef extractStyle fill:#1a4731,stroke:#2ecc71,stroke-width:2px,color:#e0e0e0
+    classDef profileStyle fill:#4a3728,stroke:#e67e22,stroke-width:2px,color:#e0e0e0
+    classDef snowflakeStyle fill:#1a2744,stroke:#29b5e8,stroke-width:2px,color:#e0e0e0
+    classDef dbtStyle fill:#2d1f3d,stroke:#ff694a,stroke-width:2px,color:#e0e0e0
+    classDef cortexStyle fill:#1a3344,stroke:#00d4aa,stroke-width:2px,color:#e0e0e0
+    classDef agentStyle fill:#3d1f2d,stroke:#e74c3c,stroke-width:2px,color:#e0e0e0
+    classDef airflowStyle fill:#1f2d2d,stroke:#17a589,stroke-width:2px,color:#e0e0e0
+    classDef uiStyle fill:#2d1f2d,stroke:#9b59b6,stroke-width:2px,color:#e0e0e0
+    classDef computeStyle fill:#1a1a2e,stroke:#636e72,stroke-width:1px,color:#b0b0b0
+    classDef validateStyle fill:#2d3a1f,stroke:#82e0aa,stroke-width:2px,color:#e0e0e0
+
+    class YT_API,YT_TRANSCRIPT sourceStyle
+    class CH_CONFIG,EXTRACTOR,JSON_OUT extractStyle
+    class PROFILER,REPORT profileStyle
+    class STAGE,RAW snowflakeStyle
+    class STG,INT,CUR,SEM dbtStyle
+    class EMBED_FN,LLM_FN,SEARCH_SVC cortexStyle
+    class INDEX_SVC,DBT_TEST validateStyle
+    class STATE,ROUTER,SEARCH_AG,SUMMARY_AG,TOPIC_AG,COMPARE_AG,RECOMMEND_AG agentStyle
+    class DAG1,DAG2 airflowStyle
+    class SEARCH_BAR,FILTERS,RESULTS,YT_LINKS uiStyle
+    class WH1,WH2,WH3 computeStyle
+    class SEARCH_HIST,USER_PREFS snowflakeStyle

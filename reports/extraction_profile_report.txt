@@ -1,0 +1,357 @@
+
+════════════════════════════════════════════════════════════
+  PodcastIQ Extraction Profile Report
+  Date: 2026-02-21 10:58
+════════════════════════════════════════════════════════════
+
+  EXTRACTION SUMMARY
+  ----------------------------------------
+  Total videos extracted:       250
+  Successful transcripts:       250
+  Failed extractions:             0 (0.0%)
+
+  QUALITY DISTRIBUTION
+  ----------------------------------------
+  ██████████████████████████████ HIGH (>0.7):      250 (100.0%)
+   MEDIUM (0.5-0.7):   0 (0.0%)
+   LOW (<0.5):         0 (0.0%)
+
+  Accepted for loading:         250
+  Rejected:                       0
+
+  TRANSCRIPT METRICS
+  ----------------------------------------
+  Avg segments per episode:     4,736
+  Avg words per episode:       48,936
+  Total segments:             1,184,110
+  Total words in dataset:     12,234,052
+  Avg coverage (transcript/video):  99.7%
+
+  WORDS PER MINUTE
+  ----------------------------------------
+  Average WPM:                  538.7
+  Min WPM:                       91.0
+  Max WPM:                      808.3
+
+  DURATION
+  ----------------------------------------
+  Total hours of content:       388.1 hrs
+  Avg episode duration:          93.1 min
+
+  DATA QUALITY FLAGS
+  ----------------------------------------
+  Artifact rate:                0.4% of segments
+  Empty segment rate:           0.0% of segments
+  Timestamp gap rate:           0.4% of episodes
+
+  COVERAGE
+  ----------------------------------------
+  Channel Coverage:           25/25
+  Genre Coverage:             6/6
+
+  GENRE BREAKDOWN
+  ----------------------------------------
+  █████ Technology & AI: 70
+  ████ Business & Entrepreneurship: 60
+  ████ Education & Self-Improvement: 50
+  ███ Science & Health: 40
+  █ Startup & VC: 20
+   Cross-Disciplinary: 10
+
+  CHANNEL BREAKDOWN (episodes per channel)
+  ----------------------------------------
+     10  20VC_with_Harry_Stebbings
+     10  a16z_Podcast
+     10  Acquired_Podcast
+     10  All-In_Podcast
+     10  Deep_Dive_with_Ali_Abdaal
+     10  Founders_Podcast
+     10  FoundMyFitness
+     10  Hard_Fork__NYT
+     10  Huberman_Lab
+     10  Impact_Theory
+     10  Joe_Rogan_Experience
+     10  Lenny_s_Podcast
+     10  Lex_Fridman_Podcast
+     10  Masters_of_Scale
+     10  Modern_Wisdom
+     10  My_First_Million
+     10  No_Priors
+     10  StarTalk
+     10  The_Cognitive_Revolution
+     10  The_Diary_of_a_CEO
+     10  The_Knowledge_Project
+     10  The_Peter_Attia_Drive
+     10  The_Tim_Ferriss_Show
+     10  Wondery__How_I_Built_This
+     10  Y_Combinator
+
+  LOWEST QUALITY EPISODES (bottom 5)
+  ----------------------------------------
+    0.719  Lenny_s_Podcast/ixY2PvQJ0To
+           Inside ChatGPT: The fastest growing product in history ...
+    0.802  Impact_Theory/dcgCdIZjL-Y
+           Every Economic Collapse Starts EXACTLY Like This......
+    0.803  Impact_Theory/lXUClNfDBWE
+           The U.S. Just Copied China’s Playbook — And It Could Co...
+    0.805  Impact_Theory/Y1rDIYRYrmM
+           The Once-In-A-Lifetime Crash No One’s Ready For (Worse ...
+    0.812  Deep_Dive_with_Ali_Abdaal/XpopyNZKYKw
+           How To Start a YouTube Channel - Beginner’s Guide to Yo...
+
+  ALL EPISODES — QUALITY SCORES
+  --------------------------------------------------------------------------------
+  Score   Coverage  WPM     Segments  Words     Channel                       Title
+  --------------------------------------------------------------------------------
+  1.000   99.8      163     2,378     26,524    FoundMyFitness                Dr. Martin Gibala: The Science of Vigorous Exercis
+  1.000   99.8      161     897       9,651     FoundMyFitness                How Vitamin D, Omega-3s, & Exercise May Increase L
+  1.000   99.7      169     1,867     18,546    FoundMyFitness                Stuart Phillips, PhD, on Building Muscle with Resi
+  1.000   99.7      159     1,668     19,117    FoundMyFitness                Dr. Brad Schoenfeld: Resistance Training for Time 
+  1.000   100.0     185     2,192     20,622    Huberman_Lab                  Control Your Vagus Nerve to Improve Mood, Alertnes
+  1.000   99.9      163     2,830     25,161    Huberman_Lab                  How to Lose Fat & Gain Muscle With Nutrition | Ala
+  1.000   99.9      194     1,934     19,338    Huberman_Lab                  Improve Your Lymphatic System for Overall Health &
+  1.000   99.9      182     994       16,164    Lenny_s_Podcast               He saved OpenAI, invented the “Like” button, and b
+  1.000   90.4      157     695       11,766    Lenny_s_Podcast               Anthropic co-founder: AGI predictions, leaving Ope
+  1.000   99.9      164     3,025     21,548    Lex_Fridman_Podcast           Jeff Bezos: Amazon and Blue Origin | Lex Fridman P
+  1.000   99.9      189     4,781     34,856    Lex_Fridman_Podcast           Tucker Carlson: Putin, Navalny, Trump, CIA, NSA, W
+  1.000   99.8      169     1,400     10,847    Lex_Fridman_Podcast           Donald Trump Interview | Lex Fridman Podcast #442
+  1.000   99.9      170     4,087     26,439    Lex_Fridman_Podcast           Sean Carroll: General Relativity, Quantum Mechanic
+  1.000   100.0     141     3,111     26,273    Lex_Fridman_Podcast           Volodymyr Zelenskyy: Ukraine, War, Peace, Putin, T
+  1.000   100.0     121     2,658     23,827    Lex_Fridman_Podcast           Narendra Modi: Prime Minister of India - Power, De
+  1.000   99.7      185     819       9,887     StarTalk                      What Billionaire Tech CEOs Get Wrong About The Fut
+  1.000   98.9      165     1,116     7,399     StarTalk                      Answering Questions About Time Travel, Solar Saili
+  0.950   99.7      560     4,002     41,528    20VC_with_Harry_Stebbings     Lovable CEO, Anton Osika: The State of Foundation 
+  0.950   99.9      598     4,130     44,262    20VC_with_Harry_Stebbings     Scott Galloway on Billionaire Happiness, Money & S
+  0.950   99.8      654     5,492     58,764    20VC_with_Harry_Stebbings     Klarna CEO: SaaS is Dead: Why Systems of Record Wi
+  0.950   99.9      597     5,196     55,437    20VC_with_Harry_Stebbings     Opendoor CEO, Kaz Nejatian: OpenAI and Oracle, How
+  0.950   99.9      532     4,826     48,559    20VC_with_Harry_Stebbings     Groq Founder, Jonathan Ross: OpenAI & Anthropic Wi
+  0.950   99.9      610     4,650     50,112    20VC_with_Harry_Stebbings     ElevenLabs CEO/Co-Founder, Mati Staniszewski:The U
+  0.950   99.8      620     4,012     41,982    20VC_with_Harry_Stebbings     Surge CEO & Co-Founder, Edwin Chen: Scaling to $1B
+  0.950   100.0     494     9,272     96,705    Acquired_Podcast              Starbucks (with Howard Schultz)
+  0.950   100.0     567     10,576    115,038   Acquired_Podcast              Porsche (with Doug DeMuro)
+  0.950   100.0     558     4,682     50,214    Acquired_Podcast              NVIDIA CEO Jensen Huang
+  0.950   100.0     561     4,596     46,231    All-In_Podcast                Charlie Kirk Murder, Assassination Culture in Amer
+  0.950   99.9      566     4,059     40,063    All-In_Podcast                Iran's Breaking Point, Trump's Greenland Acquisiti
+  0.950   100.0     715     12,042    134,602   Deep_Dive_with_Ali_Abdaal     How to Study for Exams with Flashcards (Anki Maste
+  0.950   100.1     808     3,078     35,162    Deep_Dive_with_Ali_Abdaal     My honest advice to someone who wants financial fr
+  0.950   100.1     703     1,962     21,291    Deep_Dive_with_Ali_Abdaal     5 High Income Skills for Students to Learn in 2026
+  0.950   100.2     752     3,238     34,738    Deep_Dive_with_Ali_Abdaal     How Much Money I Made as a YouTuber & Entrepreneur
+  0.950   100.0     701     2,540     28,034    Deep_Dive_with_Ali_Abdaal     How to Start a YouTube Channel - Beginners Guide (
+  0.950   100.0     543     12,044    128,168   FoundMyFitness                Dr. Peter Attia on Mastering Longevity – Insights 
+  0.950   100.0     477     3,651     34,717    FoundMyFitness                The Science of Magnesium and Its Role in Aging and
+  0.950   99.9      557     9,780     98,710    FoundMyFitness                Dr. Ben Bikman: How To Reverse Insulin Resistance 
+  0.950   99.8      582     11,150    118,997   FoundMyFitness                Andrew Huberman, PhD: How to Improve Motivation & 
+  0.950   100.0     592     6,190     65,366    FoundMyFitness                The Optimal Creatine Protocol for Strength, Brain,
+  0.950   99.9      465     2,648     22,807    FoundMyFitness                How To Use Coffee To Live Longer (Full Guide & Res
+  0.950   100.0     622     4,728     50,633    Founders_Podcast              Li Lu and Charlie Munger and Warren Buffett
+  0.950   100.1     608     5,432     56,536    Founders_Podcast              How Elon Works
+  0.950   100.0     588     4,176     42,991    Founders_Podcast              The Stubborn Genius of James Dyson
+  0.950   100.0     607     3,974     41,422    Founders_Podcast              How Bill Gates Works
+  0.950   99.9      583     3,350     33,689    Founders_Podcast              How Rockefeller Worked
+  0.950   100.1     531     1,708     16,835    Founders_Podcast              The Billionaire Who Automates Everything: Thomas P
+  0.950   100.0     565     3,108     31,091    Founders_Podcast              How Jensen Works
+  0.950   100.1     602     3,676     37,379    Founders_Podcast              How Larry Ellison Thinks
+  0.950   100.0     667     7,524     80,916    Founders_Podcast              Steve Jobs In His Own Words (Make Something Wonder
+  0.950   100.0     574     4,544     45,619    Founders_Podcast              Lessons from Jeff Bezos's Shareholder Letters
+  0.950   99.8      639     4,182     44,903    Hard_Fork__NYT                Can You Teach Claude to be ‘Good’? | Meet Anthropi
+  0.950   100.0     590     7,997     80,368    Huberman_Lab                  How to Control Your Cortisol & Overcome Burnout
+  0.950   100.0     564     9,230     94,413    Huberman_Lab                  Build Muscle & Strength & Forge Your Life Path | D
+  0.950   100.0     209     4,452     39,712    Huberman_Lab                  How to Rewire Your Brain & Learn Faster | Dr. Mich
+  0.950   100.0     213     4,856     47,493    Huberman_Lab                  How to Make Yourself Unbreakable | DJ Shipley
+  0.950   100.0     755     7,300     78,980    Lenny_s_Podcast               Marc Andreessen: The real AI boom hasn’t even star
+  0.950   99.9      679     4,146     45,058    Lenny_s_Podcast               Anthropic's CPO on what comes next | Mike Krieger 
+  0.950   100.0     602     4,206     43,270    Lenny_s_Podcast               The ultimate guide to AEO: How to get ChatGPT to r
+  0.950   100.0     548     5,040     53,727    Lenny_s_Podcast               $46B of hard truths: Why founders fail and why you
+  0.950   100.0     579     4,840     53,167    Lenny_s_Podcast               Solo founder, $80M exit, 6 months: The Base44 boot
+  0.950   100.0     551     4,558     47,826    Lenny_s_Podcast               Figma’s CEO: Why AI makes design, craft, and quali
+  0.950   100.0     482     9,492     100,647   Lex_Fridman_Podcast           Ed Barnhart: Maya, Aztec, Inca, and Lost Civilizat
+  0.950   100.0     544     11,310    120,936   Lex_Fridman_Podcast           Gregory Aldrete: The Roman Empire - Rise and Fall 
+  0.950   99.9      518     7,532     79,291    Lex_Fridman_Podcast           Graham Hancock: Lost Civilization of the Ice Age &
+  0.950   100.0     705     9,251     98,818    Lex_Fridman_Podcast           Ben Shapiro vs Destiny Debate: Politics, Jan 6, Is
+  0.950   99.7      519     1,615     17,453    Masters_of_Scale              Futurist Amy Webb: Insights from her 2024 Tech Tre
+  0.950   99.6      576     1,684     18,618    Masters_of_Scale              Bombas: From Shark Tank to over a BILLION in sales
+  0.950   99.6      603     2,036     23,160    Masters_of_Scale              Cotopaxi’s Davis Smith: Lessons from scaling a mis
+  0.950   100.0     607     10,319    105,013   Modern_Wisdom                 How Shame-Based Motivation Backfires - Dr K Health
+  0.950   100.0     520     9,134     91,401    Modern_Wisdom                 Inside DOGE, The IRS & How to Scam the US Governme
+  0.950   99.7      640     4,222     44,787    My_First_Million              Scott Galloway: Why I'm selling my American stocks
+  0.950   99.8      641     4,501     46,397    My_First_Million              Make $8K/day From These Side Hustles You’ve Never 
+  0.950   99.8      748     5,602     59,517    My_First_Million              These 4 Math Equations Will Make You A Millionaire
+  0.950   99.4      596     2,142     23,918    My_First_Million              My 50-Year-Old Mother-in-Law Makes $1M/Year. The P
+  0.950   99.7      527     3,766     39,979    My_First_Million              Billionaire Lawyer Reveals His Side Hustle Playboo
+  0.950   100.1     553     1,910     20,338    No_Priors                     No Priors Ep. 89 | With NVIDIA CEO Jensen Huang
+  0.950   100.0     661     2,616     27,905    No_Priors                     No Priors Ep. 128 | With Andrew Ng, Managing Gener
+  0.950   100.0     560     4,908     49,768    The_Cognitive_Revolution      Cracking the Medical Code: Why Cleveland Clinic Do
+  0.950   100.0     526     5,212     53,695    The_Cognitive_Revolution      The Data Factory: Inside the $100B Race for Post-T
+  0.950   100.0     530     8,025     81,685    The_Diary_of_a_CEO            Ex-Google Exec (WARNING): The Next 15 Years Will B
+  0.950   100.0     564     5,028     53,855    The_Knowledge_Project         Former Pepsi CEO: The Hidden Cost of Rising to the
+  0.950   100.0     575     5,153     55,110    The_Knowledge_Project         Brad Jacobs: How To Make a Few BILLION Dollars!
+  0.950   100.0     616     5,421     60,102    The_Knowledge_Project         The Non-Verbal Expert: These Behaviors Tell You Ev
+  0.950   100.0     633     8,973     95,781    The_Peter_Attia_Drive         365 ‒ Training for longevity: A roundtable on buil
+  0.950   100.0     565     9,914     105,596   The_Peter_Attia_Drive         335 ‒ The science of resistance training, building
+  0.950   99.9      572     7,984     79,258    The_Tim_Ferriss_Show          One of The Scariest Hackers I’ve Ever Met — Pablos
+  0.950   99.9      563     8,176     80,399    The_Tim_Ferriss_Show          Rhonda Patrick, Ph.D. — Protocols for Fasting, Low
+  0.950   99.9      571     9,800     108,740   The_Tim_Ferriss_Show          Brandon Sanderson — Building a Fiction Empire & Un
+  0.950   99.6      669     4,356     46,702    a16z_Podcast                  The AI Opportunity that goes beyond Models
+  0.950   99.8      544     3,612     35,384    a16z_Podcast                  Inside The Life of Silicon Valley's First Athlete 
+  0.950   99.9      616     5,880     60,992    a16z_Podcast                  Dylan Patel on the AI Chip Race - NVIDIA, Intel & 
+  0.950   99.7      750     5,592     60,962    a16z_Podcast                  Marc Andreessen's 2026 Outlook: AI Timelines, US v
+  0.949   99.8      531     3,072     32,205    20VC_with_Harry_Stebbings     Mercor CEO & Co-Founder, Brendan Foody: How They G
+  0.949   99.7      532     3,249     34,366    20VC_with_Harry_Stebbings     KKR's Head of European PE, Philipp Freise: Do Andr
+  0.949   100.0     523     9,492     99,873    Acquired_Podcast              Renaissance Technologies (Audio)
+  0.949   100.0     517     10,969    112,990   Acquired_Podcast              Lockheed Martin (Audio)
+  0.949   100.0     698     11,086    118,301   Deep_Dive_with_Ali_Abdaal     How to Study for Exams - An Evidence-Based Masterc
+  0.949   99.9      617     2,857     31,047    Hard_Fork__NYT                DeepMind CEO Demis Hassabis on How A.I. Is Reshapi
+  0.949   100.0     497     1,927     19,069    Huberman_Lab                  Effects of Fasting & Time Restricted Eating on Fat
+  0.949   100.1     487     1,912     18,464    Huberman_Lab                  ADHD & How Anyone Can Improve Their Focus | Huberm
+  0.949   100.1     477     1,653     15,709    Huberman_Lab                  Controlling Your Dopamine for Motivation, Focus & 
+  0.949   100.0     634     8,178     83,296    Joe_Rogan_Experience          Joe Rogan Experience #2423 - John Cena
+  0.949   100.0     588     10,487    101,091   Joe_Rogan_Experience          Joe Rogan Experience #2378 - Charlie Sheen
+  0.949   100.1     586     2,030     21,816    Masters_of_Scale              Scott Galloway: Unfiltered lessons for business an
+  0.949   99.9      444     1,403     15,591    Masters_of_Scale              From fleeing Romania to shaping Hollywood’s bigges
+  0.949   99.7      529     1,494     16,183    Masters_of_Scale              How Adobe is leveraging AI (with CEO & Chair Shant
+  0.949   100.0     513     1,592     17,483    Masters_of_Scale              Disrupting the wedding industry, with Zola’s Shan-
+  0.949   100.1     654     2,150     23,139    Masters_of_Scale              How to create a ‘transcendent’ career (with author
+  0.949   99.7      548     1,744     19,223    Masters_of_Scale              How The Flex Company disrupted menstrual care (wit
+  0.949   100.0     592     8,163     81,454    Modern_Wisdom                 The Forces Behind Britain's Downfall - Konstantin 
+  0.949   99.8      663     5,898     64,851    My_First_Million              The $4B Man: How to win BIG in business
+  0.949   100.0     611     2,712     30,304    No_Priors                     No Priors Ep. 101 | With Harvey CEO and Co-Founder
+  0.949   99.9      738     2,976     32,689    No_Priors                     No Priors Ep. 80 | With Andrej Karpathy from OpenA
+  0.949   100.0     679     3,119     32,112    No_Priors                     No Priors Ep. 127 | With SemiAnalysis Founder and 
+  0.949   100.0     540     7,635     75,864    The_Cognitive_Revolution      The Machines Are Taking Our Jobs - Thank God? Emad
+  0.949   100.0     577     6,455     66,405    The_Cognitive_Revolution      Material Abundance: Radical AI’s Closed-Loop Lab A
+  0.949   100.1     528     6,070     60,276    The_Cognitive_Revolution      Mechanistic Interpretability: Philosophy, Practice
+  0.949   100.0     556     6,918     72,373    The_Cognitive_Revolution      Can We Stop AI Deception? Apollo Research Tests Op
+  0.949   100.0     602     7,561     81,335    The_Cognitive_Revolution      How Tasklet Puts the Agency in Agents, with CEO An
+  0.949   100.0     597     5,769     60,686    The_Cognitive_Revolution      Escaping AI Slop: How Atlassian Gives AI Teammates
+  0.949   100.0     535     5,049     52,089    The_Cognitive_Revolution      The Customer Service Revolution: Building Fin, wit
+  0.949   100.0     532     6,468     64,356    The_Diary_of_a_CEO            Top Psychologist, Donald Hoffman: Seeing True Real
+  0.949   99.9      561     6,960     70,268    The_Diary_of_a_CEO            Vitamin D Expert: The Fastest Way To Dementia & Th
+  0.949   100.0     543     5,647     56,621    The_Diary_of_a_CEO            Neuroscientist (Dr. Tara Swart): Evidence We Can C
+  0.949   99.8      528     4,102     42,788    The_Knowledge_Project         My conversation with Pierre Poilievre
+  0.949   99.9      487     4,056     41,577    The_Knowledge_Project         84-Year-Old Billionaire: How I Turned a Small Blue
+  0.949   99.9      552     5,417     57,978    The_Knowledge_Project         Dr. Rhonda Patrick: The Diet Essentials Your Body 
+  0.949   100.0     645     5,390     60,785    The_Knowledge_Project         Morgan Housel: What You Need to Master (And Avoid)
+  0.949   100.0     543     8,624     91,766    The_Peter_Attia_Drive         291 ‒ Role of testosterone in men & women, perform
+  0.949   100.0     509     7,741     80,803    The_Peter_Attia_Drive         299 ‒ Optimizing muscle protein synthesis: protein
+  0.949   100.0     497     7,233     76,579    The_Peter_Attia_Drive         296 ‒ Foot health: preventing common injuries, enh
+  0.949   100.1     585     6,893     70,880    The_Peter_Attia_Drive         369 ‒ Rethinking protein needs for muscle and long
+  0.949   100.0     512     7,745     83,085    The_Peter_Attia_Drive         337- Insulin resistance masterclass: The full body
+  0.949   99.9      598     10,130    109,402   The_Tim_Ferriss_Show          Naval Ravikant and Aaron Stupple — How to Raise a 
+  0.949   99.9      599     6,602     72,580    The_Tim_Ferriss_Show          Parenting Strategies for Raising Resilient Kids — 
+  0.949   99.8      573     5,672     61,876    The_Tim_Ferriss_Show          Simple Exercises That Can Repair Tendons, Isometri
+  0.949   99.9      583     9,315     102,651   The_Tim_Ferriss_Show          Chris Sacca — How to Succeed by Living on Your Own
+  0.949   99.9      501     5,182     55,150    The_Tim_Ferriss_Show          Seth Godin — This is Strategy
+  0.949   99.8      585     2,466     27,427    Y_Combinator                  How To Build The Future: Sam Altman
+  0.949   99.2      570     2,859     28,207    a16z_Podcast                  Sam Altman on Sora, Energy, and Building an AI Emp
+  0.948   100.0     387     6,790     67,634    Acquired_Podcast              TSMC founder Morris Chang
+  0.948   100.0     698     2,724     30,140    Deep_Dive_with_Ali_Abdaal     I Got Married and Moved to Hong Kong! (Life Update
+  0.948   100.1     628     4,252     46,312    Hard_Fork__NYT                Google DeepMind C.E.O. Demis Hassabis on Living in
+  0.948   100.0     581     9,917     96,315    Joe_Rogan_Experience          Joe Rogan Experience #2379 - Matthew McConaughey
+  0.948   100.0     513     7,722     77,497    Joe_Rogan_Experience          Joe Rogan Experience #2392 - John Kiriakou
+  0.948   99.9      462     3,564     36,763    Lenny_s_Podcast               The Godmother of AI on jobs, robots & why world mo
+  0.948   100.0     587     4,970     52,873    My_First_Million              The Blueprint for living a Dope Life | Tim Ferriss
+  0.948   99.7      516     2,300     24,252    My_First_Million              Howard Marks Warning: Why I'm Getting Out Now
+  0.948   100.0     695     3,770     40,578    No_Priors                     No Priors Ep. 131 | With Jared Kushner
+  0.948   99.9      621     3,326     31,907    StarTalk                      Breaking Down UAP Footage with the Head of The Pen
+  0.948   99.9      525     6,051     60,111    The_Diary_of_a_CEO            Insulin Doctor: The Fastest Way To Burn Dangerous 
+  0.948   99.9      486     5,133     51,515    The_Diary_of_a_CEO            Mohnish Pabrai: FASTEST Way To Financial Freedom! 
+  0.948   100.0     528     4,739     46,238    The_Diary_of_a_CEO            The AI Safety Expert: These Are The Only 5 Jobs Th
+  0.948   100.0     652     6,431     72,691    The_Knowledge_Project         Dr. Becky Kennedy: The Parenting Secrets That Will
+  0.948   99.9      555     3,758     40,256    The_Knowledge_Project         The Marketing Expert: Sell Anything with this Tric
+  0.948   100.0     523     3,915     42,289    The_Knowledge_Project         Bryan Johnson: The Five Science-Backed Habits For 
+  0.948   100.0     579     7,909     83,680    The_Peter_Attia_Drive         348 ‒ Women’s sexual health, menopause, and hormon
+  0.948   100.1     530     5,048     55,838    The_Peter_Attia_Drive         307 ‒ Exercise for aging people: where to begin, a
+  0.948   100.0     534     3,411     37,366    Wondery__How_I_Built_This     Good Mythical Morning with Rhett & Link | How I Bu
+  0.948   99.7      583     1,702     18,300    Y_Combinator                  State-Of-The-Art Prompting For AI Agents
+  0.948   99.9      582     2,222     23,726    Y_Combinator                  Startup Ideas You Can Now Build With AI
+  0.948   99.8      600     2,478     26,411    Y_Combinator                  Andrew Ng: Building Faster with AI
+  0.948   99.6      669     2,495     26,286    a16z_Podcast                  Marc Andreessen and Ben Horowitz on the State of A
+  0.947   100.0     527     9,166     95,723    Acquired_Podcast              Costco (Audio)
+  0.947   99.8      562     2,690     28,088    Hard_Fork__NYT                Will A.I. Kill Us All? Our Guest Says It Might. | 
+  0.947   100.0     567     9,937     91,007    Joe_Rogan_Experience          Joe Rogan Experience #2375 - Tim Dillon
+  0.947   100.1     558     4,316     42,543    No_Priors                     NVIDIA’s Jensen Huang on Reasoning Models, Robotic
+  0.947   100.0     528     3,152     32,667    The_Cognitive_Revolution      The Perfect Substrate for AGI, with Replit CEO Amj
+  0.947   100.0     584     8,803     89,066    The_Diary_of_a_CEO            Former CIA Spies (NEW): Leave the USA Before 2030!
+  0.947   99.9      482     4,664     45,860    The_Tim_Ferriss_Show          Learnings from 1,000+ Near-Death Experiences — Dr.
+  0.947   99.6      590     4,068     44,930    Wondery__How_I_Built_This     Is Ice Spice Hip-Hop's New Princess? | Rotation Ro
+  0.947   100.1     566     2,038     23,772    Wondery__How_I_Built_This     “I Kind Of Wanted To Raise Dorks” With Al Madrigal
+  0.947   100.0     598     3,377     36,605    Y_Combinator                  Alexandr Wang: Building Scale AI, Transforming Wor
+  0.947   100.0     502     2,386     24,964    Y_Combinator                  Elon Musk: Digital Superintelligence, Multiplaneta
+  0.947   100.1     594     2,320     25,363    Y_Combinator                  Sam Altman: The Future of OpenAI, ChatGPT's Origin
+  0.946   100.0     619     3,902     40,830    Acquired_Podcast              The Jamie Dimon Interview: How JP Morgan Became an
+  0.946   99.9      611     1,854     19,444    All-In_Podcast                Inside Google DeepMind: AGI, Robotics, & World Mod
+  0.946   100.0     469     2,174     21,026    All-In_Podcast                Elon Musk on DOGE, Optimus, Starlink Smartphones, 
+  0.946   99.9      606     3,847     41,305    Hard_Fork__NYT                The A.I. Job Apocalypse Is Here | EP 138
+  0.946   100.0     627     11,951    115,623   Joe_Rogan_Experience          Joe Rogan Experience #2382 - Andrew Santino
+  0.946   99.7      477     4,552     44,984    The_Diary_of_a_CEO            Ray Dalio: We’re Heading Into Very, Very Dark Time
+  0.946   99.9      511     2,199     25,452    The_Peter_Attia_Drive         318 - The Meteoric Rise of Tadej Pogačar: From Pro
+  0.946   100.0     579     2,262     24,424    Y_Combinator                  Vertical AI Agents Could Be 10X Bigger Than SaaS
+  0.945   100.0     557     6,538     69,352    Impact_Theory                 We’re Living Through 1971 All Over Again — Peter S
+  0.945   99.4      487     1,672     18,260    Masters_of_Scale              Danny & Hallie Meyer: Lessons from scaling hospita
+  0.945   99.8      510     2,217     22,683    StarTalk                      Astrophysicists Discuss Issues with Gravity, Dark 
+  0.944   99.8      552     3,463     36,463    20VC_with_Harry_Stebbings     AI Fund’s GP, Andrew Ng: LLMs as the Next Geopolit
+  0.944   100.0     565     4,570     49,179    Acquired_Podcast              The Mark Zuckerberg Interview
+  0.944   100.0     495     3,242     33,128    Acquired_Podcast              Charlie Munger (Audio)
+  0.944   99.9      462     2,551     26,337    All-In_Podcast                Scott Bessent: Fixing the Fed, Tariffs for Nationa
+  0.944   100.0     514     5,890     60,321    Impact_Theory                 Why 99.999% of Us Won’t Survive Artificial Superin
+  0.944   99.8      593     3,115     32,968    StarTalk                      Tackling the Biggest Unsolved Problems in Math wit
+  0.944   99.9      521     3,548     33,036    StarTalk                      Do We Have To Die? With Venki Ramakrishnan
+  0.944   99.9      505     2,059     21,028    StarTalk                      Answering Questions about Higher Dimensions, Magne
+  0.943   100.0     577     3,669     38,360    Hard_Fork__NYT                Are We in an A.I. Bubble? Debriefing Dinner with S
+  0.943   100.0     601     3,750     41,835    Hard_Fork__NYT                Dario Amodei of Anthropic’s Hopes and Fears for th
+  0.943   99.9      585     2,195     22,997    No_Priors                     No Priors Ep. 141 | With Sunday Robotics Co-Founde
+  0.943   99.8      626     2,269     24,713    Y_Combinator                  Andrej Karpathy: Software Is Changing (Again)
+  0.943   100.0     605     2,226     23,549    Y_Combinator                  How to Spend Your 20s in the AI Era
+  0.942   100.1     605     3,640     36,066    All-In_Podcast                Tucker Carlson and Mark Cuban Debate How to Save A
+  0.942   100.2     670     3,017     33,505    Deep_Dive_with_Ali_Abdaal     Full Course - How to Type 3x Faster
+  0.942   100.0     617     11,152    114,441   Modern_Wisdom                 How to Reclaim Your Brain in 2026 - Dr Andrew Hube
+  0.941   100.2     686     1,917     21,484    Deep_Dive_with_Ali_Abdaal     My $2.4m London Apartment Tour
+  0.941   100.0     583     9,414     94,161    Modern_Wisdom                 The Brutal Truth About Female Attraction - Macken 
+  0.941   99.7      489     1,823     18,839    StarTalk                      Answering Questions About The Silurian Hypothesis,
+  0.940   99.3      511     2,890     24,739    StarTalk                      Answering Questions About Our Flat Universe, If th
+  0.940   99.9      572     2,462     28,303    Wondery__How_I_Built_This     Mikaela Shiffrin’s Uphill Battle for Downhill Succ
+  0.939   100.0     540     4,276     42,906    Modern_Wisdom                 The World You Grew Up In Is About to Change Foreve
+  0.938   99.3      499     1,960     20,506    My_First_Million              Confronting Cathie Wood About Her Fund’s 70% Decli
+  0.937   100.0     550     4,954     50,887    Impact_Theory                 They’re Breaking the System — Pay Attention to Wha
+  0.937   100.0     556     5,603     56,598    Impact_Theory                 The Government Is Hiding Something Much Worse Than
+  0.937   100.0     585     4,998     52,373    Modern_Wisdom                 Comforting Truths About Human Nature - Alain de Bo
+  0.937   99.9      557     1,748     19,065    Wondery__How_I_Built_This     Is Colorado PRIMED for a Breakout Season? With Pat
+  0.937   99.8      611     4,445     47,334    a16z_Podcast                  Sacks, Andreessen & Horowitz: How America Wins the
+  0.936   99.7      432     1,409     13,271    Wondery__How_I_Built_This     Our Love is Real | Episode 3 | Flesh and Code
+  0.936   100.0     520     2,100     20,558    Wondery__How_I_Built_This     Episode 13: Etan Frankel on Creating the World of 
+  0.934   100.0     580     4,973     50,552    All-In_Podcast                Does OpenAI Need a Bailout? Mamdani Wins, Socialis
+  0.934   99.4      583     1,831     19,342    Hard_Fork__NYT                Sam Altman talks the NYT lawsuit, Meta's talent po
+  0.934   99.7      565     2,140     24,652    Wondery__How_I_Built_This     “One Is an Accessory, Two Is a Lifestyle” with Nat
+  0.933   100.0     594     4,328     44,166    All-In_Podcast                OpenAI's Code Red, Sacks vs New York Times, New Po
+  0.933   99.7      523     3,914     41,618    My_First_Million              He Went From $20K to $70M Using a Strategy Anyone 
+  0.933   99.9      494     5,374     52,312    The_Diary_of_a_CEO            CIA Whistleblower: They Can See All Your Messages!
+  0.931   100.0     643     7,514     76,535    Modern_Wisdom                 How to Think Clearly About Life - Alex O’Connor & 
+  0.930   99.9      616     1,888     19,602    No_Priors                     AI, R2 and the Future of Everyday Driving | Rivian
+  0.928   100.0     590     6,030     61,027    All-In_Podcast                Massive Somali Fraud in Minnesota with Nick Shirle
+  0.928   100.0     507     2,049     19,671    Wondery__How_I_Built_This     Episode 11: Joe Cameron Mitchell on Becoming Joe E
+  0.927   100.0     550     2,034     20,882    Hard_Fork__NYT                We Asked Roblox's C.E.O. About Child Safety. It Go
+  0.927   99.9      600     2,402     24,478    No_Priors                     No Priors Ep. 144 | The 2026 AI Forecast with Sara
+  0.924   100.0     507     4,580     46,280    Impact_Theory                 The Real Reason Our Culture Is Falling Apart
+  0.922   99.8      426     1,770     16,540    Wondery__How_I_Built_This     Touch Grass | Episode 5 | Flesh and Code
+  0.922   99.6      687     3,458     37,699    a16z_Podcast                  Ben & Marc: Why Everything Is About to Get 10x Big
+  0.917   99.9      538     6,478     64,893    The_Tim_Ferriss_Show          Bill Gurley — The AI Era, 10 Days in China, & Life
+  0.914   100.0     612     8,426     82,551    Modern_Wisdom                 The Performative Male Epidemic - Louise Perry & Ma
+  0.914   98.7      549     1,719     17,499    a16z_Podcast                  "Is there an AI bubble?” Gavin Baker and David Geo
+  0.914   99.6      581     2,521     25,980    a16z_Podcast                  Mark Zuckerberg & Priscilla Chan: How AI Will Cure
+  0.910   99.9      478     7,530     70,927    Joe_Rogan_Experience          Joe Rogan Experience #2422 - Jensen Huang
+  0.909   100.0     582     5,350     53,073    All-In_Podcast                All-In's 2026 Predictions
+  0.907   100.0     529     10,916    104,957   Joe_Rogan_Experience          Joe Rogan Experience #2404 - Elon Musk
+  0.894   99.9      670     9,327     96,609    Joe_Rogan_Experience          Joe Rogan Experience #2440 - Matt Damon & Ben Affl
+  0.889   100.1     457     1,882     18,235    Impact_Theory                 Trump Just Triggered the Collapse of the IRS – No 
+  0.880   100.0     571     10,219    101,974   Joe_Rogan_Experience          Joe Rogan Experience #2407 - Billy Bob Thornton
+  0.876   100.0     395     7,839     70,411    Modern_Wisdom                 How to Treat Men Better - Alison Armstrong
+  0.857   99.9      565     6,240     59,639    StarTalk                      Are We The Universe’s Way of Knowing Itself? With 
+  0.838   100.0     464     1,798     17,682    Impact_Theory                 This Housing Collapse Is WAY Worse Than 2008 — And
+  0.818   100.0     534     5,542     58,735    Hard_Fork__NYT                Hard Fork Live, with Patrick Collison, Kathryn Zea
+  0.812   100.0     794     2,338     25,161    Deep_Dive_with_Ali_Abdaal     How To Start a YouTube Channel - Beginner’s Guide 
+  0.805   100.0     472     1,872     18,317    Impact_Theory                 The Once-In-A-Lifetime Crash No One’s Ready For (W
+  0.803   99.9      446     1,554     14,971    Impact_Theory                 The U.S. Just Copied China’s Playbook — And It Cou
+  0.802   99.9      438     2,102     19,731    Impact_Theory                 Every Economic Collapse Starts EXACTLY Like This..
+  0.719   46.6      91      522       8,702     Lenny_s_Podcast               Inside ChatGPT: The fastest growing product in his
+
+════════════════════════════════════════════════════════════

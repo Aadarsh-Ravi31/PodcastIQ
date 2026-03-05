@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1800">
+<title>PodcastIQ — System Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #ffffff;
+    font-family: 'Inter', sans-serif;
+    padding: 40px 30px;
+    min-width: 1750px;
+  }
+  svg { display: block; }
+  .title {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .title h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1a1a2e;
+    letter-spacing: -0.5px;
+  }
+  .title p {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 4px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="title">
+  <h1>PodcastIQ — System Architecture</h1>
+  <p>AI-Powered Podcast Discovery &amp; Semantic Search Platform</p>
+</div>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 1150" width="1700" height="1150">
+  <defs>
+    <!-- Arrow markers -->
+    <marker id="arrow" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#374151"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#29b5e8"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#00d4aa"/>
+    </marker>
+    <marker id="arrow-red" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#e74c3c"/>
+    </marker>
+    <marker id="arrow-purple" viewBox="0 0 10 7" refX="10" refY="3.5" markerWidth="10" markerHeight="7" orient="auto-start-reverse">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#9b59b6"/>
+    </marker>
+
+    <!-- Drop shadow -->
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-color="#00000012"/>
+    </filter>
+    <filter id="shadow-lg" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="2" dy="3" stdDeviation="5" flood-color="#00000018"/>
+    </filter>
+
+    <!-- Database cylinder shape -->
+    <symbol id="cylinder" viewBox="0 0 120 80">
+      <ellipse cx="60" cy="14" rx="58" ry="14" fill="#e8f4fd" stroke="#29b5e8" stroke-width="1.5"/>
+      <rect x="2" y="14" width="116" height="52" fill="#e8f4fd" stroke="none"/>
+      <line x1="2" y1="14" x2="2" y2="66" stroke="#29b5e8" stroke-width="1.5"/>
+      <line x1="118" y1="14" x2="118" y2="66" stroke="#29b5e8" stroke-width="1.5"/>
+      <ellipse cx="60" cy="66" rx="58" ry="14" fill="#e8f4fd" stroke="#29b5e8" stroke-width="1.5"/>
+    </symbol>
+
+    <!-- Document shape -->
+    <symbol id="doc-shape" viewBox="0 0 100 70">
+      <path d="M5,0 H95 L95,55 Q75,70 50,60 Q25,50 5,65 Z" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+    </symbol>
+  </defs>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- LAYER SECTIONS (dashed borders)             -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- EXTRACTION LAYER -->
+  <rect x="15" y="40" width="400" height="510" rx="8" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="215" y="535" text-anchor="middle" font-size="12" font-weight="700" fill="#6b7280" letter-spacing="3">EXTRACTION LAYER</text>
+
+  <!-- SNOWFLAKE LAYER -->
+  <rect x="435" y="40" width="830" height="510" rx="8" fill="none" stroke="#29b5e8" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="850" y="535" text-anchor="middle" font-size="12" font-weight="700" fill="#29b5e8" letter-spacing="3">SNOWFLAKE DATA WAREHOUSE</text>
+
+  <!-- APPLICATION LAYER -->
+  <rect x="1285" y="40" width="400" height="510" rx="8" fill="none" stroke="#9b59b6" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="1485" y="535" text-anchor="middle" font-size="12" font-weight="700" fill="#9b59b6" letter-spacing="3">APPLICATION LAYER</text>
+
+  <!-- CORTEX AI LAYER (bottom) -->
+  <rect x="435" y="580" width="830" height="200" rx="8" fill="none" stroke="#00d4aa" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="850" y="765" text-anchor="middle" font-size="12" font-weight="700" fill="#00d4aa" letter-spacing="3">SNOWFLAKE CORTEX AI</text>
+
+  <!-- AGENT LAYER (bottom right) -->
+  <rect x="1285" y="580" width="400" height="200" rx="8" fill="none" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="1485" y="765" text-anchor="middle" font-size="12" font-weight="700" fill="#e74c3c" letter-spacing="3">LANGGRAPH AGENTS</text>
+
+  <!-- PROFILING (bottom left) -->
+  <rect x="15" y="580" width="400" height="200" rx="8" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="215" y="765" text-anchor="middle" font-size="12" font-weight="700" fill="#f59e0b" letter-spacing="3">DATA PROFILING</text>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- EXTRACTION LAYER CONTENTS                   -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- YouTube Data Sources -->
+  <g transform="translate(55, 70)" filter="url(#shadow)">
+    <rect width="150" height="80" rx="6" fill="#fff" stroke="#4a90d9" stroke-width="1.5"/>
+    <rect width="150" height="22" rx="6" fill="#4a90d9"/>
+    <rect x="0" y="10" width="150" height="12" fill="#4a90d9"/>
+    <text x="75" y="15" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">DATA SOURCES</text>
+    <text x="75" y="42" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a2e">YouTube Data API v3</text>
+    <text x="75" y="57" text-anchor="middle" font-size="10" fill="#6b7280">Metadata + Stats</text>
+    <text x="75" y="72" text-anchor="middle" font-size="10" fill="#6b7280">26 Channels · 6 Genres</text>
+  </g>
+
+  <g transform="translate(55, 170)" filter="url(#shadow)">
+    <rect width="150" height="65" rx="6" fill="#fff" stroke="#4a90d9" stroke-width="1.5"/>
+    <rect width="150" height="22" rx="6" fill="#4a90d9"/>
+    <rect x="0" y="10" width="150" height="12" fill="#4a90d9"/>
+    <text x="75" y="15" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">TRANSCRIPTS</text>
+    <text x="75" y="42" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a2e">yt-dlp</text>
+    <text x="75" y="57" text-anchor="middle" font-size="10" fill="#6b7280">Auto-Captions · EN</text>
+  </g>
+
+  <!-- Arrow: Sources → Extractor -->
+  <line x1="205" y1="130" x2="245" y2="175" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="205" y1="200" x2="245" y2="190" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Extraction Script (Step 1) -->
+  <g transform="translate(245, 145)" filter="url(#shadow)">
+    <rect width="150" height="90" rx="6" fill="#fff" stroke="#22c55e" stroke-width="1.5"/>
+    <rect width="150" height="22" rx="6" fill="#22c55e"/>
+    <rect x="0" y="10" width="150" height="12" fill="#22c55e"/>
+    <text x="75" y="15" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">STEP 1 · EXTRACT</text>
+    <text x="75" y="42" text-anchor="middle" font-size="10" font-weight="600" fill="#1a1a2e">channel_extraction.py</text>
+    <text x="75" y="57" text-anchor="middle" font-size="9" fill="#6b7280">Batch Processing</text>
+    <text x="75" y="70" text-anchor="middle" font-size="9" fill="#6b7280">Resume Capability</text>
+    <text x="75" y="83" text-anchor="middle" font-size="9" fill="#6b7280">Error Handling</text>
+  </g>
+
+  <!-- Arrow: Extractor → JSON Files -->
+  <line x1="320" y1="235" x2="320" y2="270" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- JSON Output Files -->
+  <g transform="translate(190, 275)" filter="url(#shadow)">
+    <path d="M0,8 Q0,0 8,0 H182 Q190,0 190,8 V95 H10 Q5,90 0,95 Z" fill="#fff" stroke="#22c55e" stroke-width="1.5"/>
+    <!-- Folded corner -->
+    <path d="M170,0 V20 H190" fill="none" stroke="#22c55e" stroke-width="1"/>
+    <path d="M170,0 L190,20" fill="none" stroke="#22c55e" stroke-width="0.5" stroke-dasharray="2 2"/>
+    <text x="85" y="28" text-anchor="middle" font-size="11" font-weight="600" fill="#1a1a2e">Local JSON Files</text>
+    <line x1="20" y1="38" x2="170" y2="38" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="85" y="54" text-anchor="middle" font-size="9" fill="#6b7280">250+ Episodes</text>
+    <text x="85" y="67" text-anchor="middle" font-size="9" fill="#6b7280">*_metadata.json</text>
+    <text x="85" y="80" text-anchor="middle" font-size="9" fill="#6b7280">*_transcript.json</text>
+    <text x="85" y="93" text-anchor="middle" font-size="9" fill="#22c55e" font-weight="600">~146 MB</text>
+  </g>
+
+  <!-- channels.json config -->
+  <g transform="translate(55, 285)" filter="url(#shadow)">
+    <rect width="120" height="50" rx="6" fill="#f0fdf4" stroke="#22c55e" stroke-width="1" stroke-dasharray="4 2"/>
+    <text x="60" y="22" text-anchor="middle" font-size="9" font-weight="600" fill="#22c55e">channels.json</text>
+    <text x="60" y="38" text-anchor="middle" font-size="9" fill="#6b7280">26 Channel Configs</text>
+  </g>
+
+  <!-- Arrow: config → extractor -->
+  <line x1="175" y1="300" x2="260" y2="215" stroke="#374151" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrow)"/>
+
+  <!-- Arrow: JSON → Stage (main flow to Snowflake) -->
+  <line x1="380" y1="330" x2="470" y2="330" stroke="#374151" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="425" y="322" text-anchor="middle" font-size="9" font-weight="600" fill="#374151">PUT</text>
+
+  <!-- Arrow: JSON → Profiling -->
+  <line x1="285" y1="375" x2="215" y2="620" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrow)"/>
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- SNOWFLAKE LAYER CONTENTS                    -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- Internal Stage (Step 3) -->
+  <g transform="translate(470, 285)" filter="url(#shadow)">
+    <rect width="140" height="90" rx="6" fill="#e8f4fd" stroke="#29b5e8" stroke-width="1.5"/>
+    <rect width="140" height="22" rx="6" fill="#29b5e8"/>
+    <rect x="0" y="10" width="140" height="12" fill="#29b5e8"/>
+    <text x="70" y="15" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">STEP 3 · STAGE</text>
+    <text x="70" y="42" text-anchor="middle" font-size="10" font-weight="600" fill="#1a1a2e">@JSON_STAGE</text>
+    <text x="70" y="57" text-anchor="middle" font-size="9" fill="#4b5563">Internal Stage</text>
+    <text x="70" y="70" text-anchor="middle" font-size="9" fill="#4b5563">JSON File Format</text>
+    <text x="70" y="83" text-anchor="middle" font-size="9" fill="#4b5563">STRIP_OUTER_ARRAY</text>
+  </g>
+
+  <!-- Arrow: Stage → RAW -->
+  <line x1="610" y1="330" x2="635" y2="330" stroke="#29b5e8" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+  <text x="623" y="322" text-anchor="middle" font-size="8" font-weight="600" fill="#29b5e8">COPY INTO</text>
+
+  <!-- RAW Database (Step 4) - Cylinder -->
+  <g transform="translate(640, 280)" filter="url(#shadow)">
+    <!-- Cylinder body -->
+    <ellipse cx="70" cy="16" rx="68" ry="16" fill="#dbeafe" stroke="#29b5e8" stroke-width="1.5"/>
+    <rect x="2" y="16" width="136" height="68" fill="#dbeafe" stroke="none"/>
+    <line x1="2" y1="16" x2="2" y2="84" stroke="#29b5e8" stroke-width="1.5"/>
+    <line x1="138" y1="16" x2="138" y2="84" stroke="#29b5e8" stroke-width="1.5"/>
+    <ellipse cx="70" cy="84" rx="68" ry="16" fill="#dbeafe" stroke="#29b5e8" stroke-width="1.5"/>
+    <!-- Label -->
+    <text x="70" y="12" text-anchor="middle" font-size="9" font-weight="700" fill="#29b5e8">STEP 4 · LOAD</text>
+    <text x="70" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a2e">RAW</text>
+    <text x="70" y="55" text-anchor="middle" font-size="8" fill="#4b5563">raw_youtube_metadata</text>
+    <text x="70" y="67" text-anchor="middle" font-size="8" fill="#4b5563">raw_transcripts</text>
+    <text x="70" y="80" text-anchor="middle" font-size="8" fill="#29b5e8" font-weight="600">VARIANT</text>
+  </g>
+
+  <!-- Arrow: RAW → dbt Staging -->
+  <line x1="780" y1="330" x2="810" y2="170" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="805" y="260" text-anchor="middle" font-size="9" font-weight="600" fill="#ff694a" transform="rotate(-70, 805, 260)">dbt run</text>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- DBT PIPELINE (inside Snowflake)             -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- dbt label -->
+  <g transform="translate(815, 55)">
+    <rect width="60" height="20" rx="4" fill="#ff694a"/>
+    <text x="30" y="14" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">dbt</text>
+  </g>
+  <text x="885" y="70" font-size="10" fill="#6b7280">Transformation Pipeline</text>
+
+  <!-- Step 5: Staging -->
+  <g transform="translate(810, 85)" filter="url(#shadow)">
+    <rect width="140" height="100" rx="6" fill="#fff" stroke="#ff694a" stroke-width="1.5"/>
+    <rect width="140" height="22" rx="6" fill="#ff694a"/>
+    <rect x="0" y="10" width="140" height="12" fill="#ff694a"/>
+    <text x="70" y="15" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">STEP 5 · CLEAN</text>
+    <text x="70" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a2e">STAGING</text>
+    <text x="70" y="55" text-anchor="middle" font-size="8" fill="#6b7280">stg_youtube_metadata</text>
+    <text x="70" y="67" text-anchor="middle" font-size="8" fill="#6b7280">stg_transcripts</text>
+    <line x1="15" y1="75" x2="125" y2="75" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="70" y="87" text-anchor="middle" font-size="8" fill="#4b5563">Parse JSON · Fix Text</text>
+    <text x="70" y="97" text-anchor="middle" font-size="8" fill="#4b5563">Dedup · Remove Noise</text>
+  </g>
+
+  <!-- Arrow: Staging → Tests -->
+  <line x1="950" y1="135" x2="968" y2="135" stroke="#ff694a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Tests bubble (between staging and intermediate) -->
+  <g transform="translate(970, 115)" filter="url(#shadow)">
+    <rect width="70" height="40" rx="20" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+    <text x="35" y="20" text-anchor="middle" font-size="9" font-weight="700" fill="#92400e">Tests</text>
+    <text x="35" y="32" text-anchor="middle" font-size="7" fill="#92400e">not_null</text>
+  </g>
+
+  <!-- Arrow: Tests → Intermediate -->
+  <line x1="1040" y1="135" x2="1060" y2="135" stroke="#ff694a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 6: Intermediate -->
+  <g transform="translate(1060, 85)" filter="url(#shadow)">
+    <rect width="140" height="100" rx="6" fill="#fff" stroke="#ff694a" stroke-width="1.5"/>
+    <rect width="140" height="22" rx="6" fill="#ff694a"/>
+    <rect x="0" y="10" width="140" height="12" fill="#ff694a"/>
+    <text x="70" y="15" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">STEP 6 · STRUCTURE</text>
+    <text x="70" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a2e">INTERMEDIATE</text>
+    <text x="70" y="55" text-anchor="middle" font-size="8" fill="#6b7280">int_episodes</text>
+    <text x="70" y="67" text-anchor="middle" font-size="8" fill="#6b7280">int_transcript_lines</text>
+    <line x1="15" y1="75" x2="125" y2="75" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="70" y="87" text-anchor="middle" font-size="8" fill="#4b5563">Join Tables · Type Cast</text>
+    <text x="70" y="97" text-anchor="middle" font-size="8" fill="#4b5563">Guest Names · Sentences</text>
+  </g>
+
+  <!-- Arrow: Intermediate → Curated (going down) -->
+  <line x1="1130" y1="185" x2="1130" y2="225" stroke="#ff694a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 7: Curated -->
+  <g transform="translate(1060, 230)" filter="url(#shadow)">
+    <rect width="140" height="110" rx="6" fill="#fff" stroke="#ff694a" stroke-width="1.5"/>
+    <rect width="140" height="22" rx="6" fill="#ff694a"/>
+    <rect x="0" y="10" width="140" height="12" fill="#ff694a"/>
+    <text x="70" y="15" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">STEP 7 · CHUNK</text>
+    <text x="70" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a2e">CURATED</text>
+    <text x="70" y="55" text-anchor="middle" font-size="8" fill="#6b7280">cur_episodes</text>
+    <text x="70" y="67" text-anchor="middle" font-size="8" fill="#6b7280">cur_segments</text>
+    <line x1="15" y1="75" x2="125" y2="75" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="70" y="87" text-anchor="middle" font-size="8" fill="#4b5563">120s Sentence-Aligned</text>
+    <text x="70" y="97" text-anchor="middle" font-size="8" fill="#4b5563">15-20s Overlap</text>
+    <text x="70" y="107" text-anchor="middle" font-size="8" fill="#4b5563">YouTube Deep Links</text>
+  </g>
+
+  <!-- Arrow: Curated → Semantic (going left/down) -->
+  <line x1="1060" y1="310" x2="960" y2="395" stroke="#ff694a" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 8: Semantic -->
+  <g transform="translate(810, 380)" filter="url(#shadow)">
+    <rect width="150" height="120" rx="6" fill="#fff" stroke="#00d4aa" stroke-width="2"/>
+    <rect width="150" height="22" rx="6" fill="#00d4aa"/>
+    <rect x="0" y="10" width="150" height="12" fill="#00d4aa"/>
+    <text x="75" y="15" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">STEP 8 · ENRICH</text>
+    <text x="75" y="40" text-anchor="middle" font-size="11" font-weight="700" fill="#1a1a2e">SEMANTIC</text>
+    <text x="75" y="55" text-anchor="middle" font-size="8" fill="#6b7280">sem_embeddings</text>
+    <text x="75" y="67" text-anchor="middle" font-size="8" fill="#6b7280">sem_topics_entities</text>
+    <text x="75" y="79" text-anchor="middle" font-size="8" fill="#6b7280">sem_episode_summaries</text>
+    <line x1="15" y1="87" x2="135" y2="87" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="75" y="99" text-anchor="middle" font-size="8" fill="#4b5563">768-dim Vectors</text>
+    <text x="75" y="109" text-anchor="middle" font-size="8" fill="#4b5563">dbt + Cortex · Incremental</text>
+  </g>
+
+  <!-- Arrow: Semantic → Cortex Search Service setup (Step 9) -->
+  <line x1="960" y1="470" x2="1060" y2="470" stroke="#374151" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 9: Index / Cortex Search -->
+  <g transform="translate(1060, 410)" filter="url(#shadow)">
+    <rect width="150" height="100" rx="6" fill="#fff" stroke="#00d4aa" stroke-width="2"/>
+    <rect width="150" height="22" rx="6" fill="#00d4aa"/>
+    <rect x="0" y="10" width="150" height="12" fill="#00d4aa"/>
+    <text x="75" y="15" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">STEP 9 · INDEX</text>
+    <text x="75" y="42" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a2e">Cortex Search</text>
+    <text x="75" y="57" text-anchor="middle" font-size="8" fill="#6b7280">podcast_search service</text>
+    <line x1="15" y1="65" x2="135" y2="65" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="75" y="78" text-anchor="middle" font-size="8" fill="#4b5563">Hybrid: Vector + Keyword</text>
+    <text x="75" y="90" text-anchor="middle" font-size="8" fill="#4b5563">LLM Re-Ranking</text>
+    <text x="75" y="100" text-anchor="middle" font-size="8" fill="#00d4aa" font-weight="600">TARGET_LAG = 2min</text>
+  </g>
+
+  <!-- Step 10: Validate (below Step 9) -->
+  <g transform="translate(470, 410)" filter="url(#shadow)">
+    <rect width="130" height="85" rx="20" fill="#f0fdf4" stroke="#22c55e" stroke-width="1.5"/>
+    <text x="65" y="22" text-anchor="middle" font-size="9" font-weight="700" fill="#22c55e">STEP 10 · VALIDATE</text>
+    <text x="65" y="38" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a2e">dbt test</text>
+    <line x1="20" y1="45" x2="110" y2="45" stroke="#dcfce7" stroke-width="1"/>
+    <text x="65" y="58" text-anchor="middle" font-size="8" fill="#4b5563">not_null · unique</text>
+    <text x="65" y="69" text-anchor="middle" font-size="8" fill="#4b5563">relationships</text>
+    <text x="65" y="80" text-anchor="middle" font-size="8" fill="#4b5563">embedding coverage</text>
+  </g>
+
+  <!-- Arrow: Semantic → Validate -->
+  <line x1="810" y1="465" x2="600" y2="450" stroke="#22c55e" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#arrow)"/>
+
+  <!-- Arrow: Cortex Search → Application Layer (Agents) -->
+  <line x1="1210" y1="460" x2="1310" y2="350" stroke="#e74c3c" stroke-width="2" marker-end="url(#arrow-red)"/>
+  <text x="1265" y="390" text-anchor="middle" font-size="8" font-weight="600" fill="#e74c3c">search results</text>
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- CORTEX AI LAYER (bottom middle)             -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- Snowflake Cortex logo area -->
+  <g transform="translate(455, 590)">
+    <text x="0" y="15" font-size="11" font-weight="700" fill="#00d4aa">Snowflake Cortex AI Services</text>
+  </g>
+
+  <!-- EMBED_TEXT_768 -->
+  <g transform="translate(470, 620)" filter="url(#shadow)">
+    <rect width="230" height="70" rx="8" fill="#f0fdfa" stroke="#00d4aa" stroke-width="1.5"/>
+    <circle cx="30" cy="35" r="18" fill="#00d4aa22" stroke="#00d4aa" stroke-width="1"/>
+    <text x="30" y="33" text-anchor="middle" font-size="14" fill="#00d4aa">E</text>
+    <text x="30" y="43" text-anchor="middle" font-size="6" fill="#00d4aa" font-weight="600">768</text>
+    <text x="140" y="25" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a2e">EMBED_TEXT_768</text>
+    <text x="140" y="40" text-anchor="middle" font-size="9" fill="#6b7280">snowflake-arctic-embed-m</text>
+    <text x="140" y="55" text-anchor="middle" font-size="9" fill="#6b7280">768-dimensional vectors</text>
+  </g>
+
+  <!-- CORTEX COMPLETE -->
+  <g transform="translate(720, 620)" filter="url(#shadow)">
+    <rect width="230" height="70" rx="8" fill="#f0fdfa" stroke="#00d4aa" stroke-width="1.5"/>
+    <circle cx="30" cy="35" r="18" fill="#00d4aa22" stroke="#00d4aa" stroke-width="1"/>
+    <text x="30" y="38" text-anchor="middle" font-size="12" fill="#00d4aa">AI</text>
+    <text x="140" y="25" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a2e">CORTEX COMPLETE</text>
+    <text x="140" y="40" text-anchor="middle" font-size="9" fill="#6b7280">llama3.1-405b</text>
+    <text x="140" y="55" text-anchor="middle" font-size="9" fill="#6b7280">Summarization · NER · Classification</text>
+  </g>
+
+  <!-- CORTEX SEARCH -->
+  <g transform="translate(970, 620)" filter="url(#shadow)">
+    <rect width="230" height="70" rx="8" fill="#f0fdfa" stroke="#00d4aa" stroke-width="1.5"/>
+    <circle cx="30" cy="35" r="18" fill="#00d4aa22" stroke="#00d4aa" stroke-width="1"/>
+    <text x="30" y="38" text-anchor="middle" font-size="11" fill="#00d4aa">S</text>
+    <text x="140" y="25" text-anchor="middle" font-size="10" font-weight="700" fill="#1a1a2e">CORTEX SEARCH</text>
+    <text x="140" y="40" text-anchor="middle" font-size="9" fill="#6b7280">Hybrid: Vector + Keyword</text>
+    <text x="140" y="55" text-anchor="middle" font-size="9" fill="#6b7280">LLM Re-Ranking · Auto-Refresh</text>
+  </g>
+
+  <!-- Arrows: Cortex services ↔ Semantic layer -->
+  <line x1="585" y1="620" x2="870" y2="500" stroke="#00d4aa" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrow-green)"/>
+  <line x1="835" y1="620" x2="880" y2="500" stroke="#00d4aa" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrow-green)"/>
+  <line x1="1085" y1="620" x2="1130" y2="510" stroke="#00d4aa" stroke-width="1" stroke-dasharray="4 3" marker-end="url(#arrow-green)"/>
+
+  <!-- Arrow: Cortex → Agents -->
+  <line x1="1200" y1="655" x2="1300" y2="655" stroke="#e74c3c" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrow-red)"/>
+  <text x="1250" y="648" text-anchor="middle" font-size="8" font-weight="600" fill="#e74c3c">LLM inference</text>
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- APPLICATION LAYER (right side)              -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- Streamlit UI -->
+  <g transform="translate(1310, 60)" filter="url(#shadow-lg)">
+    <rect width="350" height="170" rx="8" fill="#faf5ff" stroke="#9b59b6" stroke-width="1.5"/>
+    <rect width="350" height="26" rx="8" fill="#9b59b6"/>
+    <rect x="0" y="12" width="350" height="14" fill="#9b59b6"/>
+    <text x="175" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">STREAMLIT — User Interface</text>
+
+    <!-- Search bar mockup -->
+    <rect x="15" y="38" width="320" height="28" rx="14" fill="#fff" stroke="#d1d5db" stroke-width="1"/>
+    <text x="30" y="56" font-size="10" fill="#9ca3af">Search 300+ podcast episodes...</text>
+    <circle cx="320" cy="52" r="10" fill="#9b59b6"/>
+    <text x="320" y="56" text-anchor="middle" font-size="10" fill="#fff">→</text>
+
+    <!-- UI Components -->
+    <g transform="translate(15, 75)">
+      <rect width="100" height="50" rx="4" fill="#fff" stroke="#e5e7eb" stroke-width="1"/>
+      <text x="50" y="18" text-anchor="middle" font-size="9" font-weight="600" fill="#1a1a2e">Filters</text>
+      <text x="50" y="32" text-anchor="middle" font-size="8" fill="#6b7280">Channel</text>
+      <text x="50" y="43" text-anchor="middle" font-size="8" fill="#6b7280">Topic · Date</text>
+    </g>
+    <g transform="translate(125, 75)">
+      <rect width="100" height="50" rx="4" fill="#fff" stroke="#e5e7eb" stroke-width="1"/>
+      <text x="50" y="18" text-anchor="middle" font-size="9" font-weight="600" fill="#1a1a2e">Result Cards</text>
+      <text x="50" y="32" text-anchor="middle" font-size="8" fill="#6b7280">Segment Text</text>
+      <text x="50" y="43" text-anchor="middle" font-size="8" fill="#6b7280">Score · Tags</text>
+    </g>
+    <g transform="translate(235, 75)">
+      <rect width="100" height="50" rx="4" fill="#fff" stroke="#e5e7eb" stroke-width="1"/>
+      <text x="50" y="18" text-anchor="middle" font-size="9" font-weight="600" fill="#e74c3c">▶ YouTube</text>
+      <text x="50" y="32" text-anchor="middle" font-size="8" fill="#6b7280">Timestamp Links</text>
+      <text x="50" y="43" text-anchor="middle" font-size="8" fill="#6b7280">?t=Ns Deep Link</text>
+    </g>
+
+    <!-- Expand context -->
+    <rect x="15" y="132" width="320" height="22" rx="4" fill="#f3e8ff" stroke="#9b59b622" stroke-width="1"/>
+    <text x="175" y="147" text-anchor="middle" font-size="9" fill="#7c3aed">Context Expansion — Show Surrounding Segments</text>
+  </g>
+
+  <!-- Arrow: UI → Agents (query flow) -->
+  <line x1="1485" y1="230" x2="1485" y2="280" stroke="#9b59b6" stroke-width="1.5" marker-end="url(#arrow-purple)"/>
+  <text x="1495" y="260" font-size="8" font-weight="600" fill="#9b59b6">user query</text>
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- LANGGRAPH AGENTS (right middle)             -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- Router Agent -->
+  <g transform="translate(1370, 285)" filter="url(#shadow)">
+    <polygon points="115,0 230,40 115,80 0,40" fill="#fef2f2" stroke="#e74c3c" stroke-width="1.5"/>
+    <text x="115" y="33" text-anchor="middle" font-size="10" font-weight="700" fill="#e74c3c">Router Agent</text>
+    <text x="115" y="47" text-anchor="middle" font-size="8" fill="#6b7280">Cortex COMPLETE</text>
+    <text x="115" y="59" text-anchor="middle" font-size="8" fill="#6b7280">Intent Classification</text>
+  </g>
+
+  <!-- Arrows from Router to agents -->
+  <line x1="1420" y1="365" x2="1370" y2="400" stroke="#e74c3c" stroke-width="1.2" marker-end="url(#arrow-red)"/>
+  <line x1="1485" y1="365" x2="1485" y2="400" stroke="#e74c3c" stroke-width="1.2" marker-end="url(#arrow-red)"/>
+  <line x1="1550" y1="365" x2="1600" y2="400" stroke="#e74c3c" stroke-width="1.2" marker-end="url(#arrow-red)"/>
+
+  <!-- Search Agent -->
+  <g transform="translate(1305, 400)" filter="url(#shadow)">
+    <rect width="120" height="65" rx="6" fill="#fff" stroke="#e74c3c" stroke-width="1.5"/>
+    <text x="60" y="18" text-anchor="middle" font-size="9" font-weight="700" fill="#e74c3c">Search</text>
+    <text x="60" y="32" text-anchor="middle" font-size="8" fill="#6b7280">Cortex Search</text>
+    <text x="60" y="44" text-anchor="middle" font-size="8" fill="#6b7280">Context Retrieval</text>
+    <text x="60" y="56" text-anchor="middle" font-size="8" fill="#6b7280">Adjacent Segments</text>
+  </g>
+
+  <!-- Summarization Agent -->
+  <g transform="translate(1430, 400)" filter="url(#shadow)">
+    <rect width="120" height="65" rx="6" fill="#fff" stroke="#e74c3c" stroke-width="1.5"/>
+    <text x="60" y="18" text-anchor="middle" font-size="9" font-weight="700" fill="#e74c3c">Summarization</text>
+    <text x="60" y="32" text-anchor="middle" font-size="8" fill="#6b7280">Cortex COMPLETE</text>
+    <text x="60" y="44" text-anchor="middle" font-size="8" fill="#6b7280">LLM Synthesis</text>
+    <text x="60" y="56" text-anchor="middle" font-size="8" fill="#6b7280">Citations + YT Links</text>
+  </g>
+
+  <!-- Arrow: Search → Summarization -->
+  <line x1="1425" y1="432" x2="1430" y2="432" stroke="#e74c3c" stroke-width="1" marker-end="url(#arrow-red)"/>
+
+  <!-- Stretch agents (smaller, dimmed) -->
+  <g transform="translate(1555, 400)" filter="url(#shadow)" opacity="0.7">
+    <rect width="105" height="65" rx="6" fill="#fff" stroke="#e74c3c" stroke-width="1" stroke-dasharray="4 2"/>
+    <text x="52" y="17" text-anchor="middle" font-size="8" font-weight="700" fill="#e74c3c">Stretch Agents</text>
+    <text x="52" y="30" text-anchor="middle" font-size="7" fill="#6b7280">Topic Extraction</text>
+    <text x="52" y="41" text-anchor="middle" font-size="7" fill="#6b7280">Comparison</text>
+    <text x="52" y="52" text-anchor="middle" font-size="7" fill="#6b7280">Recommendation</text>
+  </g>
+
+  <!-- Arrow: Agents → UI (response flow) -->
+  <line x1="1490" y1="400" x2="1490" y2="232" stroke="#e74c3c" stroke-width="1" stroke-dasharray="5 3" marker-end="url(#arrow-red)"/>
+  <text x="1510" y="250" font-size="8" fill="#e74c3c">response</text>
+
+  <!-- LangGraph State box -->
+  <g transform="translate(1305, 480)" filter="url(#shadow)">
+    <rect width="355" height="35" rx="4" fill="#fef2f2" stroke="#e74c3c44" stroke-width="1"/>
+    <text x="177" y="15" text-anchor="middle" font-size="9" font-weight="600" fill="#e74c3c">PodcastIQState</text>
+    <text x="177" y="28" text-anchor="middle" font-size="8" fill="#6b7280">user_query · query_type · search_results · summary · messages</text>
+  </g>
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- AGENT LAYER (bottom right)                  -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- Agent-Cortex connection explanation -->
+  <g transform="translate(1310, 610)">
+    <rect width="350" height="55" rx="8" fill="#fef2f2" stroke="#e74c3c33" stroke-width="1"/>
+    <text x="175" y="20" text-anchor="middle" font-size="9" font-weight="700" fill="#e74c3c">All Agents Powered by Cortex LLM</text>
+    <text x="175" y="35" text-anchor="middle" font-size="8" fill="#6b7280">LangGraph = Orchestration (routing, state, workflow)</text>
+    <text x="175" y="48" text-anchor="middle" font-size="8" fill="#6b7280">Cortex COMPLETE = LLM Engine (inference, generation)</text>
+  </g>
+
+  <!-- App Schema -->
+  <g transform="translate(1310, 680)" filter="url(#shadow)">
+    <!-- Cylinder -->
+    <ellipse cx="60" cy="12" rx="58" ry="12" fill="#ede9fe" stroke="#9b59b6" stroke-width="1"/>
+    <rect x="2" y="12" width="116" height="40" fill="#ede9fe" stroke="none"/>
+    <line x1="2" y1="12" x2="2" y2="52" stroke="#9b59b6" stroke-width="1"/>
+    <line x1="118" y1="12" x2="118" y2="52" stroke="#9b59b6" stroke-width="1"/>
+    <ellipse cx="60" cy="52" rx="58" ry="12" fill="#ede9fe" stroke="#9b59b6" stroke-width="1"/>
+    <text x="60" y="30" text-anchor="middle" font-size="9" font-weight="600" fill="#1a1a2e">APP Schema</text>
+    <text x="60" y="43" text-anchor="middle" font-size="7" fill="#6b7280">search_history</text>
+  </g>
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- PROFILING LAYER (bottom left)               -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- Step 2: Profiling -->
+  <g transform="translate(40, 620)" filter="url(#shadow)">
+    <rect width="160" height="80" rx="6" fill="#fff" stroke="#f59e0b" stroke-width="1.5"/>
+    <rect width="160" height="22" rx="6" fill="#f59e0b"/>
+    <rect x="0" y="10" width="160" height="12" fill="#f59e0b"/>
+    <text x="80" y="15" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">STEP 2 · PROFILE</text>
+    <text x="80" y="40" text-anchor="middle" font-size="10" font-weight="600" fill="#1a1a2e">advanced_profile.py</text>
+    <text x="80" y="55" text-anchor="middle" font-size="9" fill="#6b7280">ydata-profiling</text>
+    <text x="80" y="68" text-anchor="middle" font-size="9" fill="#6b7280">Completeness · Distributions</text>
+  </g>
+
+  <!-- Report output -->
+  <g transform="translate(230, 625)" filter="url(#shadow)">
+    <!-- Document shape -->
+    <path d="M0,6 Q0,0 6,0 H134 Q140,0 140,6 V55 Q105,65 70,58 Q35,51 0,60 Z" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.2"/>
+    <text x="70" y="22" text-anchor="middle" font-size="9" font-weight="600" fill="#92400e">HTML Report</text>
+    <text x="70" y="36" text-anchor="middle" font-size="8" fill="#78716c">Null Rates · Coverage %</text>
+    <text x="70" y="48" text-anchor="middle" font-size="8" fill="#78716c">Word Count · Artifacts</text>
+  </g>
+
+  <!-- Arrow: Profiler → Report -->
+  <line x1="200" y1="660" x2="230" y2="660" stroke="#f59e0b" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+
+  <!-- ═══════════════════════════════════════════ -->
+  <!-- WAREHOUSES (bottom)                         -->
+  <!-- ═══════════════════════════════════════════ -->
+
+  <!-- Warehouse boxes -->
+  <g transform="translate(40, 810)">
+    <text x="0" y="0" font-size="11" font-weight="700" fill="#4b5563">Snowflake Warehouses</text>
+    <text x="260" y="0" font-size="9" fill="#9ca3af">Cost-Optimized · Auto-Suspend</text>
+  </g>
+  <g transform="translate(40, 825)">
+    <rect width="180" height="40" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+    <text x="90" y="17" text-anchor="middle" font-size="10" font-weight="600" fill="#1a1a2e">LOADING_WH</text>
+    <text x="90" y="32" text-anchor="middle" font-size="9" fill="#6b7280">X-SMALL · Suspend 60s</text>
+  </g>
+  <g transform="translate(240, 825)">
+    <rect width="180" height="40" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+    <text x="90" y="17" text-anchor="middle" font-size="10" font-weight="600" fill="#1a1a2e">TRANSFORM_WH</text>
+    <text x="90" y="32" text-anchor="middle" font-size="9" fill="#6b7280">SMALL · Suspend 300s</text>
+  </g>
+  <g transform="translate(440, 825)">
+    <rect width="180" height="40" rx="6" fill="#f8fafc" stroke="#94a3b8" stroke-width="1"/>
+    <text x="90" y="17" text-anchor="middle" font-size="10" font-weight="600" fill="#1a1a2e">SEARCH_WH</text>
+    <text x="90" y="32" text-anchor="middle" font-size="9" fill="#6b7280">X-SMALL · Suspend 60s</text>
+  </g>
+
+  <!-- Key Metrics -->
+  <g transform="translate(700, 810)">
+    <text x="0" y="0" font-size="11" font-weight="700" fill="#4b5563">Key Metrics</text>
+  </g>
+  <g transform="translate(700, 820)">
+    <rect width="130" height="48" rx="6" fill="#f0fdf4" stroke="#22c55e66" stroke-width="1"/>
+    <text x="65" y="18" text-anchor="middle" font-size="18" font-weight="800" fill="#1a1a2e">300+</text>
+    <text x="65" y="35" text-anchor="middle" font-size="8" fill="#6b7280" letter-spacing="1">EPISODES</text>
+  </g>
+  <g transform="translate(845, 820)">
+    <rect width="130" height="48" rx="6" fill="#f0fdf4" stroke="#22c55e66" stroke-width="1"/>
+    <text x="65" y="18" text-anchor="middle" font-size="18" font-weight="800" fill="#1a1a2e">18K+</text>
+    <text x="65" y="35" text-anchor="middle" font-size="8" fill="#6b7280" letter-spacing="1">SEGMENTS</text>
+  </g>
+  <g transform="translate(990, 820)">
+    <rect width="130" height="48" rx="6" fill="#eff6ff" stroke="#4a90d966" stroke-width="1"/>
+    <text x="65" y="18" text-anchor="middle" font-size="18" font-weight="800" fill="#1a1a2e">768</text>
+    <text x="65" y="35" text-anchor="middle" font-size="8" fill="#6b7280" letter-spacing="1">DIMENSIONS</text>
+  </g>
+  <g transform="translate(1135, 820)">
+    <rect width="130" height="48" rx="6" fill="#fef2f2" stroke="#e74c3c66" stroke-width="1"/>
+    <text x="65" y="18" text-anchor="middle" font-size="18" font-weight="800" fill="#1a1a2e">&lt;5s</text>
+    <text x="65" y="35" text-anchor="middle" font-size="8" fill="#6b7280" letter-spacing="1">SEARCH LATENCY</text>
+  </g>
+  <g transform="translate(1280, 820)">
+    <rect width="130" height="48" rx="6" fill="#f0fdfa" stroke="#00d4aa66" stroke-width="1"/>
+    <text x="65" y="18" text-anchor="middle" font-size="18" font-weight="800" fill="#1a1a2e">6</text>
+    <text x="65" y="35" text-anchor="middle" font-size="8" fill="#6b7280" letter-spacing="1">AI AGENTS</text>
+  </g>
+  <g transform="translate(1425, 820)">
+    <rect width="130" height="48" rx="6" fill="#e8f4fd" stroke="#29b5e866" stroke-width="1"/>
+    <text x="65" y="18" text-anchor="middle" font-size="18" font-weight="800" fill="#1a1a2e">&lt;150</text>
+    <text x="65" y="35" text-anchor="middle" font-size="8" fill="#6b7280" letter-spacing="1">SF CREDITS</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="850" y="900" text-anchor="middle" font-size="11" fill="#9ca3af">PodcastIQ — Gen AI Data Engineering Capstone · February 2026</text>
+
+</svg>
+
+</body>
+</html>

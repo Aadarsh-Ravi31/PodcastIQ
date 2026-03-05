@@ -3,7 +3,7 @@
 -- Prerequisites: Snowflake account with SYSADMIN and SECURITYADMIN roles
 
 -- ============================================================
--- 1. DATABASE & SCHEMAS
+-- 1. DATABASE & SCHEMAS (6-layer architecture)
 -- ============================================================
 
 USE ROLE SYSADMIN;
@@ -11,6 +11,8 @@ USE ROLE SYSADMIN;
 CREATE DATABASE IF NOT EXISTS PODCASTIQ;
 
 CREATE SCHEMA IF NOT EXISTS PODCASTIQ.RAW;
+CREATE SCHEMA IF NOT EXISTS PODCASTIQ.STAGING;
+CREATE SCHEMA IF NOT EXISTS PODCASTIQ.INTERMEDIATE;
 CREATE SCHEMA IF NOT EXISTS PODCASTIQ.CURATED;
 CREATE SCHEMA IF NOT EXISTS PODCASTIQ.SEMANTIC;
 CREATE SCHEMA IF NOT EXISTS PODCASTIQ.APP;
@@ -38,62 +40,47 @@ CREATE WAREHOUSE IF NOT EXISTS SEARCH_WH
     COMMENT = 'Used for Cortex Search queries from Streamlit app';
 
 -- ============================================================
--- 3. RAW LAYER TABLES
+-- 3. FILE FORMAT & INTERNAL STAGE
 -- ============================================================
 
 USE SCHEMA PODCASTIQ.RAW;
 
+CREATE FILE FORMAT IF NOT EXISTS JSON_FORMAT
+    TYPE = 'JSON'
+    STRIP_OUTER_ARRAY = TRUE
+    IGNORE_UTF8_ERRORS = TRUE;
+
+CREATE STAGE IF NOT EXISTS JSON_STAGE
+    FILE_FORMAT = JSON_FORMAT
+    COMMENT = 'Internal stage for loading extracted JSON files';
+
+-- ============================================================
+-- 4. RAW LAYER TABLES (VARIANT for JSON loading)
+-- ============================================================
+
+-- Metadata: one JSON object per video, loaded via COPY INTO
 CREATE TABLE IF NOT EXISTS raw_youtube_metadata (
-    video_id            VARCHAR(20)     NOT NULL,
-    channel_id          VARCHAR(30),
-    channel_name        VARCHAR(200),
-    episode_title       VARCHAR(500)    NOT NULL,
-    description         TEXT,
-    publish_date        TIMESTAMP_NTZ,
-    duration_seconds    INT,
-    view_count          INT,
-    like_count          INT,
-    video_url           VARCHAR(500),
-    extracted_at        TIMESTAMP_NTZ   DEFAULT CURRENT_TIMESTAMP(),
-    CONSTRAINT pk_raw_metadata PRIMARY KEY (video_id)
+    raw_data            VARIANT         NOT NULL,
+    source_file         VARCHAR(500),
+    loaded_at           TIMESTAMP_NTZ   DEFAULT CURRENT_TIMESTAMP()
 );
 
+-- Transcripts: array of segments per video, loaded via COPY INTO
 CREATE TABLE IF NOT EXISTS raw_transcripts (
-    transcript_id       VARCHAR(50)     NOT NULL,
-    video_id            VARCHAR(20)     NOT NULL,
-    text                TEXT            NOT NULL,
-    start_seconds       FLOAT           NOT NULL,
-    duration_seconds    FLOAT           NOT NULL,
-    language            VARCHAR(10)     DEFAULT 'en',
-    is_auto_generated   BOOLEAN         DEFAULT TRUE,
-    extracted_at        TIMESTAMP_NTZ   DEFAULT CURRENT_TIMESTAMP(),
-    CONSTRAINT pk_raw_transcripts PRIMARY KEY (transcript_id),
-    CONSTRAINT fk_raw_transcripts_video FOREIGN KEY (video_id)
-        REFERENCES raw_youtube_metadata(video_id)
+    raw_data            VARIANT         NOT NULL,
+    source_file         VARCHAR(500),
+    loaded_at           TIMESTAMP_NTZ   DEFAULT CURRENT_TIMESTAMP()
 );
 
 -- ============================================================
--- 4. CURATED LAYER TABLES (populated by DBT)
+-- 5. STAGING, INTERMEDIATE, CURATED, SEMANTIC layers
+--    All managed by dbt models — do NOT create tables manually.
+--
+--    STAGING:      stg_youtube_metadata, stg_transcripts
+--    INTERMEDIATE: int_episodes, int_transcript_lines
+--    CURATED:      cur_episodes, cur_segments (120s sentence-aligned chunks)
+--    SEMANTIC:     sem_embeddings, sem_topics_entities, sem_episode_summaries
 -- ============================================================
-
-USE SCHEMA PODCASTIQ.CURATED;
-
--- These tables will be created/managed by DBT models.
--- Included here for reference only.
-
--- curated_episodes: Full episodes with cleaned, concatenated transcripts
--- curated_segments: 60-second chunks with 15-second overlap
-
--- ============================================================
--- 5. SEMANTIC LAYER TABLES (populated by DBT)
--- ============================================================
-
-USE SCHEMA PODCASTIQ.SEMANTIC;
-
--- These tables will be created/managed by DBT models.
--- embeddings: 768-dim vectors from snowflake-arctic-embed-m
--- topics_entities: Extracted people, orgs, technologies, topics
--- episode_summaries: Multi-level summaries
 
 -- ============================================================
 -- 6. APP LAYER TABLES
@@ -148,3 +135,4 @@ ALTER WAREHOUSE SEARCH_WH SET RESOURCE_MONITOR = podcastiq_monitor;
 -- SHOW SCHEMAS IN DATABASE PODCASTIQ;
 -- SHOW WAREHOUSES;
 -- SHOW TABLES IN SCHEMA PODCASTIQ.RAW;
+-- LIST @PODCASTIQ.RAW.JSON_STAGE;

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1800">
+<title>PodcastIQ — Complete Data Engineering Pipeline</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #ffffff;
+    font-family: 'Inter', sans-serif;
+    padding: 40px 30px;
+    min-width: 1750px;
+  }
+  svg { display: block; }
+  .title {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .title h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1a1a2e;
+    letter-spacing: -0.5px;
+  }
+  .title p {
+    font-size: 13px;
+    color: #6b7280;
+    margin-top: 4px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div class="title">
+  <h1>PodcastIQ — The Complete Data Engineering Pipeline</h1>
+  <p>10-Step Journey from YouTube to Production-Ready Semantic Search</p>
+</div>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 1050" width="1700" height="1050">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="1" dy="2" stdDeviation="3" flood-color="#00000012"/>
+    </filter>
+    <filter id="shadow-lg" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="2" dy="4" stdDeviation="6" flood-color="#00000018"/>
+    </filter>
+    <marker id="arrow" viewBox="0 0 12 8" refX="12" refY="4" markerWidth="12" markerHeight="8" orient="auto-start-reverse">
+      <polygon points="0 0, 12 4, 0 8" fill="#374151"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 12 8" refX="12" refY="4" markerWidth="12" markerHeight="8" orient="auto-start-reverse">
+      <polygon points="0 0, 12 4, 0 8" fill="#29b5e8"/>
+    </marker>
+    <marker id="arrow-orange" viewBox="0 0 12 8" refX="12" refY="4" markerWidth="12" markerHeight="8" orient="auto-start-reverse">
+      <polygon points="0 0, 12 4, 0 8" fill="#ff694a"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 12 8" refX="12" refY="4" markerWidth="12" markerHeight="8" orient="auto-start-reverse">
+      <polygon points="0 0, 12 4, 0 8" fill="#00d4aa"/>
+    </marker>
+    <marker id="arrow-emerald" viewBox="0 0 12 8" refX="12" refY="4" markerWidth="12" markerHeight="8" orient="auto-start-reverse">
+      <polygon points="0 0, 12 4, 0 8" fill="#22c55e"/>
+    </marker>
+  </defs>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- ROW 1: STEPS 1-4 (Extract → Profile → Stage → Load)   -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <!-- Row 1 layer label -->
+  <rect x="30" y="30" width="1640" height="295" rx="12" fill="none" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="850" y="58" text-anchor="middle" font-size="11" font-weight="700" fill="#9ca3af" letter-spacing="3">ROW 1 &mdash; INGESTION PIPELINE (Python + Snowflake)</text>
+
+  <!-- ── STEP 1: EXTRACT ── -->
+  <g transform="translate(60, 80)" filter="url(#shadow-lg)">
+    <rect width="340" height="220" rx="10" fill="#fff" stroke="#22c55e" stroke-width="2"/>
+
+    <!-- Step badge -->
+    <rect x="12" y="12" width="75" height="26" rx="13" fill="#22c55e"/>
+    <text x="49" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">STEP 1</text>
+
+    <!-- Title -->
+    <text x="100" y="30" font-size="18" font-weight="800" fill="#1a1a2e">EXTRACT</text>
+    <text x="210" y="30" font-size="12" fill="#6b7280">(Python)</text>
+
+    <line x1="15" y1="44" x2="325" y2="44" stroke="#e5e7eb" stroke-width="1"/>
+
+    <!-- Content -->
+    <text x="20" y="68" font-size="11" font-weight="600" fill="#22c55e">Tools:</text>
+    <text x="20" y="86" font-size="10" fill="#4b5563">YouTube Data API v3 &mdash; metadata</text>
+    <text x="20" y="102" font-size="10" fill="#4b5563">yt-dlp + --impersonate chrome &mdash; transcripts</text>
+
+    <line x1="15" y1="114" x2="325" y2="114" stroke="#f3f4f6" stroke-width="1"/>
+
+    <text x="20" y="134" font-size="11" font-weight="600" fill="#22c55e">Output:</text>
+    <text x="20" y="152" font-size="10" fill="#4b5563">{video_id}_metadata.json</text>
+    <text x="20" y="168" font-size="10" fill="#4b5563">{video_id}_transcript.json</text>
+    <text x="20" y="184" font-size="10" fill="#6b7280">250 episodes &times; 2 files = 500 JSON</text>
+
+    <line x1="15" y1="194" x2="325" y2="194" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="170" y="213" text-anchor="middle" font-size="10" font-weight="700" fill="#22c55e" letter-spacing="1">LOCAL FILES &rarr; data/raw/</text>
+  </g>
+
+  <!-- Arrow 1→2 -->
+  <line x1="400" y1="190" x2="440" y2="190" stroke="#374151" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ── STEP 2: PROFILE ── -->
+  <g transform="translate(445, 80)" filter="url(#shadow-lg)">
+    <rect width="280" height="220" rx="10" fill="#fff" stroke="#f59e0b" stroke-width="2"/>
+
+    <rect x="12" y="12" width="75" height="26" rx="13" fill="#f59e0b"/>
+    <text x="49" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">STEP 2</text>
+    <text x="100" y="30" font-size="18" font-weight="800" fill="#1a1a2e">PROFILE</text>
+    <text x="215" y="30" font-size="12" fill="#6b7280">(Python)</text>
+
+    <line x1="15" y1="44" x2="265" y2="44" stroke="#e5e7eb" stroke-width="1"/>
+
+    <text x="20" y="68" font-size="11" font-weight="600" fill="#f59e0b">Type 1: ydata-profiling</text>
+    <text x="20" y="86" font-size="10" fill="#4b5563">Statistical EDA (distributions,</text>
+    <text x="20" y="102" font-size="10" fill="#4b5563">correlations, nulls, duplicates)</text>
+    <text x="20" y="118" font-size="10" fill="#6b7280">&rarr; HTML report</text>
+
+    <line x1="15" y1="130" x2="265" y2="130" stroke="#f3f4f6" stroke-width="1"/>
+
+    <text x="20" y="150" font-size="11" font-weight="600" fill="#f59e0b">Type 2: Custom Profiler</text>
+    <text x="20" y="168" font-size="10" fill="#4b5563">Coverage %, quality score,</text>
+    <text x="20" y="184" font-size="10" fill="#4b5563">artifacts, gaps, accept/reject</text>
+    <text x="20" y="200" font-size="10" fill="#6b7280">&rarr; ASCII report</text>
+
+    <line x1="15" y1="210" x2="265" y2="210" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="140" y="218" text-anchor="middle" font-size="8" font-weight="700" fill="#f59e0b" letter-spacing="1">QUALITY GATE</text>
+  </g>
+
+  <!-- Arrow 2→3 -->
+  <line x1="725" y1="190" x2="765" y2="190" stroke="#374151" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- ── STEP 3: STAGE ── -->
+  <g transform="translate(770, 80)" filter="url(#shadow-lg)">
+    <rect width="280" height="220" rx="10" fill="#fff" stroke="#29b5e8" stroke-width="2"/>
+
+    <rect x="12" y="12" width="75" height="26" rx="13" fill="#29b5e8"/>
+    <text x="49" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">STEP 3</text>
+    <text x="100" y="30" font-size="18" font-weight="800" fill="#1a1a2e">STAGE</text>
+    <text x="195" y="30" font-size="12" fill="#6b7280">(Snowflake)</text>
+
+    <line x1="15" y1="44" x2="265" y2="44" stroke="#e5e7eb" stroke-width="1"/>
+
+    <text x="20" y="68" font-size="11" font-weight="600" fill="#29b5e8">Operation:</text>
+    <text x="20" y="86" font-size="11" font-family="monospace" fill="#4b5563">PUT file://data/raw/*.json</text>
+    <text x="20" y="104" font-size="11" font-family="monospace" fill="#4b5563">  @PODCASTIQ.RAW.</text>
+    <text x="20" y="120" font-size="11" font-family="monospace" fill="#4b5563">  PODCAST_DATA_STAGE</text>
+
+    <line x1="15" y1="134" x2="265" y2="134" stroke="#f3f4f6" stroke-width="1"/>
+
+    <text x="20" y="154" font-size="10" fill="#4b5563">Upload local JSON to Snowflake</text>
+    <text x="20" y="170" font-size="10" fill="#4b5563">internal named stage</text>
+    <text x="20" y="186" font-size="10" fill="#4b5563">Auto-compress (GZIP)</text>
+
+    <line x1="15" y1="198" x2="265" y2="198" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="140" y="215" text-anchor="middle" font-size="10" font-weight="700" fill="#29b5e8" letter-spacing="1">INTERNAL STAGE</text>
+  </g>
+
+  <!-- Arrow 3→4 -->
+  <line x1="1050" y1="190" x2="1090" y2="190" stroke="#29b5e8" stroke-width="2.5" marker-end="url(#arrow-blue)"/>
+
+  <!-- ── STEP 4: LOAD ── -->
+  <g transform="translate(1095, 80)" filter="url(#shadow-lg)">
+    <rect width="280" height="220" rx="10" fill="#fff" stroke="#29b5e8" stroke-width="2"/>
+
+    <rect x="12" y="12" width="75" height="26" rx="13" fill="#29b5e8"/>
+    <text x="49" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">STEP 4</text>
+    <text x="100" y="30" font-size="18" font-weight="800" fill="#1a1a2e">LOAD</text>
+    <text x="175" y="30" font-size="12" fill="#6b7280">(Snowflake)</text>
+
+    <line x1="15" y1="44" x2="265" y2="44" stroke="#e5e7eb" stroke-width="1"/>
+
+    <text x="20" y="68" font-size="11" font-weight="600" fill="#29b5e8">Operation:</text>
+    <text x="20" y="86" font-size="11" font-family="monospace" fill="#4b5563">COPY INTO RAW.EPISODES</text>
+    <text x="20" y="102" font-size="11" font-family="monospace" fill="#4b5563">MERGE INTO RAW.CHANNELS</text>
+
+    <line x1="15" y1="116" x2="265" y2="116" stroke="#f3f4f6" stroke-width="1"/>
+
+    <text x="20" y="136" font-size="10" fill="#4b5563">VARIANT column for raw JSON</text>
+    <text x="20" y="152" font-size="10" fill="#4b5563">JSON_FORMAT file format</text>
+    <text x="20" y="168" font-size="10" fill="#4b5563">Idempotent (MERGE / skip dupes)</text>
+    <text x="20" y="184" font-size="10" fill="#4b5563">snowflake_loader.py</text>
+
+    <line x1="15" y1="196" x2="265" y2="196" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="140" y="213" text-anchor="middle" font-size="10" font-weight="700" fill="#29b5e8" letter-spacing="1">RAW SCHEMA</text>
+  </g>
+
+  <!-- Status badges row 1 -->
+  <g transform="translate(1420, 110)">
+    <rect width="240" height="170" rx="10" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="120" y="25" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">Week 1 Status</text>
+    <line x1="15" y1="35" x2="225" y2="35" stroke="#e5e7eb" stroke-width="1"/>
+
+    <circle cx="30" cy="58" r="8" fill="#22c55e"/>
+    <text x="30" y="62" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">&#10003;</text>
+    <text x="48" y="62" font-size="11" fill="#4b5563">Step 1: Extract</text>
+    <text x="200" y="62" text-anchor="end" font-size="10" font-weight="700" fill="#22c55e">DONE</text>
+
+    <circle cx="30" cy="84" r="8" fill="#22c55e"/>
+    <text x="30" y="88" text-anchor="middle" font-size="9" font-weight="700" fill="#fff">&#10003;</text>
+    <text x="48" y="88" font-size="11" fill="#4b5563">Step 2: Profile</text>
+    <text x="200" y="88" text-anchor="end" font-size="10" font-weight="700" fill="#22c55e">DONE</text>
+
+    <circle cx="30" cy="110" r="8" fill="#f59e0b"/>
+    <text x="30" y="114" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">&bull;</text>
+    <text x="48" y="114" font-size="11" fill="#4b5563">Step 3: Stage</text>
+    <text x="200" y="114" text-anchor="end" font-size="10" font-weight="700" fill="#f59e0b">WEEK 2</text>
+
+    <circle cx="30" cy="136" r="8" fill="#f59e0b"/>
+    <text x="30" y="140" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">&bull;</text>
+    <text x="48" y="140" font-size="11" fill="#4b5563">Step 4: Load</text>
+    <text x="200" y="140" text-anchor="end" font-size="10" font-weight="700" fill="#f59e0b">WEEK 2</text>
+
+    <line x1="15" y1="154" x2="225" y2="154" stroke="#e5e7eb" stroke-width="1"/>
+    <text x="120" y="168" text-anchor="middle" font-size="9" fill="#6b7280">Loader script ready to run</text>
+  </g>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CONNECTOR: Row 1 → Row 2                               -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <path d="M 1235 300 L 1235 355 L 60 355 L 60 395" stroke="#ff694a" stroke-width="2.5" fill="none" marker-end="url(#arrow-orange)" stroke-dasharray="none"/>
+  <rect x="580" y="342" width="140" height="24" rx="12" fill="#ff694a"/>
+  <text x="650" y="358" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">dbt run</text>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- ROW 2: STEPS 5-8 (Clean → Structure → Chunk → Enrich)  -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <rect x="30" y="380" width="1640" height="295" rx="12" fill="none" stroke="#ff694a" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="850" y="408" text-anchor="middle" font-size="11" font-weight="700" fill="#ff694a" letter-spacing="3">ROW 2 &mdash; dbt TRANSFORMATION PIPELINE (SQL in Snowflake)</text>
+
+  <!-- ── STEP 5: CLEAN ── -->
+  <g transform="translate(60, 430)" filter="url(#shadow-lg)">
+    <rect width="340" height="220" rx="10" fill="#fff" stroke="#ff694a" stroke-width="2"/>
+
+    <rect x="12" y="12" width="75" height="26" rx="13" fill="#ff694a"/>
+    <text x="49" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">STEP 5</text>
+    <text x="100" y="30" font-size="18" font-weight="800" fill="#1a1a2e">CLEAN</text>
+    <text x="180" y="30" font-size="12" fill="#6b7280">(dbt)</text>
+
+    <line x1="15" y1="44" x2="325" y2="44" stroke="#e5e7eb" stroke-width="1"/>
+
+    <text x="20" y="68" font-size="11" font-weight="600" fill="#ff694a">Models:</text>
+    <text x="20" y="86" font-size="11" font-family="monospace" fill="#4b5563">stg_youtube_metadata.sql</text>
+    <text x="20" y="102" font-size="11" font-family="monospace" fill="#4b5563">stg_transcripts.sql</text>
+
+    <line x1="15" y1="116" x2="325" y2="116" stroke="#f3f4f6" stroke-width="1"/>
+
+    <text x="20" y="136" font-size="10" fill="#4b5563">Parse VARIANT JSON &rarr; flat columns</text>
+    <text x="20" y="152" font-size="10" fill="#4b5563">Cast types (timestamps, integers)</text>
+    <text x="20" y="168" font-size="10" fill="#4b5563">Remove [Music], [Applause] noise</text>
+    <text x="20" y="184" font-size="10" fill="#4b5563">Trim whitespace, normalize unicode</text>
+    <text x="20" y="200" font-size="10" fill="#4b5563">Dedup by video_id, filter empty text</text>
+
+    <line x1="15" y1="210" x2="325" y2="210" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="170" y="218" text-anchor="middle" font-size="10" font-weight="700" fill="#ff694a" letter-spacing="1">&rarr; STAGING SCHEMA</text>
+  </g>
+
+  <!-- Arrow 5→6 -->
+  <line x1="400" y1="540" x2="440" y2="540" stroke="#ff694a" stroke-width="2.5" marker-end="url(#arrow-orange)"/>
+
+  <!-- ── STEP 6: STRUCTURE ── -->
+  <g transform="translate(445, 430)" filter="url(#shadow-lg)">
+    <rect width="280" height="220" rx="10" fill="#fff" stroke="#ff694a" stroke-width="2"/>
+
+    <rect x="12" y="12" width="75" height="26" rx="13" fill="#ff694a"/>
+    <text x="49" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">STEP 6</text>
+    <text x="100" y="30" font-size="18" font-weight="800" fill="#1a1a2e">STRUCTURE</text>
+
+    <line x1="15" y1="44" x2="265" y2="44" stroke="#e5e7eb" stroke-width="1"/>
+
+    <text x="20" y="68" font-size="11" font-weight="600" fill="#ff694a">Models:</text>
+    <text x="20" y="86" font-size="11" font-family="monospace" fill="#4b5563">int_episodes.sql</text>
+    <text x="20" y="102" font-size="11" font-family="monospace" fill="#4b5563">int_transcript_lines.sql</text>
+
+    <line x1="15" y1="116" x2="265" y2="116" stroke="#f3f4f6" stroke-width="1"/>
+
+    <text x="20" y="136" font-size="10" fill="#4b5563">Join metadata + transcripts</text>
+    <text x="20" y="152" font-size="10" fill="#4b5563">Calculate word counts, durations</text>
+    <text x="20" y="168" font-size="10" fill="#4b5563">Extract guest names from titles</text>
+    <text x="20" y="184" font-size="10" fill="#4b5563">Sentence boundaries + line numbers</text>
+
+    <line x1="15" y1="196" x2="265" y2="196" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="140" y="213" text-anchor="middle" font-size="10" font-weight="700" fill="#ff694a" letter-spacing="1">&rarr; INTERMEDIATE SCHEMA</text>
+  </g>
+
+  <!-- Arrow 6→7 -->
+  <line x1="725" y1="540" x2="765" y2="540" stroke="#ff694a" stroke-width="2.5" marker-end="url(#arrow-orange)"/>
+
+  <!-- ── STEP 7: CHUNK ── -->
+  <g transform="translate(770, 430)" filter="url(#shadow-lg)">
+    <rect width="280" height="220" rx="10" fill="#fff" stroke="#ff694a" stroke-width="2"/>
+
+    <rect x="12" y="12" width="75" height="26" rx="13" fill="#ff694a"/>
+    <text x="49" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">STEP 7</text>
+    <text x="100" y="30" font-size="18" font-weight="800" fill="#1a1a2e">CHUNK</text>
+    <text x="185" y="30" font-size="12" fill="#6b7280">(dbt)</text>
+
+    <line x1="15" y1="44" x2="265" y2="44" stroke="#e5e7eb" stroke-width="1"/>
+
+    <text x="20" y="68" font-size="11" font-weight="600" fill="#ff694a">Models:</text>
+    <text x="20" y="86" font-size="11" font-family="monospace" fill="#4b5563">cur_episodes.sql</text>
+    <text x="20" y="102" font-size="11" font-family="monospace" fill="#4b5563">cur_segments.sql</text>
+
+    <line x1="15" y1="116" x2="265" y2="116" stroke="#f3f4f6" stroke-width="1"/>
+
+    <text x="20" y="136" font-size="10" fill="#4b5563">120-second chunking windows</text>
+    <text x="20" y="152" font-size="10" fill="#4b5563">Sentence-aligned boundaries</text>
+    <text x="20" y="168" font-size="10" fill="#4b5563">15-20s overlap between chunks</text>
+    <text x="20" y="184" font-size="10" fill="#4b5563">YouTube deep links (?t=Ns)</text>
+
+    <line x1="15" y1="196" x2="265" y2="196" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="140" y="213" text-anchor="middle" font-size="10" font-weight="700" fill="#ff694a" letter-spacing="1">&rarr; CURATED SCHEMA</text>
+  </g>
+
+  <!-- Arrow 7→8 -->
+  <line x1="1050" y1="540" x2="1090" y2="540" stroke="#00d4aa" stroke-width="2.5" marker-end="url(#arrow-green)"/>
+
+  <!-- ── STEP 8: ENRICH ── -->
+  <g transform="translate(1095, 430)" filter="url(#shadow-lg)">
+    <rect width="310" height="220" rx="10" fill="#fff" stroke="#00d4aa" stroke-width="2"/>
+
+    <rect x="12" y="12" width="75" height="26" rx="13" fill="#00d4aa"/>
+    <text x="49" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">STEP 8</text>
+    <text x="100" y="30" font-size="18" font-weight="800" fill="#1a1a2e">ENRICH</text>
+    <text x="195" y="30" font-size="12" fill="#6b7280">(dbt + Cortex)</text>
+
+    <line x1="15" y1="44" x2="295" y2="44" stroke="#e5e7eb" stroke-width="1"/>
+
+    <text x="20" y="68" font-size="11" font-weight="600" fill="#00d4aa">Models (INCREMENTAL):</text>
+    <text x="20" y="86" font-size="11" font-family="monospace" fill="#4b5563">sem_embeddings.sql</text>
+    <text x="20" y="102" font-size="11" font-family="monospace" fill="#4b5563">sem_topics_entities.sql</text>
+    <text x="20" y="118" font-size="11" font-family="monospace" fill="#4b5563">sem_episode_summaries.sql</text>
+
+    <line x1="15" y1="132" x2="295" y2="132" stroke="#f3f4f6" stroke-width="1"/>
+
+    <text x="20" y="152" font-size="10" fill="#4b5563">EMBED_TEXT_768 (arctic-embed-m)</text>
+    <text x="20" y="168" font-size="10" fill="#4b5563">CORTEX COMPLETE (llama3.1-405b)</text>
+    <text x="20" y="184" font-size="10" fill="#4b5563">768-dim vectors, NER, summaries</text>
+
+    <line x1="15" y1="196" x2="295" y2="196" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="155" y="213" text-anchor="middle" font-size="10" font-weight="700" fill="#00d4aa" letter-spacing="1">&rarr; SEMANTIC SCHEMA</text>
+  </g>
+
+  <!-- Week labels for row 2 -->
+  <g transform="translate(1440, 460)">
+    <rect width="220" height="110" rx="10" fill="#f8fafc" stroke="#e5e7eb" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="110" y="25" text-anchor="middle" font-size="12" font-weight="700" fill="#374151">Timeline</text>
+    <line x1="15" y1="35" x2="205" y2="35" stroke="#e5e7eb" stroke-width="1"/>
+
+    <circle cx="30" cy="56" r="8" fill="#d1d5db"/>
+    <text x="48" y="60" font-size="11" fill="#4b5563">Steps 5-6</text>
+    <text x="185" y="60" text-anchor="end" font-size="10" font-weight="700" fill="#6b7280">Week 2</text>
+
+    <circle cx="30" cy="78" r="8" fill="#d1d5db"/>
+    <text x="48" y="82" font-size="11" fill="#4b5563">Steps 7-8</text>
+    <text x="185" y="82" text-anchor="end" font-size="10" font-weight="700" fill="#6b7280">Week 3</text>
+
+    <circle cx="30" cy="100" r="8" fill="#d1d5db"/>
+    <text x="48" y="104" font-size="11" fill="#4b5563">Steps 9-10</text>
+    <text x="185" y="104" text-anchor="end" font-size="10" font-weight="700" fill="#6b7280">Week 4</text>
+  </g>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- CONNECTOR: Row 2 → Row 3                               -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <path d="M 1250 650 L 1250 710 L 280 710 L 280 750" stroke="#00d4aa" stroke-width="2.5" fill="none" marker-end="url(#arrow-green)"/>
+
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- ROW 3: STEPS 9-10 (Index → Validate)                   -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <rect x="30" y="735" width="1640" height="270" rx="12" fill="none" stroke="#22c55e" stroke-width="1.5" stroke-dasharray="8 4"/>
+  <text x="850" y="763" text-anchor="middle" font-size="11" font-weight="700" fill="#22c55e" letter-spacing="3">ROW 3 &mdash; SEARCH &amp; VALIDATION (Snowflake + dbt tests)</text>
+
+  <!-- ── STEP 9: INDEX ── -->
+  <g transform="translate(60, 785)" filter="url(#shadow-lg)">
+    <rect width="440" height="195" rx="10" fill="#fff" stroke="#00d4aa" stroke-width="2"/>
+
+    <rect x="12" y="12" width="75" height="26" rx="13" fill="#00d4aa"/>
+    <text x="49" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">STEP 9</text>
+    <text x="100" y="30" font-size="18" font-weight="800" fill="#1a1a2e">INDEX</text>
+    <text x="180" y="30" font-size="12" fill="#6b7280">(Snowflake)</text>
+
+    <line x1="15" y1="44" x2="425" y2="44" stroke="#e5e7eb" stroke-width="1"/>
+
+    <text x="20" y="68" font-size="11" font-weight="600" fill="#00d4aa">Cortex Search Service:</text>
+    <text x="20" y="88" font-size="11" font-family="monospace" fill="#4b5563">CREATE CORTEX SEARCH SERVICE podcast_search</text>
+
+    <line x1="15" y1="100" x2="425" y2="100" stroke="#f3f4f6" stroke-width="1"/>
+
+    <!-- Search type pills -->
+    <rect x="20" y="110" width="100" height="28" rx="14" fill="#f0fdfa" stroke="#00d4aa" stroke-width="1"/>
+    <text x="70" y="128" text-anchor="middle" font-size="10" font-weight="600" fill="#00d4aa">Vector</text>
+
+    <text x="132" y="128" text-anchor="middle" font-size="12" fill="#6b7280">+</text>
+
+    <rect x="145" y="110" width="100" height="28" rx="14" fill="#f0fdfa" stroke="#00d4aa" stroke-width="1"/>
+    <text x="195" y="128" text-anchor="middle" font-size="10" font-weight="600" fill="#00d4aa">Keyword</text>
+
+    <text x="257" y="128" text-anchor="middle" font-size="12" fill="#6b7280">+</text>
+
+    <rect x="270" y="110" width="145" height="28" rx="14" fill="#f0fdfa" stroke="#00d4aa" stroke-width="1"/>
+    <text x="342" y="128" text-anchor="middle" font-size="10" font-weight="600" fill="#00d4aa">LLM Re-Ranking</text>
+
+    <text x="20" y="160" font-size="10" fill="#4b5563">Join: embeddings &harr; segments &harr; episodes</text>
+    <text x="20" y="176" font-size="10" fill="#4b5563">TARGET_LAG = '2 minutes' &bull; Auto-refresh</text>
+
+    <line x1="15" y1="186" x2="425" y2="186" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="220" y="194" text-anchor="middle" font-size="10" font-weight="700" fill="#00d4aa" letter-spacing="1">&rarr; SEARCHABLE</text>
+  </g>
+
+  <!-- Arrow 9→10 -->
+  <line x1="500" y1="880" x2="560" y2="880" stroke="#22c55e" stroke-width="2.5" marker-end="url(#arrow-emerald)"/>
+
+  <!-- ── STEP 10: VALIDATE ── -->
+  <g transform="translate(565, 785)" filter="url(#shadow-lg)">
+    <rect width="440" height="195" rx="10" fill="#fff" stroke="#22c55e" stroke-width="2"/>
+
+    <rect x="12" y="12" width="80" height="26" rx="13" fill="#22c55e"/>
+    <text x="52" y="30" text-anchor="middle" font-size="11" font-weight="800" fill="#fff">STEP 10</text>
+    <text x="108" y="30" font-size="18" font-weight="800" fill="#1a1a2e">VALIDATE</text>
+    <text x="235" y="30" font-size="12" fill="#6b7280">(dbt tests)</text>
+
+    <line x1="15" y1="44" x2="425" y2="44" stroke="#e5e7eb" stroke-width="1"/>
+
+    <text x="20" y="68" font-size="11" font-weight="600" fill="#22c55e">Command:</text>
+    <text x="100" y="68" font-size="11" font-family="monospace" fill="#4b5563">dbt test</text>
+
+    <line x1="15" y1="80" x2="425" y2="80" stroke="#f3f4f6" stroke-width="1"/>
+
+    <text x="20" y="100" font-size="10" fill="#4b5563">not_null on all critical columns (video_id, segment_text, vector)</text>
+    <text x="20" y="116" font-size="10" fill="#4b5563">unique on primary keys (video_id, segment_id)</text>
+    <text x="20" y="132" font-size="10" fill="#4b5563">relationships (segments &rarr; episodes, embeddings &rarr; segments)</text>
+    <text x="20" y="148" font-size="10" fill="#4b5563">Custom: embedding coverage = 100% of segments</text>
+    <text x="20" y="164" font-size="10" fill="#4b5563">Custom: YouTube links valid format, timestamps ordered</text>
+
+    <line x1="15" y1="176" x2="425" y2="176" stroke="#f3f4f6" stroke-width="1"/>
+    <text x="220" y="192" text-anchor="middle" font-size="10" font-weight="700" fill="#22c55e" letter-spacing="1">&rarr; PRODUCTION-READY</text>
+  </g>
+
+  <!-- ── FINAL STATE ── -->
+  <g transform="translate(1080, 790)" filter="url(#shadow-lg)">
+    <rect width="280" height="80" rx="10" fill="#f0fdf4" stroke="#22c55e" stroke-width="2"/>
+    <text x="140" y="30" text-anchor="middle" font-size="16" font-weight="800" fill="#22c55e">PRODUCTION READY</text>
+    <text x="140" y="50" text-anchor="middle" font-size="10" fill="#4b5563">All tests pass &bull; Search &lt; 5s latency</text>
+    <text x="140" y="66" text-anchor="middle" font-size="10" fill="#4b5563">100% embedding coverage &bull; &lt;150 credits</text>
+  </g>
+
+  <!-- Arrow: validate → production -->
+  <line x1="1005" y1="880" x2="1080" y2="840" stroke="#22c55e" stroke-width="2.5" marker-end="url(#arrow-emerald)"/>
+
+  <!-- ── KEY METRICS ── -->
+  <g transform="translate(1080, 895)">
+    <rect width="75" height="55" rx="8" fill="#f0fdf4" stroke="#22c55e66" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="37" y="24" text-anchor="middle" font-size="18" font-weight="800" fill="#1a1a2e">250</text>
+    <text x="37" y="42" text-anchor="middle" font-size="7" fill="#6b7280" letter-spacing="1">EPISODES</text>
+  </g>
+  <g transform="translate(1165, 895)">
+    <rect width="75" height="55" rx="8" fill="#f0fdf4" stroke="#22c55e66" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="37" y="24" text-anchor="middle" font-size="18" font-weight="800" fill="#1a1a2e">18K+</text>
+    <text x="37" y="42" text-anchor="middle" font-size="7" fill="#6b7280" letter-spacing="1">SEGMENTS</text>
+  </g>
+  <g transform="translate(1250, 895)">
+    <rect width="75" height="55" rx="8" fill="#eff6ff" stroke="#4a90d966" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="37" y="24" text-anchor="middle" font-size="18" font-weight="800" fill="#1a1a2e">768</text>
+    <text x="37" y="42" text-anchor="middle" font-size="7" fill="#6b7280" letter-spacing="1">DIMENSIONS</text>
+  </g>
+  <g transform="translate(1335, 895)">
+    <rect width="75" height="55" rx="8" fill="#fef2f2" stroke="#e74c3c66" stroke-width="1.5" filter="url(#shadow)"/>
+    <text x="37" y="24" text-anchor="middle" font-size="18" font-weight="800" fill="#1a1a2e">&lt;5s</text>
+    <text x="37" y="42" text-anchor="middle" font-size="7" fill="#6b7280" letter-spacing="1">LATENCY</text>
+  </g>
+
+  <!-- ── SCHEMA FLOW (bottom legend) ── -->
+  <g transform="translate(60, 1000)">
+    <text x="0" y="12" font-size="11" font-weight="700" fill="#374151">Snowflake Schema Flow:</text>
+
+    <rect x="180" y="0" width="80" height="22" rx="4" fill="#e8f4fd" stroke="#29b5e8" stroke-width="1"/>
+    <text x="220" y="15" text-anchor="middle" font-size="10" font-weight="600" fill="#29b5e8">RAW</text>
+
+    <text x="270" y="15" font-size="12" fill="#6b7280">&rarr;</text>
+
+    <rect x="285" y="0" width="90" height="22" rx="4" fill="#fff4e6" stroke="#ff694a" stroke-width="1"/>
+    <text x="330" y="15" text-anchor="middle" font-size="10" font-weight="600" fill="#ff694a">STAGING</text>
+
+    <text x="385" y="15" font-size="12" fill="#6b7280">&rarr;</text>
+
+    <rect x="400" y="0" width="125" height="22" rx="4" fill="#fff4e6" stroke="#ff694a" stroke-width="1"/>
+    <text x="462" y="15" text-anchor="middle" font-size="10" font-weight="600" fill="#ff694a">INTERMEDIATE</text>
+
+    <text x="535" y="15" font-size="12" fill="#6b7280">&rarr;</text>
+
+    <rect x="550" y="0" width="95" height="22" rx="4" fill="#fff4e6" stroke="#ff694a" stroke-width="1"/>
+    <text x="597" y="15" text-anchor="middle" font-size="10" font-weight="600" fill="#ff694a">CURATED</text>
+
+    <text x="655" y="15" font-size="12" fill="#6b7280">&rarr;</text>
+
+    <rect x="670" y="0" width="100" height="22" rx="4" fill="#f0fdfa" stroke="#00d4aa" stroke-width="1"/>
+    <text x="720" y="15" text-anchor="middle" font-size="10" font-weight="600" fill="#00d4aa">SEMANTIC</text>
+
+    <text x="780" y="15" font-size="12" fill="#6b7280">&rarr;</text>
+
+    <rect x="795" y="0" width="120" height="22" rx="4" fill="#f0fdf4" stroke="#22c55e" stroke-width="1"/>
+    <text x="855" y="15" text-anchor="middle" font-size="10" font-weight="600" fill="#22c55e">SEARCHABLE</text>
+  </g>
+
+  <!-- Footer -->
+  <text x="850" y="1040" text-anchor="middle" font-size="11" fill="#9ca3af">PodcastIQ &mdash; Complete Data Engineering Pipeline &middot; 10 Steps &middot; 8-Week Implementation &middot; February 2026</text>
+
+</svg>
+
+</body>
+</html>

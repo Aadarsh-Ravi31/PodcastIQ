@@ -10,8 +10,9 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-RAW_DATA_DIR = Path(r"D:\Projects\PodcastIQ\data\raw")
-OUTPUT_REPORT_PATH = Path(r"D:\Projects\PodcastIQ\data\transcript_data_profile.html")
+PROJECT_ROOT = Path(__file__).parent.parent
+RAW_DATA_DIR = PROJECT_ROOT / "data" / "raw"
+OUTPUT_REPORT_PATH = PROJECT_ROOT / "reports" / "transcript_data_profile.html"
 
 def collect_data():
     """Collects metadata and transcript metrics for all processed episodes."""

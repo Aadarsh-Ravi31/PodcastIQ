@@ -12,9 +12,9 @@
 | Week | Focus | Status |
 |------|-------|--------|
 | 1 | Environment Setup + Steps 1-2 (Extract & Profile) | [x] Completed |
-| 2 | Steps 3-6 (Stage, Load, Clean, Structure) | [/] In Progress |
-| 3 | Steps 7-8 (Chunk & Enrich) | [ ] Not Started |
-| 4 | Steps 9-10 (Index & Validate) + LangGraph MVP | [ ] Not Started |
+| 2 | Steps 3-6 (Stage, Load, Clean, Structure) | [x] Completed |
+| 3 | Steps 7-8 (Chunk & Enrich) | [x] Completed |
+| 4 | Steps 9-10 (Index & Validate) + LangGraph MVP | [/] In Progress |
 | 5 | Streamlit UI + Topic Extraction Agent | [ ] Not Started |
 | 6 | Comparison/Recommendation Agents + MCP | [ ] Not Started |
 | 7 | Orchestration (Airflow), Testing & Optimization | [ ] Not Started |
@@ -76,11 +76,11 @@ Hybrid search
 - [ ] Verify local connection to Snowflake via Python
 
 ### 0.4 Snowflake Infrastructure
-- [ ] Create database `PODCASTIQ`
-- [ ] Create schemas: `RAW`, `STAGING`, `INTERMEDIATE`, `CURATED`, `SEMANTIC`, `APP`
-- [ ] Create warehouses: `LOADING_WH` (X-SMALL), `TRANSFORM_WH` (SMALL), `SEARCH_WH` (X-SMALL)
-- [ ] Create internal stage: `@PODCASTIQ.RAW.JSON_STAGE`
-- [ ] Set auto-suspend policies (60-300s)
+- [x] Create database `PODCASTIQ`
+- [x] Create schemas: `RAW`, `STAGING`, `INTERMEDIATE`, `CURATED`, `SEMANTIC`, `APP`
+- [x] Create warehouses: `LOADING_WH` (X-SMALL), `TRANSFORM_WH` (SMALL), `SEARCH_WH` (X-SMALL)
+- [x] Create internal stage: `@PODCASTIQ.RAW.JSON_STAGE`
+- [x] Set auto-suspend policies (60-300s)
 
 ---
 
@@ -118,106 +118,72 @@ Hybrid search
 ## ☁️ STEP 3: STAGE (Snowflake) — Week 2
 
 ### 3.1 Internal Stage Setup
-- [ ] Create named internal stage `@PODCASTIQ.RAW.JSON_STAGE`
-- [ ] Create `scripts/stage_data.py` — PUT local JSON files to internal stage
-- [ ] PUT metadata JSON files to stage
-- [ ] PUT transcript JSON files to stage
-- [ ] Verify staged files with `LIST @JSON_STAGE`
+- [x] Create named internal stage `@PODCASTIQ.RAW.JSON_STAGE`
+- [x] Create `scripts/stage_data.py` — PUT local JSON files to internal stage
+- [x] PUT metadata JSON files to stage
+- [x] PUT transcript JSON files to stage
+- [x] Verify staged files with `LIST @JSON_STAGE`
 
 ---
 
 ## 📦 STEP 4: LOAD (Snowflake) — Week 2
 
 ### 4.1 RAW Layer Loading
-- [ ] Create `raw.raw_youtube_metadata` table (VARIANT column for JSON)
-- [ ] Create `raw.raw_transcripts` table (VARIANT column for JSON)
-- [ ] Create file format: `JSON_FORMAT` (type = JSON, strip_outer_array = true)
-- [ ] Write COPY INTO statements for metadata
-- [ ] Write COPY INTO statements for transcripts
-- [ ] Create `sql/load_raw.sql` with all loading logic
-- [ ] Verify row counts match source file counts
-- [ ] Verify VARIANT data is queryable with `:` notation
+- [x] Create `raw.raw_youtube_metadata` table (VARIANT column for JSON)
+- [x] Create `raw.raw_transcripts` table (VARIANT column for JSON)
+- [x] Create file format: `JSON_FORMAT` (type = JSON, strip_outer_array = true)
+- [x] Write COPY INTO statements for metadata
+- [x] Write COPY INTO statements for transcripts
+- [x] Create `sql/load_raw.sql` with all loading logic
+- [x] Verify row counts match source file counts
+- [x] Verify VARIANT data is queryable with `:` notation
 
 ---
 
 ## 🧹 STEP 5: CLEAN — dbt Staging Models (Week 2)
 
 ### 5.1 dbt Project Setup
-- [ ] Initialize dbt project `dbt_podcastiq`
-- [ ] Configure `profiles.yml` for Snowflake connection
-- [ ] Create `dbt_project.yml` with model paths for staging/intermediate/curated/semantic
+- [x] Initialize dbt project `dbt_podcastiq`
+- [x] Configure `profiles.yml` for Snowflake connection
+- [x] Create `dbt_project.yml` with model paths for staging/intermediate/curated/semantic
 
 ### 5.2 Staging Models (stg_)
-- [ ] Create `models/staging/stg_youtube_metadata.sql`
-  - Parse VARIANT JSON → flat columns (video_id, title, channel_name, published_at, duration_seconds, etc.)
-  - Cast types (timestamps, integers)
-  - Remove duplicates (dedup by video_id)
-  - Add `_loaded_at` audit column
-- [ ] Create `models/staging/stg_transcripts.sql`
-  - Parse VARIANT JSON → flat columns (video_id, text, start_seconds, duration_seconds)
-  - Fix text: trim whitespace, normalize unicode, remove `[Music]`/`[Applause]` noise markers
-  - Filter out empty/null text segments
-  - Add `_loaded_at` audit column
-- [ ] Create `models/staging/schema.yml` with column descriptions and basic tests
+- [x] Create `models/staging/stg_youtube_metadata.sql`
+- [x] Create `models/staging/stg_transcripts.sql`
+- [x] Create `models/staging/schema.yml` with column descriptions and basic tests
 
 ---
 
 ## 🔗 STEP 6: STRUCTURE — dbt Intermediate Models (Week 2)
 
 ### 6.1 Intermediate Models (int_)
-- [ ] Create `models/intermediate/int_episodes.sql`
-  - Join metadata + transcripts (aggregate full transcript per episode)
-  - Calculate derived fields: total_word_count, transcript_duration_seconds, has_transcript flag
-  - Type casting and normalization
-  - Extract guest names from title patterns (e.g., "with Guest Name", "ft. Guest Name")
-- [ ] Create `models/intermediate/int_transcript_lines.sql`
-  - Normalize transcript lines with episode context
-  - Add cumulative word counts and sentence boundaries
-  - Create sequential line numbering per episode
-- [ ] Create `models/intermediate/schema.yml` with tests (not_null, unique, relationships)
+- [x] Create `models/intermediate/int_episodes.sql`
+- [x] Create `models/intermediate/int_transcript_lines.sql`
+- [x] Create `models/intermediate/schema.yml` with tests (not_null, unique, relationships)
 
 ---
 
 ## ✂️ STEP 7: CHUNK — dbt Curated Models (Week 3)
 
 ### 7.1 Curated Models (cur_)
-- [ ] Create `models/curated/cur_episodes.sql`
-  - Final cleaned episode records with all metadata
-  - Materialized as TABLE for query performance
-- [ ] Create `models/curated/cur_segments.sql`
-  - Implement 120-second chunking windows (sentence-aligned boundaries)
-  - Ensure chunks break at sentence boundaries (not mid-word)
-  - Add overlap between adjacent chunks (~15-20s)
-  - Generate YouTube deep links: `https://youtu.be/{video_id}?t={start_seconds}s`
-  - Add `previous_segment_id` and `next_segment_id` for context retrieval
-  - Calculate `word_count` per segment
-  - Materialized as TABLE
-- [ ] Create `models/curated/schema.yml` with tests
-- [ ] Verify: avg segments per episode (~30-40 at 120s windows)
-- [ ] Verify: chunk boundaries align with sentence endings
+- [x] Create `models/curated/cur_episodes.sql`
+- [x] Create `models/curated/cur_chunks.sql` (chunked segments table — CUR_CHUNKS in Snowflake)
+- [x] Create `models/curated/schema.yml` with tests
+- [x] Verify chunking output in Snowflake
 
 ---
 
 ## 🧠 STEP 8: ENRICH — dbt Semantic Models (Week 3)
 
 ### 8.1 Embedding Generation
-- [ ] Create `models/semantic/sem_embeddings.sql` (INCREMENTAL)
-  - Use `SNOWFLAKE.CORTEX.EMBED_TEXT_768('snowflake-arctic-embed-m', segment_text)`
-  - Only process new/changed segments (incremental)
-  - Store 768-dimensional vectors in VECTOR column type
-  - Monitor credit usage during initial batch run
+- [x] Create `models/semantic/sem_chunk_embeddings.sql` → `SEM_CHUNK_EMBEDDINGS` in Snowflake
 
 ### 8.2 Topic & Entity Extraction
-- [ ] Create `models/semantic/sem_topics_entities.sql` (INCREMENTAL)
-  - Use `SNOWFLAKE.CORTEX.COMPLETE('llama3.1-405b', extraction_prompt)` for NER
-  - Extract: people, organizations, technologies, topics
-  - Store confidence scores for filtering
-  - Parse LLM JSON output into structured columns
+- [x] Create `models/semantic/sem_chunk_topics.sql` → `SEM_CHUNK_TOPICS` in Snowflake
+- [x] Create `models/semantic/sem_chunk_entities.sql` → `SEM_CHUNK_ENTITIES` in Snowflake
 
 ### 8.3 Episode Summaries
-- [ ] Create `models/semantic/sem_episode_summaries.sql` (INCREMENTAL)
-  - Generate multi-level summaries (1-sentence, paragraph, detailed)
-  - Use Cortex LLM with curated episode text as input
+- [x] Create `models/semantic/sem_episode_summaries.sql` → `SEM_EPISODE_SUMMARIES` in Snowflake
 
 ### 8.4 Semantic Schema
 - [ ] Create `models/semantic/schema.yml` with tests and docs
@@ -227,12 +193,9 @@ Hybrid search
 ## 🔍 STEP 9: INDEX (Snowflake) — Week 4
 
 ### 9.1 Cortex Search Service
-- [ ] Create `sql/cortex_search_setup.sql`
-- [ ] Create Cortex Search service `podcast_search`:
-  - Hybrid search (vector + keyword + LLM re-ranking)
-  - Join embeddings ↔ segments ↔ episodes
-  - Configure `TARGET_LAG = '2 minutes'`
-- [ ] Test search quality with sample queries
+- [x] Create `sql/cortex_search_setup.sql`
+- [x] Create Cortex Search service `PODCASTIQ_SEARCH` (live in SEMANTIC schema since Feb 21)
+- [ ] Test search quality with sample queries (use `pipeline_verification.sql`)
 - [ ] Verify search latency < 2 seconds
 
 ---
@@ -305,18 +268,21 @@ Hybrid search
 
 ---
 
-## 📝 Current Focus: Week 2
-**Goal:** Complete Steps 3-6 (Stage → Structure)
+## 📝 Current Focus: Week 3
+**Goal:** Complete Step 8 (Enrich — Embeddings, Topics, Summaries) then Step 9 (Index — Cortex Search)
 
 **Completed:**
-- Step 1: Batch extraction of 26 channels (250+ episodes in `data/raw/`)
-- Step 2: Data profiling with ydata-profiling (report at `reports/transcript_data_profile.html`)
-- Environment setup, `.env`, `requirements.txt`
+- Steps 1-2: Batch extraction of 26 channels (250+ episodes), data profiling report
+- Steps 3-4: Snowflake infrastructure, staged + loaded JSON to RAW layer
+- Steps 5-6: dbt stg_ and int_ models (clean, structure)
+- Step 7: dbt cur_ models — CUR_CHUNKS table live in Snowflake ✅
 
 **Next Up:**
-- Snowflake infrastructure setup — run `sql/schema_setup.sql` (schemas, stages, warehouses)
-- Stage & Load JSON data into Snowflake RAW (Steps 3-4)
-- dbt project init + staging/intermediate models (Steps 5-6)
+- Step 8: Generate embeddings with `SNOWFLAKE.CORTEX.EMBED_TEXT_768` → `sem_embeddings` table
+- Step 8: Topic & entity extraction via Cortex LLM → `sem_topics_entities` table
+- Step 8: Episode summaries via Cortex LLM → `sem_episode_summaries` table
+- Step 9: Create Cortex Search service on `sem_embeddings` + `cur_chunks`
+- Step 10: dbt tests for data quality validation
 
 **Blockers:** None
 
@@ -327,9 +293,9 @@ Hybrid search
 | Week | Status | Start Date | End Date | Notes |
 |------|--------|------------|----------|-------|
 | 1 | Completed | Feb 15 | Feb 20 | Steps 1-2 done: 250+ episodes extracted, profiling report generated |
-| 2 | Not Started | - | - | |
-| 3 | Not Started | - | - | |
-| 4 | Not Started | - | - | |
+| 2 | Completed | - | Mar 17 | Steps 3-6 done: RAW loaded, stg/int dbt models complete |
+| 3 | Completed | Mar 17 | Mar 17 | Steps 7-8 done: CUR_CHUNKS, SEM embeddings/topics/entities/summaries all live |
+| 4 | In Progress | Mar 17 | - | PODCASTIQ_SEARCH service live; LangGraph agents next |
 | 5 | Not Started | - | - | |
 | 6 | Not Started | - | - | |
 | 7 | Not Started | - | - | |

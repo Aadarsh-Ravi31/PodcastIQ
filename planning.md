@@ -1,786 +1,374 @@
-# PodcastIQ Implementation Plan
+# PodcastIQ Implementation Plan (Expanded)
 
 ## Context
 
 **Problem:** Over 5 million podcasts exist, but audio content is unsearchable. Users waste hours listening to entire episodes to find specific discussions, and valuable insights remain buried in audio format.
 
-**Solution:** PodcastIQ - An AI-powered podcast discovery platform that makes podcast content as searchable as text on the web using semantic search, multi-agent orchestration, and RAG architecture.
+**Solution:** PodcastIQ - An AI-powered podcast **intelligence platform** that makes podcast content searchable, tracks how claims evolve over time, and automatically fact-checks podcast statements using a temporal knowledge graph, multi-agent orchestration, and hybrid RAG architecture (vector search + graph traversal).
 
-**Why This Change:** This project addresses a real pain point while demonstrating mastery of Gen AI data engineering: ETL pipelines (Airflow, DBT), data warehousing (Snowflake), RAG implementation (Cortex Search), and Agentic AI patterns (LangGraph).
+**What Makes This Novel:**
+- **GraphRAG** — Combines vector search (Cortex Search) with graph traversal (Neo4j) for relationship reasoning. Based on Microsoft Research's 2024 GraphRAG pattern.
+- **Temporal Knowledge Graph** — Tracks how claims and opinions evolve across episodes and speakers over time. Detects opinion drift, revised predictions, and contradictions.
+- **Hybrid Fact-Checking** — Two-stage verification pipeline: Cortex LLM pre-filter + MCP web search for uncertain claims. Cost-optimized (~60-70% resolved without API calls).
+- **Two-Tier Speaker Attribution** — Metadata extraction + LLM inference with explicit confidence scoring for claim attribution without audio diarization.
 
 **Course Requirements Met:**
-1. ✅ Data Engineering: ETL/ELT pipeline extracting YouTube transcripts → transforming with DBT → loading to Snowflake
-2. ✅ Generative AI: Multi-agent system with 6 specialized agents using Snowflake Cortex LLMs
-3. ✅ RAG Implementation: Vector embeddings + semantic search + context retrieval
-4. ✅ Agentic AI Architecture: LangGraph orchestrating Router, Search, Summarization, Topic Extraction, Comparison, and Recommendation agents
-5. ✅ MCP Integration: LangGraph agents consume MCP servers for enhanced capabilities (filesystem access, web search, etc.)
+1. ✅ Data Engineering: ETL/ELT pipeline extracting YouTube transcripts → transforming via Snowflake SQL → loading to Snowflake (Steps 1–9 complete)
+2. ✅ Generative AI: Multi-agent system with 9 specialized agents using Snowflake Cortex LLMs
+3. ✅ RAG Implementation: Hybrid RAG — vector embeddings via Cortex Search + graph traversal via Neo4j (GraphRAG pattern)
+4. ✅ Agentic AI Architecture: LangGraph orchestrating Router, Search, Summarization, Knowledge Graph, Temporal Analysis, Fact-Check, Comparison, Recommendation, and Insight agents
+5. ✅ MCP Integration: Fact-checking agent uses MCP Web Search server for real-time claim verification
 
 ---
 
 ## High-Level Architecture
 
 ```
-YouTube Transcripts (300 episodes from 10-15 channels)
+YouTube API (25 channels, 290+ episodes, 6 genres)
           ↓
-   Apache Airflow (ETL Orchestration)
+   channel_extraction.py (yt-dlp + YouTube Data API v3)
+   → data/raw/{channel}/{video_id}_metadata.json
+   → data/raw/{channel}/{video_id}_transcript.json
           ↓
-   Snowflake (4-Layer Data Warehouse)
-   ├── RAW: Unprocessed transcripts
-   ├── CURATED: Cleaned + chunked segments (60s windows)
-   ├── SEMANTIC: Vector embeddings + topics
-   └── APP: User interactions + search history
+   snowflake_loader.py (PUT → COPY INTO)
           ↓
-   DBT (Data Transformation)
+   Snowflake (6-Schema Data Warehouse)
+   ├── RAW:          EPISODES (VARIANT), CHANNELS
+   ├── STAGING:      STG_EPISODES, STG_SEGMENTS (views)
+   │                 INT_EPISODES, INT_SEGMENTS  (views)
+   ├── CURATED:      CUR_CHUNKS (120s windows, ~250K chunks)
+   ├── SEMANTIC:     SEM_CHUNK_EMBEDDINGS (VECTOR 768-dim)
+   │                 SEM_CHUNK_TOPICS, SEM_CHUNK_ENTITIES
+   │                 SEM_EPISODE_SUMMARIES
+   │                 SEM_CLAIMS (extracted claims with speaker attribution)
+   │                 SEM_CLAIM_EVOLUTION (temporal drift tracking)
+   │                 SEM_EPISODE_PARTICIPANTS (host/guest per episode)
+   ├── APP:          search_history, user_preferences
+   └── Cortex Search: PODCASTIQ_SEARCH (hybrid search service) ✅ LIVE
           ↓
-   Snowflake Cortex AI
-   ├── Embeddings: snowflake-arctic-embed-m (768-dim)
-   ├── LLM: llama3.1-405b
-   └── Cortex Search: Managed hybrid search
+   Claim Extraction Pipeline
+   ├── Cortex LLM extracts structured claims from chunks
+   ├── Two-tier speaker attribution (metadata + LLM inference)
+   ├── Claim classification (VERIFIABLE_FACT / PREDICTION / OPINION / STATISTICAL)
+   └── Claims stored in SEM_CLAIMS table
           ↓
-   LangGraph Multi-Agent System
+   Neo4j Knowledge Graph
+   ├── Nodes: Person, Organization, Topic, Episode, Channel, Claim
+   ├── Edges: MADE_CLAIM, APPEARED_ON, DISCUSSED, EVOLVED_FROM, etc.
+   ├── Entity resolution (merge duplicate names)
+   └── Claim linking + drift detection
+          ↓
+   Hybrid Fact-Checking Pipeline
+   ├── Stage 1: Cortex LLM pre-filter (resolve ~30-40% from training knowledge)
+   ├── Stage 2: MCP Web Search for uncertain claims (Brave Search API)
+   ├── Stage 3: Cortex LLM synthesizes final verdict
+   └── Results: VERIFIED / OUTDATED / DISPUTED / UNVERIFIED / FALSE
+          ↓
+   LangGraph Multi-Agent System (9 Agents)
    ├── Router Agent (orchestration)
-   ├── Search Agent (Cortex Search queries)
-   ├── Summarization Agent (episode summaries)
-   ├── Topic Extraction Agent (NER, entities)
-   ├── Comparison Agent (cross-podcast analysis)
-   └── Recommendation Agent (personalized suggestions)
+   ├── Search Agent (hybrid: Cortex Search + Neo4j)
+   ├── Summarization Agent (answers + YouTube links + claim status)
+   ├── Knowledge Graph Agent (Cypher queries)
+   ├── Temporal Analysis Agent (claim evolution + drift detection)
+   ├── Fact-Check Agent (hybrid: Cortex LLM + MCP web search)
+   ├── Comparison Agent (graph-powered cross-podcast)
+   ├── Recommendation Agent (graph-based suggestions)
+   └── Insight Agent (credibility scores, debate detection)
           ↑
-   MCP Servers (External Tool Integration)
+   MCP Servers
+   ├── Web Search MCP (Brave Search API for fact-checking)
    ├── Filesystem MCP (read transcripts, logs)
-   ├── Web Search MCP (real-time fact-checking)
    └── Database MCP (query Snowflake directly)
           ↓
-   Streamlit UI (Search + Results + Deep Links)
+   Streamlit UI
+   ├── Search + Results with verification badges
+   ├── Interactive Knowledge Graph Explorer
+   ├── Claim Timeline View (temporal evolution)
+   ├── Channel Credibility Dashboard
+   └── Episode Detail with per-claim fact-check status
 ```
-
-**Data Flow:**
-1. Airflow extracts YouTube transcripts daily → loads to Snowflake RAW
-2. DBT transforms RAW → CURATED (chunking) → SEMANTIC (embeddings)
-3. LangGraph agents query Snowflake Cortex Search → generate responses
-4. Streamlit displays results with clickable YouTube timestamp links
 
 ---
 
 ## Technology Stack
 
-| Component | Technology | Purpose |
-|-----------|-----------|---------|
-| Data Warehouse | Snowflake | Storage, compute, vector search |
-| LLM/AI | Snowflake Cortex | llama3.1-405b for reasoning, Arctic Embed for embeddings |
-| Orchestration | Apache Airflow (local via Astro CLI) | ETL automation, scheduling |
-| Transformation | DBT | SQL-based data modeling |
-| Agent Framework | LangGraph | Multi-agent state machines |
-| Frontend | Streamlit | Interactive chat interface |
-| Data Source | YouTube Transcript API | Free podcast transcripts (no API key) |
+| Component | Technology | Status | Purpose |
+|-----------|-----------|--------|---------|
+| Data Warehouse | Snowflake | ✅ Live | Storage, compute, vector search |
+| LLM/AI | Snowflake Cortex | ✅ Live | llama3.1-405b for reasoning, Arctic Embed for embeddings |
+| Transcript Extraction | yt-dlp + YouTube Data API v3 | ✅ Live | Download WebVTT subtitles + metadata |
+| Data Loading | Python `snowflake_loader.py` | ✅ Live | PUT + COPY INTO RAW layer (key-pair auth) |
+| Transformation | Snowflake SQL Views + Cortex AI | ✅ Live | STAGING views, CURATED chunks, SEMANTIC enrichment |
+| Search | Snowflake Cortex Search | ✅ Live | Hybrid vector + keyword + LLM re-ranking |
+| Graph Database | Neo4j Community Edition | ⏳ Week 5 | Knowledge graph storage + Cypher queries |
+| Graph Integration | neo4j Python driver | ⏳ Week 5 | Connect LangGraph agents to Neo4j |
+| Graph Visualization | neovis.js or react-force-graph | ⏳ Week 8 | Interactive graph explorer in UI |
+| Agent Framework | LangGraph | ⏳ Week 4 | Multi-agent state machines |
+| Frontend | Streamlit | ⏳ Week 8 | Interactive search + graph + timeline UI |
+| MCP Servers | @modelcontextprotocol/sdk | ⏳ Week 7 | Web Search for fact-checking |
+| Orchestration | Apache Airflow (local via Astro CLI) | ⏳ Week 9 | ETL automation, scheduling |
 
-**Cost:** $0 - Leverages university Snowflake access + free YouTube transcripts
+**Cost:** <$100 additional — University Snowflake access + free Neo4j CE + free Brave Search tier
 
 ---
 
 ## Snowflake Schema Design
 
-### Layer 1: RAW (Landing Zone)
-**Tables:**
-- `raw.raw_youtube_metadata` - Video titles, channels, durations, publish dates
-- `raw.raw_transcripts` - Individual transcript lines with timestamps
+### Existing Layers (Complete ✅)
 
-### Layer 2: CURATED (Cleaned & Chunked)
-**Tables:**
-- `curated.curated_episodes` - Full episodes with cleaned transcripts
-- `curated.curated_segments` - **60-second chunks with 15-second overlap** (critical for search quality)
+**Layer 1: RAW** ✅
+- `RAW.EPISODES` — One row per video. `RAW_DATA VARIANT` (full merged payload). PK: `VIDEO_ID`
+- `RAW.CHANNELS` — One row per channel. `CHANNEL_ID`, `CHANNEL_NAME`, `GENRE`, `YOUTUBE_URL`
 
-**Chunking Strategy:** Time-based windowing ensures consistent chunk sizes (~200-400 words) and preserves timestamp accuracy for deep linking to YouTube.
+**Layer 2: STAGING** ✅ (all views)
+- `STAGING.STG_EPISODES` — Parses VARIANT → 22 flat typed columns
+- `STAGING.STG_SEGMENTS` — LATERAL FLATTEN → one row per transcript line
+- `STAGING.INT_EPISODES` — Joins STG_EPISODES + CHANNELS. Adds TRANSCRIPT_QUALITY, ENGAGEMENT_RATE
+- `STAGING.INT_SEGMENTS` — Adds YOUTUBE_TIMESTAMP_URL, WORD_COUNT
 
-### Layer 3: SEMANTIC (AI-Enhanced)
-**Tables:**
-- `semantic.embeddings` - 768-dimensional vectors (arctic-embed-m) for semantic search
-- `semantic.topics_entities` - Extracted people, organizations, technologies via Cortex LLM
-- `semantic.episode_summaries` - Multi-level summaries (1-sentence, paragraph, detailed)
+**Layer 3: CURATED** ✅
+- `CURATED.CUR_CHUNKS` — 120-second windowed chunks. CHUNK_ID, CHUNK_TEXT, YOUTUBE_URL, WORD_COUNT
 
-**Cortex Search Service:** Managed hybrid search combining vector similarity + keyword matching + LLM re-ranking.
+**Layer 4: SEMANTIC** ✅ (existing) + new tables
+- `SEM_CHUNK_EMBEDDINGS` — VECTOR(FLOAT, 768) per chunk ✅
+- `SEM_CHUNK_TOPICS` — LLM-extracted topics ✅
+- `SEM_CHUNK_ENTITIES` — NER (people, orgs, tech) ✅
+- `SEM_EPISODE_SUMMARIES` — Episode-level summaries ✅
+- `PODCASTIQ_SEARCH` — Cortex Search service (live since Feb 21) ✅
 
-### Layer 4: APP (User Interactions)
-**Tables:**
-- `app.search_history` - Query logs and clicked results
-- `app.user_preferences` - Saved episodes and favorite topics
-- `app.recommendation_scores` - Pre-computed personalized rankings
+**Layer 5: APP** (Weeks 8-9)
+- `APP.SEARCH_HISTORY` — Query logs
+- `APP.USER_PREFERENCES` — Saved episodes, favorite topics
 
-**Estimated Storage:** <300MB for 300 episodes (well within free tier)
+### New Tables (To Build)
 
----
-
-## ETL Pipeline Design
-
-### Airflow DAGs
-
-**DAG 1: `youtube_extract_dag.py`** (Daily at 2 AM)
-```
-Task 1: Fetch new video IDs from target channels (YouTube Data API)
-Task 2: Extract transcripts using youtube-transcript-api
-Task 3: Validate transcript quality (>100 words, English only)
-Task 4: Load to Snowflake RAW layer (incremental MERGE)
-Task 5: Trigger DBT transformation
-```
-
-**Key Features:**
-- Retry logic: 3 attempts with exponential backoff (5 min → 15 min → 30 min)
-- Error handling: Failed videos logged to separate table for manual review
-- Incremental loading: Only new transcripts, no duplicates
-
-**DAG 2: `dbt_transform_dag.py`** (Triggered after ingestion)
-```
-Task 1: Run curated models (clean transcripts → chunk into segments)
-Task 2: Run semantic models (generate embeddings → extract topics)
-Task 3: Run DBT tests (data quality checks)
-```
-
-**DAG 3: `embedding_generation_dag.py`** (Weekly on Sundays)
-```
-Task 1: Generate embeddings for any segments missing them
-Task 2: Refresh Cortex Search index
-```
-
----
-
-## DBT Transformation Strategy
-
-### Critical DBT Models
-
-**1. `curated_segments.sql`** (Materialized as Table)
-- Implements chunking: 60-second windows with 15-second overlap
-- Uses window functions: `FLOOR(start_seconds / 45)` creates overlapping groups
-- Generates YouTube deep links: `'https://youtu.be/' || video_id || '?t=' || start_seconds || 's'`
-- Links segments: Adds `previous_segment_id` and `next_segment_id` for context retrieval
-
-**2. `embeddings.sql`** (Incremental Materialization)
-- Generates embeddings: `SNOWFLAKE.CORTEX.EMBED_TEXT_768('snowflake-arctic-embed-m', text)`
-- Incremental: Only processes new segments (reduces Cortex API costs)
-- Output: 768-dimensional vectors stored in VECTOR column type
-
-**3. `topics_entities.sql`** (Incremental)
-- Uses Cortex LLM for NER: `SNOWFLAKE.CORTEX.COMPLETE('llama3.1-405b', extraction_prompt)`
-- Extracts: People, organizations, technologies, topics
-- Stores confidence scores for filtering
-
-**DBT Best Practices:**
-- Incremental models for expensive operations (embeddings, LLM calls)
-- Materialized tables for frequently queried data (episodes, segments)
-- Data quality tests: Not null checks, referential integrity, embedding coverage
-
----
-
-## RAG Implementation
-
-### Cortex Search Configuration
-
-**Decision:** Use Snowflake Cortex Search (managed service) instead of custom vector search.
-
-**Rationale:**
-- ✅ Hybrid search built-in (vector + keyword + re-ranking)
-- ✅ Auto-refreshing index (2-minute lag configurable)
-- ✅ Production-ready without manual index management
-- ✅ Simpler implementation (critical for 8-week timeline)
-
-**Setup:**
+**SEM_EPISODE_PARTICIPANTS** (Week 4)
 ```sql
-CREATE CORTEX SEARCH SERVICE podcast_search
-ON embedding_vector
-WAREHOUSE = SEARCH_WH
-TARGET_LAG = '2 minutes'
-AS (
-    SELECT
-        e.segment_id,
-        s.text AS segment_text,
-        e.embedding_vector,
-        s.youtube_timestamp_link,
-        s.episode_id,
-        ep.channel_name,
-        ep.episode_title
-    FROM semantic.embeddings e
-    JOIN curated.curated_segments s ON e.segment_id = s.segment_id
-    JOIN curated.curated_episodes ep ON s.episode_id = ep.episode_id
+CREATE TABLE SEMANTIC.SEM_EPISODE_PARTICIPANTS (
+    VIDEO_ID VARCHAR,
+    PARTICIPANT_NAME VARCHAR(200),
+    PARTICIPANT_ROLE VARCHAR(20),         -- HOST / GUEST
+    EXTRACTION_METHOD VARCHAR(20),        -- TITLE_PARSE / MANUAL / LLM_INFERRED
+    CONFIDENCE VARCHAR(20),
+    PRIMARY KEY (VIDEO_ID, PARTICIPANT_NAME)
 );
 ```
 
-### Search Query Pattern
-
-**Hybrid Search (Recommended):**
+**SEM_CLAIMS** (Week 4)
 ```sql
-SELECT * FROM TABLE(
-    CORTEX_SEARCH(
-        'podcast_search',
-        'How do I optimize database queries?',  -- User query
-        {'limit': 10, 'search_mode': 'hybrid'}  -- Vector + keyword + rerank
-    )
-)
-ORDER BY SEARCH_SCORE DESC;
+CREATE TABLE SEMANTIC.SEM_CLAIMS (
+    CLAIM_ID VARCHAR PRIMARY KEY,
+    CHUNK_ID VARCHAR NOT NULL,
+    VIDEO_ID VARCHAR NOT NULL,
+    CLAIM_TEXT VARCHAR(2000),
+    SPEAKER VARCHAR(200),
+    SPEAKER_ROLE VARCHAR(20),            -- HOST / GUEST / UNKNOWN
+    ATTRIBUTION_CONFIDENCE VARCHAR(20),  -- HIGH / MEDIUM / LOW / UNKNOWN
+    ATTRIBUTION_SOURCE VARCHAR(20),      -- METADATA / LLM_INFERRED / EPISODE_LEVEL
+    TOPIC VARCHAR(500),
+    CLAIM_TYPE VARCHAR(50),              -- VERIFIABLE_FACT / PREDICTION / OPINION / STATISTICAL
+    SENTIMENT VARCHAR(20),
+    CONFIDENCE VARCHAR(20),
+    CLAIM_DATE DATE,
+    YOUTUBE_URL VARCHAR(500),
+    VERIFICATION_STATUS VARCHAR(20) DEFAULT 'PENDING',
+    VERIFICATION_SOURCE VARCHAR(20),     -- LLM_ONLY / LLM_PLUS_WEB / PENDING
+    LAST_VERIFIED TIMESTAMP,
+    EVIDENCE_SUMMARY VARCHAR(2000),
+    EVIDENCE_URLS ARRAY,
+    EXTRACTED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+    EXTRACTION_MODEL VARCHAR(50) DEFAULT 'llama3.1-405b'
+);
 ```
 
-**Context Retrieval Strategy:**
-For each top result, fetch adjacent segments using `previous_segment_id` and `next_segment_id` to provide richer context to LLM (improves answer quality).
+**SEM_CLAIM_EVOLUTION** (Week 6)
+```sql
+CREATE TABLE SEMANTIC.SEM_CLAIM_EVOLUTION (
+    EVOLUTION_ID VARCHAR PRIMARY KEY,
+    ORIGINAL_CLAIM_ID VARCHAR,
+    EVOLVED_CLAIM_ID VARCHAR,
+    DRIFT_TYPE VARCHAR(20),              -- REVISED / ESCALATED / SOFTENED / CONTRADICTED / CONFIRMED
+    SAME_SPEAKER BOOLEAN,
+    TIME_DELTA_DAYS INTEGER,
+    ANALYSIS VARCHAR(1000),
+    DETECTED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+);
+```
 
 ---
 
-## Multi-Agent Architecture
+## Neo4j Knowledge Graph Schema
 
-### Agent Priority
+### Node Types
+```cypher
+(:Person {name, aliases, first_seen, episode_count})
+(:Organization {name, type, founded_year})
+(:Topic {name, category, first_mentioned})
+(:Episode {video_id, title, publish_date, channel_name, youtube_url})
+(:Channel {channel_id, name, genre})
+(:Claim {
+    claim_id, text, type, sentiment, confidence, date,
+    chunk_id, youtube_url,
+    verification_status, verification_source, last_verified, evidence_summary
+})
+```
 
-**MVP Agents (Weeks 3-4):**
-1. **Router Agent** - Analyzes user query → routes to appropriate specialist
-2. **Search Agent** - Queries Cortex Search → retrieves relevant segments
-3. **Summarization Agent** - Generates concise summaries with YouTube links
+### Edge Types
+```cypher
+(Person)-[:APPEARED_ON {role: "host"|"guest"}]->(Episode)
+(Person)-[:WORKS_AT {since, until}]->(Organization)
+(Person)-[:MADE_CLAIM {confidence: "HIGH"}]->(Claim)
+(Person)-[:LIKELY_MADE_CLAIM {confidence: "MEDIUM"}]->(Claim)
+(Episode)-[:BELONGS_TO]->(Channel)
+(Episode)-[:DISCUSSED {depth}]->(Topic)
+(Claim)-[:ABOUT]->(Topic)
+(Claim)-[:MENTIONS]->(Person|Organization)
+(Claim)-[:DISCUSSED_IN]->(Episode)          -- unknown speaker fallback
+(Claim)-[:EVOLVED_FROM {drift_type}]->(Claim)
+(Claim)-[:SOURCED_FROM]->(Episode)
+```
 
-**Stretch Agents (Weeks 5-6):**
-4. **Topic Extraction Agent** - NER and entity analysis
-5. **Comparison Agent** - Cross-podcast perspective analysis
-6. **Recommendation Agent** - Personalized episode suggestions
+---
 
-### LangGraph Workflow
+## Two-Tier Speaker Attribution
 
+### Tier 1: Metadata Extraction (100% confident)
+- Host = channel owner (always known, hardcoded per channel)
+- Guest = parsed from episode title via regex + LLM fallback
+- Channel-specific title patterns:
+  - Lex Fridman: `"Sam Altman: Future of AI | Lex Fridman Podcast #412"`
+  - Joe Rogan: `"#2108 - Sam Altman"`
+  - Huberman Lab: `"Dr. Peter Attia: Exercise & Longevity"`
+  - My First Million: `"Shaan Puri on Why Every Founder..."`
+  - All-In: 4 fixed hosts (Calacanis, Sacks, Chamath, Friedberg)
+- Expected coverage: ~70-80% of episodes get a named guest
+
+### Tier 2: LLM Speaker Inference (per-claim, during claim extraction)
+- Same LLM call as claim extraction (zero extra cost)
+- Prompt includes known participants from Tier 1
+- Context clues: personal anecdotes, role references, question/answer patterns
+- Each claim gets `attribution_confidence`: HIGH / MEDIUM / LOW / UNKNOWN
+
+### Graph Mapping
+- HIGH confidence → `(Person)-[:MADE_CLAIM]->(Claim)`
+- MEDIUM confidence → `(Person)-[:LIKELY_MADE_CLAIM]->(Claim)`
+- UNKNOWN → `(Claim)-[:DISCUSSED_IN]->(Episode)`
+
+---
+
+## Hybrid Fact-Checking Pipeline
+
+### Stage 1: Cortex LLM Pre-Filter (free, fast, no rate limits)
+- Run every VERIFIABLE_FACT and STATISTICAL claim through Cortex LLM
+- Prompt: "Based on your knowledge, is this claim true, false, or uncertain?"
+- Confident results → marked immediately
+- Uncertain results → flagged for Stage 2
+- Expected: ~30-40% resolved at this stage
+
+### Stage 2: MCP Web Search (for uncertain claims only)
+- Fact-Check Agent formulates search query from claim
+- MCP Web Search server (Brave Search API, free tier: 2,000 queries/month)
+- Returns top web results with current information
+
+### Stage 3: LLM Verdict Synthesis
+- Cortex LLM reads web results + original claim
+- Assigns final status: VERIFIED / OUTDATED / DISPUTED / UNVERIFIED / FALSE
+- Generates evidence summary + source URLs
+- Results written to SEM_CLAIMS + Neo4j Claim nodes
+
+---
+
+## Data Re-Extraction Plan (Time-Stratified)
+
+### Problem
+Original extraction sorted by view count → popular episodes cluster in late 2025. 10 channels have <7 month date spans.
+
+### Solution
+Re-extract ~40 episodes for 6 channels: 2-3 episodes per year (2022-2024), keeping existing 2025 episodes.
+
+### Priority 1 — Must Fix
+| Channel | Current Span | Add 2022 | Add 2023 | Add 2024 | New Eps |
+|---------|-------------|----------|----------|----------|---------|
+| All-In Podcast | 4 months | +3 | +3 | +2 | 8 |
+| a16z Podcast | 5 months | +2 | +3 | +3 | 8 |
+| Joe Rogan (tech guests) | 4 months | +2 | +2 | +2 | 6 |
+
+### Priority 2 — High Value
+| Channel | Current Span | Add 2022 | Add 2023 | Add 2024 | New Eps |
+|---------|-------------|----------|----------|----------|---------|
+| My First Million | 6 months | +2 | +2 | +2 | 6 |
+| Diary of a CEO | 6 months | +2 | +2 | +2 | 6 |
+| Huberman Lab | 7 months | +2 | +2 | +2 | 6 |
+
+### Extraction Strategy
 ```python
-# State schema
-class PodcastIQState(TypedDict):
-    user_query: str
-    query_type: str  # 'search', 'summarize', 'compare'
-    search_results: List[dict]
-    summary: str
-    messages: List[str]
-
-# Build graph
-workflow = StateGraph(PodcastIQState)
-workflow.add_node("router", router_agent)
-workflow.add_node("search_agent", search_agent)
-workflow.add_node("summarization_agent", summarization_agent)
-
-workflow.set_entry_point("router")
-workflow.add_conditional_edges("router", route_to_agent)
-workflow.add_edge("search_agent", "summarization_agent")
-workflow.add_edge("summarization_agent", END)
-
-app = workflow.compile()
+for year in [2022, 2023, 2024]:
+    publishedAfter = f"{year}-01-01T00:00:00Z"
+    publishedBefore = f"{year}-12-31T23:59:59Z"
+    # Fetch top 2-3 by viewCount within this year range
 ```
 
-### Agent Implementations
-
-**Router Agent:**
-- Uses Claude/Llama to classify query intent
-- Returns routing decision: "SEARCH", "SUMMARIZE", "COMPARE", etc.
-
-**Search Agent:**
-- Executes Snowflake Cortex Search query
-- Returns top 5-10 segments with relevance scores
-- Retrieves adjacent segments for context
-
-**Summarization Agent:**
-- Combines top search results
-- Uses Cortex LLM to generate 2-3 sentence summary
-- Appends YouTube timestamp links
+### Post Re-Extraction Targets
+- Total episodes: ~290 (250 existing + 40 new)
+- All priority channels: 20+ month spans
+- 20+ channels with 12+ month spans
 
 ---
 
-## 8-Week Implementation Plan
+## Expanded Agent Architecture (9 Agents)
 
-### Week 1: Environment Setup & Proof of Concept
-**Goal:** Extract 5-10 episodes, load to Snowflake, verify pipeline works
+### MVP Agents (Week 4)
+1. **Router Agent** — Classifies query → routes to specialist
+2. **Search Agent** — Hybrid: Cortex Search + Neo4j traversal
+3. **Summarization Agent** — Generates answers with YouTube links + claim status
 
-**Tasks:**
-- Set up Snowflake account, create databases/schemas (RAW, CURATED, SEMANTIC, APP)
-- Install Airflow locally (Astro CLI recommended)
-- Create Python environment with youtube-transcript-api, snowflake-connector-python
-- Write simple script to extract 5 transcripts (hardcoded video IDs)
-- Manually load transcripts to Snowflake RAW layer
+### Knowledge Graph Agents (Weeks 5-6)
+4. **Knowledge Graph Agent** — Cypher queries for relationship reasoning
+5. **Temporal Analysis Agent** — Claim evolution tracking + drift detection
+6. **Comparison Agent** — Graph-powered cross-podcast analysis
 
-**Deliverable for Professor:**
-- Demo live Snowflake query showing 5 episodes loaded
-- Screenshot of Snowflake UI with data
-
-**Time Allocation:** 2 days setup, 3 days testing, 2 days buffer
-
----
-
-### Week 2: Full ETL Pipeline (300 Episodes)
-**Goal:** Automate extraction of 300 episodes from 10-15 channels
-
-**Tasks:**
-- Finalize channel list (10-15 tech/AI podcasts with English transcripts) - **Present to user for approval before finalizing**
-- Build `youtube_extract_dag.py` with error handling
-- Implement incremental loading (MERGE statement)
-- Create DBT project structure
-- Write `curated_episodes.sql` model
-- Run DBT to transform RAW → CURATED
-
-**Deliverable for Professor:**
-- Airflow UI screenshot showing successful DAG run
-- SQL query: `SELECT COUNT(*) FROM curated.curated_episodes` (target: 300+)
-- CSV export of loaded episodes with channel distribution
-
-**Candidate Podcasts (to be confirmed with user):**
-- Tech/AI: Lex Fridman, All-In Podcast, Fireship, ThePrimeagen
-- Business: Tim Ferriss, How I Built This, My First Million
-- Startups: Y Combinator, Indie Hackers
-- Science: Huberman Lab, Peter Attia
-- General: Joe Rogan clips (tech episodes only)
-
-**Channel Selection Process:**
-1. Present candidate list to user for approval
-2. Validate each channel has English transcripts available
-3. Test extraction with 1-2 episodes per channel
-4. Finalize list of 10-15 channels before full extraction
-
-**Risk Mitigation:** If <100 episodes loaded due to missing transcripts, manually curate additional videos with confirmed captions.
-
----
-
-### Week 3: Chunking & Embeddings
-**Goal:** Generate searchable segments with vector embeddings
-
-**Tasks:**
-- Implement `curated_segments.sql` with 60s/15s overlap chunking
-- Verify chunking: Check avg segments per episode (~60)
-- Write `embeddings.sql` using Cortex EMBED_TEXT_768
-- Run full embedding generation (estimated 18,000 segments × 768 dims)
-- Create Cortex Search service
-- Test basic semantic search query
-
-**Deliverable for Professor:**
-- Demo Cortex Search query: "Show me segments about Kubernetes scaling"
-- Return top 5 results with YouTube timestamp links
-- Screenshot showing embedding coverage: `SELECT COUNT(*) FROM semantic.embeddings`
-
-**Performance Target:**
-- Embedding generation: <6 hours on SMALL warehouse
-- Search query latency: <2 seconds
-
----
-
-### Week 4: Multi-Agent MVP (Router + Search + Summarization)
-**Goal:** Build core LangGraph system with 3 agents
-
-**Tasks:**
-- Set up LangGraph project structure
-- Implement Router Agent using Claude Sonnet or Llama
-- Implement Search Agent (Cortex Search integration)
-- Implement Summarization Agent (Cortex LLM)
-- Test end-to-end workflow: User query → Router → Search → Summary
-- Add YouTube timestamp links to final output
-
-**Deliverable for Professor:**
-- Live demo: User types "Explain how neural networks work"
-- System returns: 2-3 sentence summary + 3 timestamped YouTube links
-- Agent trace showing: Router classified as "SEARCH" → Found 5 segments → Generated summary
-
-**Test Queries:**
-1. "How do I optimize database performance?"
-2. "What are the best practices for API design?"
-3. "Explain Rust's ownership model"
-
----
-
-### Week 5: Streamlit UI + Topic Extraction
-**Goal:** User-facing interface + 4th agent
-
-**Tasks:**
-- Build Streamlit app with search bar
-- Display search results in cards (episode title, channel, timestamp, relevance score)
-- Add click-to-YouTube functionality
-- Implement Topic Extraction Agent (queries semantic.topics_entities table)
-- Add topic filter sidebar (checkboxes for AI, databases, programming, etc.)
-
-**Deliverable for Professor:**
-- Deployed Streamlit app (localhost or streamlit.io free tier)
-- Screenshot showing:
-  - Search query entered
-  - 5 result cards with topics tagged
-  - Topic filter active (e.g., only show "AI" episodes)
-
-**UI Features:**
-- Search bar with placeholder "Search 300+ podcast episodes..."
-- Results display: Episode title, channel name, segment text preview, timestamp link, relevance score
-- Topic tags: Color-coded badges showing extracted topics
-- Sidebar filters: Channel, topic, date range
-
----
-
-### Week 6: Comparison & Recommendation Agents + MCP Integration
-**Goal:** Complete all 6 agents + integrate MCP for enhanced capabilities
-
-**Tasks:**
-- Implement Comparison Agent (analyzes how different podcasters discuss same topic)
-- Implement Recommendation Agent (content-based filtering using embeddings)
-- Add "Related Episodes" section to Streamlit UI
-- Create app.search_history table
-- Log all user searches for analytics
-- **MCP Integration:** Set up Filesystem and Web Search MCP servers
-- Integrate MCP clients into LangGraph agents
-- Add MCP tool routing to Router Agent
-
-**Deliverable for Professor:**
-- Demo comparison query: "Compare views on AI safety from Lex Fridman vs ThePrimeagen"
-- System returns: Common themes, unique perspectives, contradictions
-- Show recommendation panel suggesting 3 similar episodes based on current search
-
-**Comparison Agent Output Format:**
-```
-Common Themes:
-- Both discuss the importance of alignment research
-- Both mention the rapid pace of AI development
-
-Unique Perspectives:
-- Lex Fridman: Emphasizes philosophical implications
-- ThePrimeagen: Focuses on practical engineering trade-offs
-
-Contradictions:
-- Lex is optimistic about AGI timeline (10-20 years)
-- ThePrimeagen is skeptical about near-term AGI
-```
-
-**MCP Integration Details:**
-
-**Setup Tasks:**
-1. Install MCP SDK: `npm install -g @modelcontextprotocol/sdk`
-2. Set up Filesystem MCP server (read logs, transcripts, debug files)
-3. Configure Web Search MCP server (Brave Search API or alternative)
-4. Create Python wrappers for MCP tools as LangChain tools
-5. Add MCP tool executor to LangGraph workflow
-6. Update Router Agent to conditionally route to MCP tools
-
-**MCP Use Cases:**
-- **Filesystem MCP:** "Why did yesterday's Airflow DAG fail?" → Reads log file
-- **Web Search MCP:** "Is the AI claim from episode 42 still accurate?" → Searches web
-- **Debug Assistant:** "Show me the raw transcript for video xyz" → Accesses file system
-
-**Success Criteria:**
-- Router Agent successfully routes MCP tool requests
-- Filesystem MCP can read Airflow logs (<2 seconds latency)
-- Web Search MCP returns relevant real-time results
-- MCP tools accessible from Streamlit UI
-
-**Contingency:** If MCP integration takes >8 hours, make it optional/post-project enhancement. Core agents take priority.
-
----
-
-### Week 7: Testing, Optimization, Documentation
-**Goal:** Production readiness
-
-**Tasks:**
-- Write DBT tests (referential integrity, null checks, embedding coverage)
-- Add Airflow alerting (email on DAG failure)
-- Optimize Snowflake queries (add clustering keys if >10K rows)
-- Implement Streamlit caching (`@st.cache_data`) to reduce query load
-- Write README.md with architecture diagram
-- Create user guide for Streamlit app
-- Monitor Snowflake credit usage (should be <300 credits total)
-
-**Deliverable for Professor:**
-- Documentation PDF containing:
-  - Architecture diagram (similar to this plan)
-  - Sample SQL queries demonstrating each layer
-  - Snowflake credit usage report (screenshot from `WAREHOUSE_METERING_HISTORY`)
-  - Known limitations and future enhancements
-
-**DBT Tests to Implement:**
-```sql
--- Test: All segments have embeddings
--- Test: No null values in episode titles
--- Test: All YouTube links are valid format
--- Test: Segment timestamps are chronological
-```
-
----
-
-### Week 8: Final Demo Preparation & Presentation
-**Goal:** Polished demo showcasing all features
-
-**Tasks:**
-- Prepare 10-minute demo script with 3-5 example queries
-- Create slide deck:
-  - Problem statement (audio content is unsearchable)
-  - Solution overview (architecture diagram)
-  - Technical highlights (RAG + multi-agent system)
-  - Challenges and learnings
-  - Future enhancements
-- Record backup demo video (in case live demo fails)
-- Prepare to answer questions on:
-  - Why Snowflake over other data warehouses?
-  - How does Cortex Search compare to Pinecone/Weaviate?
-  - What was the hardest technical challenge?
-  - How would you scale to 1 million episodes?
-
-**Deliverable for Professor:**
-- Live demo presentation (10 minutes)
-- GitHub repository with full code and documentation
-- Final report (5-10 pages) covering:
-  - Architecture decisions and trade-offs
-  - Data pipeline design
-  - RAG implementation approach
-  - Multi-agent system design
-  - Learnings and future work
-  - Snowflake credit usage breakdown
-
-**Demo Script Example:**
-1. **Search Query:** "How do I scale a database?" → Shows 5 results with timestamps
-2. **Click Link:** Opens YouTube at exact moment (e.g., 45:23)
-3. **Topic Filter:** Filter to only "Database" topics → Results update
-4. **Comparison Query:** "Compare MongoDB vs PostgreSQL discussions" → Side-by-side analysis
-5. **Recommendations:** Show "You might also like these episodes" panel
-
-**Success Metrics:**
-- ✅ 300+ episodes indexed
-- ✅ <5 second search latency
-- ✅ <$400 in Snowflake credits used
-- ✅ 6 agents functional (even if simple implementations)
-
----
-
-## Critical Files to Implement
-
-### Priority 1 (Weeks 1-2): Data Pipeline
-1. **airflow/dags/youtube_extract_dag.py** - Core ETL orchestration
-2. **dbt_podcastiq/models/curated/curated_episodes.sql** - Episode cleaning
-3. **dbt_podcastiq/models/curated/curated_segments.sql** - **Critical chunking logic**
-
-### Priority 2 (Weeks 3-4): RAG System
-4. **dbt_podcastiq/models/semantic/embeddings.sql** - Vector generation
-5. **sql/cortex_search_setup.sql** - Managed search service configuration
-6. **langgraph_agents/agents/search.py** - Search agent implementation
-
-### Priority 3 (Weeks 4-5): Multi-Agent System
-7. **langgraph_agents/graph.py** - LangGraph workflow orchestration
-8. **langgraph_agents/agents/router.py** - Query routing logic
-9. **langgraph_agents/agents/summarization.py** - Summary generation
-
-### Priority 4 (Week 5): User Interface
-10. **streamlit_app/app.py** - Main UI entry point
-11. **streamlit_app/components/search_bar.py** - Search input component
-12. **streamlit_app/components/results_display.py** - Results rendering
+### Fact-Check + Insight Agents (Week 7)
+7. **Fact-Check Agent** — Hybrid: Cortex LLM pre-filter + MCP web search
+8. **Recommendation Agent** — Graph-based content suggestions
+9. **Insight Agent** — Meta-analysis: credibility scores, debate detection
 
 ---
 
 ## Key Design Decisions
 
-### 1. Use Snowflake Cortex Search (Managed) vs Custom Vector Search
-**Decision:** Cortex Search (managed service)
+### 1. GraphRAG: Cortex Search + Neo4j
+Vector search finds semantically similar content; graph traversal finds relationship-based content. Combined = GraphRAG (Microsoft Research 2024). Enables queries pure vector search cannot answer.
 
-**Rationale:**
-- Production-ready hybrid search (vector + keyword + re-ranking) out-of-the-box
-- No need to manage vector indexes manually
-- Auto-refreshing with configurable 2-minute lag
-- Simpler implementation critical for 8-week timeline
-- Trade-off: Less control over ranking algorithm (acceptable for MVP)
+### 2. Two-Tier Speaker Attribution
+No audio diarization needed. Zero extra LLM cost. Explicit confidence scoring models uncertainty honestly. Future path: add Whisper diarization.
 
----
+### 3. Hybrid Fact-Checking
+Reduces API costs by ~60-70%. Satisfies both Cortex AI and MCP course requirements. MCP provides freshness LLM training data lacks.
 
-### 2. Chunking Strategy: Time-Based vs Semantic
-**Decision:** Time-based chunking (60-second windows with 15-second overlap)
+### 4. Time-Stratified Re-Extraction
+Original extraction clustered in 2025. Targeted re-extraction (~40 episodes, ~3-4 hours) fixes temporal gaps with minimal effort.
 
-**Rationale:**
-- Preserves timestamp accuracy for YouTube deep linking (critical feature)
-- Consistent chunk sizes (~200-400 words at typical podcast speaking rate)
-- Simple to implement in DBT using window functions
-- 25% overlap maintains context across chunk boundaries
-- Alternative (semantic chunking based on topic shifts) rejected due to:
-  - Complexity of maintaining timestamps
-  - Inconsistent chunk sizes
-  - Harder to debug
+### 5. 120-Second Time-Based Chunking
+Preserves YouTube deep linking. Consistent chunk sizes. Simple implementation.
 
----
-
-### 3. MVP Agent Prioritization
-**Decision:** Focus on Router, Search, and Summarization for Weeks 3-4
-
-**Rationale:**
-- Router demonstrates orchestration (required for "agentic AI patterns")
-- Search is core RAG functionality (required for project)
-- Summarization adds value beyond raw search results (impresses professor)
-- Comparison and Recommendation are stretch goals (Weeks 5-6)
-- If behind schedule, 3 agents are sufficient for passing grade
-
----
-
-### 4. Airflow Deployment: Local vs Cloud
-**Decision:** Local Airflow via Astro CLI
-
-**Rationale:**
-- Zero cost (no cloud infrastructure bills)
-- Full control for learning and debugging
-- Sufficient for 300 episodes (not production scale)
-- Easy to migrate to Astronomer cloud later if needed
-- Alternative (GitHub Actions) considered but Airflow is more industry-standard
-
----
-
-### 5. DBT Materialization Strategy
-**Decision:** Incremental for expensive models (embeddings, LLM calls), Table for frequently queried data
-
-**Rationale:**
-- Incremental models reduce Cortex API costs (only process new segments)
-- Table materialization optimizes search query performance
-- Follows DBT best practices for cost-efficient transformations
-
----
-
-## Development Environment Setup
-
-### Required Accounts
-1. **Snowflake** - University access (already available)
-2. **GitHub** - Code repository and version control
-3. **YouTube Data API** - Optional for metadata (transcripts don't require API key)
-4. **Anthropic/OpenAI** - Optional for Claude/GPT agents (can use Cortex LLMs instead)
-
-### Local Installation
-
-**1. Python Environment:**
-```bash
-python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-```
-
-**requirements.txt:**
-```
-youtube-transcript-api==0.6.2
-snowflake-connector-python==3.12.0
-apache-airflow==2.10.0
-apache-airflow-providers-snowflake==5.6.0
-dbt-snowflake==1.8.0
-langgraph==0.2.28
-langchain==0.3.0
-langchain-core==0.3.0
-streamlit==1.38.0
-pandas==2.2.0
-python-dotenv==1.0.0
-mcp==0.9.0  # Model Context Protocol SDK (if available)
-```
-
-**Additional MCP Setup (Node.js required):**
-```bash
-# Install MCP servers globally
-npm install -g @modelcontextprotocol/server-filesystem
-npm install -g @modelcontextprotocol/server-brave-search  # Optional: requires Brave API key
-```
-
-**2. Airflow Setup (Astro CLI):**
-```bash
-# Install Astro CLI
-# Mac: brew install astro
-# Windows: https://docs.astronomer.io/astro/cli/install-cli
-
-# Initialize project
-astro dev init
-
-# Start Airflow
-astro dev start  # Runs on localhost:8080
-```
-
-**3. DBT Setup:**
-```bash
-dbt init dbt_podcastiq
-
-# Configure ~/.dbt/profiles.yml with Snowflake credentials
-```
-
-**4. Snowflake Configuration:**
-```sql
--- Create database hierarchy
-CREATE DATABASE PODCASTIQ;
-CREATE SCHEMA PODCASTIQ.RAW;
-CREATE SCHEMA PODCASTIQ.CURATED;
-CREATE SCHEMA PODCASTIQ.SEMANTIC;
-CREATE SCHEMA PODCASTIQ.APP;
-
--- Create warehouses (right-sized for cost optimization)
-CREATE WAREHOUSE LOADING_WH
-    WAREHOUSE_SIZE = 'X-SMALL'
-    AUTO_SUSPEND = 60  -- 1 minute idle timeout
-    AUTO_RESUME = TRUE;
-
-CREATE WAREHOUSE TRANSFORM_WH
-    WAREHOUSE_SIZE = 'SMALL'
-    AUTO_SUSPEND = 300  -- 5 minutes
-    AUTO_RESUME = TRUE;
-
-CREATE WAREHOUSE SEARCH_WH
-    WAREHOUSE_SIZE = 'X-SMALL'
-    AUTO_SUSPEND = 60
-    AUTO_RESUME = TRUE;
-```
-
-### Project Directory Structure
-```
-podcastiq/
-├── airflow/
-│   └── dags/
-│       ├── youtube_extract_dag.py
-│       ├── dbt_transform_dag.py
-│       └── embedding_generation_dag.py
-├── dbt_podcastiq/
-│   ├── models/
-│   │   ├── curated/
-│   │   │   ├── curated_episodes.sql
-│   │   │   └── curated_segments.sql
-│   │   ├── semantic/
-│   │   │   ├── embeddings.sql
-│   │   │   └── topics_entities.sql
-│   │   └── app/
-│   └── dbt_project.yml
-├── langgraph_agents/
-│   ├── agents/
-│   │   ├── router.py
-│   │   ├── search.py
-│   │   └── summarization.py
-│   └── graph.py
-├── streamlit_app/
-│   └── app.py
-├── sql/
-│   ├── schema_setup.sql
-│   └── cortex_search_setup.sql
-├── .env
-├── requirements.txt
-└── README.md
-```
+### 6. Neo4j Community Edition (Local Docker)
+Free. Full Cypher query language. Easy Python integration. Docker install = 10 minutes.
 
 ---
 
 ## Cost Management
 
 ### Snowflake Credit Budget
+- Original pipeline: ~248 credits (estimated)
+- Re-extraction enrichment: ~15 credits
+- Claim extraction (LLM calls on ~20K chunks): ~20-30 credits
+- Ongoing queries/development: ~50 credits
+- **Total estimated: ~340 credits** (within 3-account budget of 600 credits)
 
-**Free Tier:** $400 in credits (200 credits × $2/credit)
-
-**Projected 8-Week Usage (300 Episodes):**
-| Activity | Warehouse | Credits/Hour | Total Hours | Total Credits |
-|----------|-----------|--------------|-------------|---------------|
-| Initial data load (300 episodes) | SMALL | 2 | 4 | 8 |
-| Daily incremental loads | X-SMALL | 1 | 2 | 20 |
-| DBT transformations (2x data) | SMALL | 2 | 40 | 80 |
-| Embedding generation (18K segments) | SMALL | 2 | 10 | 20 |
-| Search queries (testing) | X-SMALL | 1 | 20 | 20 |
-| Development/exploration | X-SMALL | 1 | 100 | 100 |
-| **Total Estimated** | | | | **248 credits** |
-
-**Estimated Cost:** 248 credits × $2 = **$496.00** (slightly over $400 budget, but team has 3 accounts total = 600 credits available)
-
-### Cost Optimization Strategies
-
-1. **Aggressive Auto-Suspend:** All warehouses suspend after 60-300 seconds of inactivity
-2. **Use X-SMALL Warehouses:** Sufficient for <10K rows (our dataset is ~18K segments)
-3. **Query Optimization:** Use LIMIT during development, add indexes for production
-4. **Result Caching:** Snowflake caches identical queries for 24 hours (free)
-5. **Incremental DBT Models:** Only process new data (reduces Cortex API calls)
-6. **Streamlit Caching:** Use `@st.cache_data` to avoid redundant Snowflake queries
-
-**Weekly Monitoring Query:**
-```sql
-SELECT
-    WAREHOUSE_NAME,
-    SUM(CREDITS_USED) AS total_credits,
-    SUM(CREDITS_USED) * 2 AS cost_usd
-FROM SNOWFLAKE.ACCOUNT_USAGE.WAREHOUSE_METERING_HISTORY
-WHERE START_TIME >= DATEADD(day, -7, CURRENT_TIMESTAMP())
-GROUP BY WAREHOUSE_NAME;
-```
-
-**Budget Alert:** Set resource monitor at 150 credits (75% of budget) to notify before overages.
+### New Components (Free)
+- Neo4j Community Edition: Free (local Docker)
+- Brave Search API: Free tier (2,000 queries/month)
+- LangGraph: Free (open source)
 
 ---
 
@@ -788,162 +376,77 @@ GROUP BY WAREHOUSE_NAME;
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| **Learning curve for 4+ new technologies** | HIGH | - Focus on MVP features first<br>- Week 1 entirely for setup<br>- Use official quickstart guides<br>- Join Snowflake/DBT community Slack |
-| **Transcript quality issues (auto-captions ~90% accurate)** | MEDIUM | - Pre-filter: Only use channels with clear audio<br>- Add quality_score heuristic in DBT<br>- Display disclaimer in UI |
-| **Snowflake credits exceeding budget** | MEDIUM | - Monitor weekly credit usage<br>- Set resource monitor at 400 credits across team<br>- Use X-SMALL warehouses<br>- Cache aggressively |
-| **Time constraints (8 weeks, solo)** | HIGH | - Strict MVP prioritization (3 agents in Week 4)<br>- Reduce scope to 150 episodes if needed<br>- Timebox features: >4 hours → defer to "future work" |
-| **Scope creep (6 agents is ambitious)** | MEDIUM | - Week 4 checkpoint: Only 3 agents required<br>- Weeks 5-6: Add agents incrementally<br>- If behind, cut Comparison/Recommendation |
-| **Missing transcripts for some videos** | LOW | - Accept 70-80% success rate as normal<br>- Target 300 episodes from 400 attempts<br>- Choose popular channels (more likely to have transcripts) |
-
-**Contingency Plan (If Behind Schedule by Week 4):**
-- Cut to 4 agents total (drop Comparison and Recommendation)
-- Simplify UI to basic search box + results list (no visualizations)
-- Use 100 high-quality episodes instead of 150 mediocre ones
+| Neo4j learning curve | MEDIUM | Budget 1 full day. Cypher is similar to SQL. Docker install = 10 min. |
+| Claim extraction quality | MEDIUM | Start with high-confidence claims only. Structured prompts with examples. Accept 70-80% accuracy. |
+| Fact-checking rate limits | LOW | Cortex LLM pre-filter resolves ~30-40% first, reducing web searches needed. |
+| Temporal evolution sparse for some topics | LOW | Focus on topic-level evolution (across speakers), not just individual speaker changes. |
+| Re-extraction pipeline issues | LOW | Pipeline already tested and working. MERGE handles dedup. ~3-4 hours total. |
+| Scope creep (9 agents ambitious) | MEDIUM | Hard prioritize: MVP agents (W4) > Graph (W5) > Temporal (W6) > Fact-check (W7). Cut Insight Agent if behind. |
+| Neo4j + Snowflake sync | LOW | Snowflake = source of truth. Neo4j = read-optimized projection. One-way sync. |
+| Timeline (11 weeks vs 8) | MEDIUM | Core pipeline done. Extra weeks go entirely to novel features. Cut Priority 3 re-extraction if behind. |
 
 ---
 
-## Verification Plan
+## Demo Script (Week 11)
 
-### End-to-End Testing
-
-**Week 2 Verification:**
-```sql
--- Confirm 50 episodes loaded
-SELECT COUNT(*) FROM curated.curated_episodes;  -- Expected: 50+
-
--- Check transcript quality
-SELECT AVG(word_count), MIN(word_count), MAX(word_count)
-FROM curated.curated_episodes;  -- Expected: 3000-5000 avg
-```
-
-**Week 3 Verification:**
-```sql
--- Confirm chunking worked
-SELECT COUNT(*) FROM curated.curated_segments;  -- Expected: 3000-6000
-
--- Verify embeddings generated
-SELECT COUNT(*) FROM semantic.embeddings;  -- Should match segments count
-
--- Test Cortex Search
-SELECT * FROM TABLE(
-    CORTEX_SEARCH('podcast_search', 'machine learning', {'limit': 5})
-);  -- Expected: 5 relevant results with scores >0.5
-```
-
-**Week 4 Verification:**
-```python
-# Test LangGraph workflow
-result = app.invoke({
-    "user_query": "How do neural networks work?",
-    "messages": []
-})
-
-# Expected output:
-# {
-#   "summary": "2-3 sentence summary...",
-#   "search_results": [5 segments with YouTube links],
-#   "messages": ["Router: SEARCH", "Search: Found 5 segments", "Summary: Generated"]
-# }
-```
-
-**Week 5 Verification:**
-- Open Streamlit app at `localhost:8501`
-- Type query "database optimization"
-- Verify: Results display, topic tags shown, YouTube links clickable
-- Click result → YouTube opens at correct timestamp
-
-**Week 8 Final Check:**
-- All 6 agents respond to test queries
-- Search latency <5 seconds
-- Snowflake credits used <150
-- README.md complete with setup instructions
-- Demo video recorded (backup)
-
----
-
-## Immediate Actions After Plan Approval
-
-Once you approve this plan, I will immediately execute the following setup tasks:
-
-### 1. Project Structure Creation
-**Location:** `D:\Projects\PodcastIQ\`
-
-**Files to create:**
-```
-D:\Projects\PodcastIQ/
-├── PRD.md (Product Requirements Document)
-├── tasks.md (Implementation checklist with weekly breakdown)
-├── claude.md (Instructions for future Claude Code sessions)
-├── planning.md (This plan file, copied for reference)
-├── .gitignore
-├── README.md
-└── (subfolders will be created in Week 1)
-```
-
-### 2. PRD.md (Product Requirements Document)
-Contains:
-- Project overview and objectives
-- Target users and use cases
-- Functional requirements (data pipeline, search, agents, UI)
-- Non-functional requirements (performance, cost, scalability)
-- Success criteria and KPIs
-- Technical constraints
-
-### 3. tasks.md (Implementation Checklist)
-Contains:
-- Week-by-week task breakdown (pulled from this plan)
-- Checkbox format for tracking progress
-- Dependencies between tasks
-- Owner field (for future team expansion)
-- Status tracking (Not Started, In Progress, Completed, Blocked)
-
-### 4. claude.md (Session Instructions)
-Contains instructions for future Claude Code sessions:
-- **Always read `planning.md` at the start of every conversation** to understand project context
-- **Check `tasks.md` before starting work** to see current progress and next priorities
-- **Mark completed tasks immediately** in tasks.md using Edit tool
-- Project-specific coding standards and conventions
-- Common commands and workflows
-- Links to key documentation (Snowflake, DBT, LangGraph)
-
-### 5. Channel Selection Process
-Before starting Week 2 extraction, I will:
-1. Present candidate podcast channel list with sample episodes
-2. Validate transcript availability for each channel
-3. Get your approval on final 10 channels
-4. Document channel list in PRD.md
-
----
-
-## Next Steps
-
-1. **Approve this plan** - Confirm the approach aligns with your vision
-2. **I'll create project structure** - PRD, tasks.md, claude.md at `D:\Projects\PodcastIQ\`
-3. **Week 1 kickoff** - Set up Snowflake environment and Airflow
-4. **Proof of concept** - Extract 5-10 episodes to validate approach
-5. **Weekly check-ins** - Update professor with progress and metrics
-
-**Key Decisions Made:**
-- ✅ 100 episodes total (~10 per channel)
-- ✅ Snowflake Cortex LLMs only (no external API costs)
-- ✅ MCP client integration (Filesystem + Web Search)
-- ✅ Suggested podcast list (to be confirmed in Week 2)
-- ✅ Local Airflow via Astro CLI
-- ✅ Project location: `D:\Projects\PodcastIQ\`
+1. **Basic Search:** "How do large language models work?" → Summary + YouTube links
+2. **Knowledge Graph:** "Who has Sam Altman appeared with?" → Graph visualization
+3. **Temporal Evolution:** "How have AGI timeline predictions changed 2022-2025?" → Claim timeline
+4. **Fact-Checking:** "Are there outdated claims in Huberman Lab episodes?" → Verification badges
+5. **Cross-Podcast Comparison:** "Compare Lex Fridman and Joe Rogan on AI safety" → Graph analysis
+6. **Credibility Insight:** "Which channels have highest fact-check accuracy?" → Dashboard
+7. **Influence Network:** "Show the network around 'scaling laws'" → Interactive graph
 
 ---
 
 ## Future Enhancements (Post-Project)
 
-**If we had more time:**
-1. Speaker diarization (distinguish between host and guest)
-2. Multi-language support (Spanish, French podcasts)
-3. Audio clip generation (auto-generate shareable clips)
-4. Chrome extension (highlight and search while watching YouTube)
-5. Collaborative filtering for recommendations (requires user accounts)
-6. Podcast creator analytics dashboard
-7. Build custom MCP server (expose PodcastIQ search as tool for other LLM apps)
-8. Real-time podcast monitoring (auto-ingest new episodes daily)
-9. Transcript quality improvement (use Whisper for re-transcription)
+1. Speaker diarization via Whisper + pyannote (ground truth for attribution)
+2. Multi-language support
+3. Audio clip generation (shareable clips from timestamp links)
+4. Chrome extension (search while watching YouTube)
+5. Custom MCP server (expose PodcastIQ search as tool for other LLM apps)
+6. Real-time podcast monitoring (auto-ingest new episodes daily)
+7. Episodic memory for personalized user experience across sessions
+8. Collaborative filtering for recommendations (requires user accounts)
 
-**Startup Potential:** This could evolve into a SaaS product for podcast discovery, media companies, or educational platforms.
+---
+
+## Critical Files
+
+### Completed ✅
+1. `scripts/channel_extraction.py` — yt-dlp + YouTube API extraction
+2. `scripts/snowflake_loader.py` — PUT + COPY INTO with key-pair auth
+3. `scripts/advanced_profile.py` — ydata-profiling data quality report
+4. `sql/schema_setup.sql` — Database, schemas, warehouses DDL
+5. `sql/ddl/raw/` — EPISODES + CHANNELS DDL
+6. `sql/ddl/staging/` — STG_EPISODES, STG_SEGMENTS views
+7. `sql/ddl/intermediate/` — INT_EPISODES, INT_SEGMENTS views
+8. `sql/ddl/curated/` — CUR_CHUNKS table DDL
+9. `sql/ddl/semantic/` — SEM_CHUNK_EMBEDDINGS, TOPICS, ENTITIES, SUMMARIES DDL
+10. `sql/pipeline_verification.sql` — Health check queries
+
+### To Build
+11. `scripts/time_stratified_extraction.py` — Re-extraction for 6 channels (Week 4)
+12. `sql/ddl/semantic/sem_claims.sql` — Claims table DDL (Week 4)
+13. `sql/ddl/semantic/sem_episode_participants.sql` — Participants DDL (Week 4)
+14. `sql/ddl/semantic/sem_claim_evolution.sql` — Evolution DDL (Week 6)
+15. `langgraph_agents/state.py` — PodcastIQState TypedDict (Week 4)
+16. `langgraph_agents/graph.py` — LangGraph StateGraph workflow (Week 4)
+17. `langgraph_agents/agents/router.py` — Query intent classification (Week 4)
+18. `langgraph_agents/agents/search.py` — Cortex Search + Neo4j hybrid (Week 4)
+19. `langgraph_agents/agents/summarization.py` — Cortex LLM answers (Week 4)
+20. `langgraph_agents/agents/knowledge_graph.py` — Cypher queries (Week 5)
+21. `langgraph_agents/agents/temporal.py` — Claim evolution (Week 6)
+22. `langgraph_agents/agents/fact_check.py` — Hybrid verification (Week 7)
+23. `langgraph_agents/agents/comparison.py` — Cross-podcast (Week 7)
+24. `langgraph_agents/agents/recommendation.py` — Graph-based (Week 7)
+25. `langgraph_agents/agents/insight.py` — Meta-analysis (Week 7)
+26. `scripts/neo4j_loader.py` — Load claims → Neo4j (Week 5)
+27. `scripts/claim_extractor.py` — LLM claim extraction pipeline (Week 4)
+28. `scripts/guest_extractor.py` — Title parsing + LLM guest names (Week 4)
+29. `scripts/fact_checker.py` — Batch verification pipeline (Week 7)
+30. `streamlit_app/app.py` — Main UI (Week 8)
+31. `airflow/dags/youtube_extract_dag.py` — Extraction DAG (Week 9)
+32. `airflow/dags/claim_extraction_dag.py` — Claim + Neo4j DAG (Week 9)
+33. `airflow/dags/fact_check_dag.py` — Weekly fact-check refresh (Week 9)

@@ -15,8 +15,8 @@
 | 3 | Steps 7-8 (Chunk & Enrich) + Step 9 (Index) | ✅ Completed |
 | 4 | Re-Extraction + LangGraph MVP + Claim Extraction | 🔄 In Progress |
 | 5 | Neo4j Knowledge Graph + Graph Agent | ⬜ Not Started |
-| 6 | Temporal Analysis + Claim Evolution | ⬜ Not Started |
-| 7 | Hybrid Fact-Checking + MCP + Remaining Agents | ⬜ Not Started |
+| 6 | Temporal Analysis + Claim Evolution | ✅ Completed |
+| 7 | Hybrid Fact-Checking + MCP + Remaining Agents | 🔄 In Progress |
 | 8 | Streamlit UI (search, graph explorer, timeline, dashboard) | ⬜ Not Started |
 | 9 | Airflow Orchestration + Integration Testing | ⬜ Not Started |
 | 10 | Testing, Optimization, Documentation | ⬜ Not Started |
@@ -299,50 +299,44 @@ python -m langgraph_agents.graph "your question here"
 - [ ] Configure API key in environment
 - [ ] Test MCP server: verify search results return
 
-### Fact-Check Agent
-- [ ] Create `langgraph_agents/agents/fact_check.py`
-- [ ] Stage 1: Cortex LLM pre-filter
-  - Filter claims: only VERIFIABLE_FACT and STATISTICAL types
-  - Prompt: "Based on your knowledge, is this claim true, false, or uncertain?"
-  - Mark confident results immediately
-- [ ] Stage 2: MCP Web Search for uncertain claims
-  - Formulate search query from claim text
-  - Call MCP Web Search server
-  - Retrieve top 3 results
-- [ ] Stage 3: LLM verdict synthesis
-  - Cortex LLM reads web results + original claim
-  - Assign status: VERIFIED / OUTDATED / DISPUTED / UNVERIFIED / FALSE
-  - Generate evidence_summary + evidence_urls
-- [ ] Store results: UPDATE SEM_CLAIMS + update Neo4j Claim nodes
+### Fact-Check Agent ✅ Complete (Mar 21, 2026)
+- [x] Create `langgraph_agents/agents/fact_check.py`
+- [x] Stage 1: Cortex llama3.1-70b pre-filter → VERIFIED / FALSE / UNCERTAIN
+- [x] Stage 2: Brave Search API (X-Subscription-Token) for UNCERTAIN claims → top 5 results
+- [x] Stage 3: Cortex llama3.1-70b verdict synthesis → VERIFIED/FALSE/OUTDATED/DISPUTED/UNVERIFIED
+- [x] Test 1: "Is exercise good for mental health?" → VERIFIED (LLM-only, no web search) ✅
+- [x] Test 2: "Fact check: Sam Altman said GPT-5 released in 2024" → DISPUTED + 3 URLs ✅
+- [x] Added FACTCHECK to Router + wired into LangGraph graph ✅
 
-### Batch Fact-Checking
-- [ ] Create `scripts/fact_checker.py`
-- [ ] Run Stage 1 on all VERIFIABLE_FACT + STATISTICAL claims
-- [ ] Run Stage 2 on uncertain claims (budget: ~500-800 web searches)
-- [ ] Log verification stats: % verified, % outdated, % by channel
+### Batch Fact-Checking ✅ Complete (Mar 21, 2026)
+- [x] Create `scripts/fact_checker.py`
+- [x] Stage 1 on all VERIFIABLE_FACT + STATISTICAL PENDING claims
+- [x] Stage 2 Brave Search for uncertain claims (--web-budget default 500)
+- [x] Idempotent: only processes PENDING claims
+- [x] --dry-run, --stage1-only, --limit flags for controlled runs
 
-### Comparison Agent
-- [ ] Create `langgraph_agents/agents/comparison.py`
-- [ ] Use Neo4j graph edges for cross-podcast analysis
-- [ ] Handle: "Compare {person1} and {person2} on {topic}"
-- [ ] Output: common themes, unique perspectives, contradictions
+### Comparison Agent ✅ Complete (Mar 21, 2026)
+- [x] Create `langgraph_agents/agents/comparison.py`
+- [x] Intent extraction: entity1, entity2, topic, entity_type (speaker/channel)
+- [x] Handle: "Compare {person1} and {person2} on {topic}"
+- [x] Output: agreements, disagreements, unique perspectives via llama3.1-70b
+- [x] Test: "Compare Sam Altman vs Elon Musk on AI" → 15+15 claims ✅
 
-### Recommendation Agent
-- [ ] Create `langgraph_agents/agents/recommendation.py`
-- [ ] Graph-based: suggest related episodes via shared topics/people
-- [ ] Handle: "What else should I watch?" based on current search
+### Recommendation Agent ✅ Complete (Mar 21, 2026)
+- [x] Create `langgraph_agents/agents/recommendation.py`
+- [x] Intent extraction: topic, guest, channel
+- [x] Priority: guest → channel → topic → recent fallback
+- [x] Handle: "What should I watch about startups?" → 10 episodes ✅
 
-### Insight Agent
-- [ ] Create `langgraph_agents/agents/insight.py`
-- [ ] Meta-analysis queries:
-  - "Which channels have highest fact-check accuracy?"
-  - "What are the most debated topics?"
-  - "Give me a credibility report for {channel}"
-- [ ] Calculate per-channel verification stats from SEM_CLAIMS
+### Insight Agent ✅ Complete (Mar 21, 2026)
+- [x] Create `langgraph_agents/agents/insight.py`
+- [x] 5 insight types: channel_drift, channel_report, most_debated, top_speakers, top_topics
+- [x] Meta-analysis queries: "What are the most debated topics?" → 10 topics ✅
 
-### Wire All Agents to Router
-- [ ] Update Router Agent with all 9 routing targets
-- [ ] Test full agent routing end-to-end
+### Wire All Agents to Router ✅ Complete (Mar 21, 2026)
+- [x] Updated Router Agent with COMPARE, RECOMMEND, INSIGHT, TEMPORAL, GRAPH types
+- [x] Updated graph.py with all 7 routing targets + conditional edges
+- [x] Test: all 7 query types route correctly end-to-end ✅
 
 ---
 
@@ -500,8 +494,8 @@ python -m langgraph_agents.graph "your question here"
 | 3 | ✅ Completed | Mar 17 | Mar 17 | Steps 7-9: Chunks, embeddings, search live |
 | 4 | ✅ Completed | Mar 18 | Mar 20 | Re-extraction + MVP agents + claim extraction + validation |
 | 5 | ✅ Completed | Mar 20 | Mar 20 | Neo4j: 10,610 nodes, 27,807 relationships. Graph agent working. |
-| 6 | 🔄 In Progress | Mar 20 | — | Temporal analysis + claim evolution |
-| 7 | ⬜ Not Started | — | — | Fact-checking + MCP + remaining agents |
+| 6 | ✅ Completed | Mar 20 | Mar 21 | Temporal: 243 pairs (144 CONTRADICTED). Comparison/Recommendation/Insight agents built. |
+| 7 | 🔄 In Progress | Mar 21 | — | Fact-checking + MCP |
 | 8 | ⬜ Not Started | — | — | Streamlit UI |
 | 9 | ⬜ Not Started | — | — | Airflow orchestration |
 | 10 | ⬜ Not Started | — | — | Testing + optimization + docs |
@@ -528,17 +522,16 @@ python -m langgraph_agents.graph "your question here"
 
 ---
 
-## 📝 Current Focus: Week 6
+## 📝 Current Focus: Week 7
 
 **Priority order:**
-1. Wait for `temporal_analyzer.py` to finish (started Mar 20, ~1-2 hrs) — populates SEM_CLAIM_EVOLUTION
-2. Test temporal agent with evolution queries
-3. Add EVOLVED_FROM edges to Neo4j
-4. Re-run claim extractor for all 13K chunks (background) + re-run temporal_analyzer after
-5. Start Week 7: Fact-checking + remaining agents
+1. Build fact-check agent (`langgraph_agents/agents/fact_check.py`) ← NEXT
+2. Build batch fact-checker script (`scripts/fact_checker.py`)
+3. Wire FACTCHECK into router + graph
+4. Run MCP web search setup (Brave API key already in .env)
+5. Re-run claim extractor + temporal_analyzer after extractor finishes
 
-**Blockers:** None
+**Blockers:** None (Brave Search API key in .env: BRAVE_SEARCH)
 
 **Background tasks running:**
-- `temporal_analyzer.py --max-topics 300` — started Mar 20, populating SEM_CLAIM_EVOLUTION
-- Claim extractor — still processing remaining chunks (~11K), re-run neo4j_loader + temporal_analyzer when done
+- Claim extractor (bdcbe75) — ~51% complete (5,420/10,561 remaining chunks processed)

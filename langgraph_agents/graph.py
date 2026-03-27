@@ -26,6 +26,7 @@ from langgraph_agents.agents.temporal import temporal_agent
 from langgraph_agents.agents.comparison import comparison_agent
 from langgraph_agents.agents.recommendation import recommendation_agent
 from langgraph_agents.agents.insight import insight_agent
+from langgraph_agents.agents.fact_check import fact_check_agent
 
 log = logging.getLogger(__name__)
 
@@ -48,6 +49,9 @@ def _route(state: PodcastIQState) -> str:
     if qt == "INSIGHT":
         log.info("[Graph] Routing → insight")
         return "insight"
+    if qt == "FACTCHECK":
+        log.info("[Graph] Routing → fact_check")
+        return "fact_check"
     log.info(f"[Graph] Routing query_type={qt} → search")
     return "search"
 
@@ -63,6 +67,7 @@ def build_graph():
     graph.add_node("comparison",      comparison_agent)
     graph.add_node("recommendation",  recommendation_agent)
     graph.add_node("insight",         insight_agent)
+    graph.add_node("fact_check",      fact_check_agent)
 
     graph.set_entry_point("router")
 
@@ -76,6 +81,7 @@ def build_graph():
             "comparison":      "comparison",
             "recommendation":  "recommendation",
             "insight":         "insight",
+            "fact_check":      "fact_check",
         },
     )
 
@@ -86,6 +92,7 @@ def build_graph():
     graph.add_edge("comparison",      END)
     graph.add_edge("recommendation",  END)
     graph.add_edge("insight",         END)
+    graph.add_edge("fact_check",      END)
 
     return graph.compile()
 

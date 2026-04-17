@@ -33,6 +33,22 @@ ORDER BY chunk_count DESC
 LIMIT 10
 """
 
+# Fallback: search episode titles and chunk text directly
+_TOPIC_FULLTEXT_SQL = """
+SELECT DISTINCT
+    EPISODE_TITLE,
+    CHANNEL_NAME,
+    YOUTUBE_URL,
+    PUBLISH_DATE,
+    COUNT(*) AS chunk_count
+FROM CURATED.CUR_CHUNKS
+WHERE (LOWER(EPISODE_TITLE) LIKE %s OR LOWER(CHUNK_TEXT) LIKE %s)
+  AND EPISODE_TITLE IS NOT NULL
+GROUP BY EPISODE_TITLE, CHANNEL_NAME, YOUTUBE_URL, PUBLISH_DATE
+ORDER BY chunk_count DESC
+LIMIT 10
+"""
+
 _GUEST_EPISODES_SQL = """
 SELECT DISTINCT
     e.EPISODE_TITLE,
@@ -120,10 +136,29 @@ def _fetch_episodes(intent: dict) -> list[dict]:
         return execute(_GUEST_EPISODES_SQL, (kw,))
     elif channel:
         kw = f"%{channel.lower()}%"
-        return execute(_CHANNEL_EPISODES_SQL, (kw,))
+        rows = execute(_CHANNEL_EPISODES_SQL, (kw,))
+        if not rows:
+            # try without spaces / partial match
+            kw2 = f"%{channel.lower().split()[0]}%"
+            rows = execute(_CHANNEL_EPISODES_SQL, (kw2,))
+        return rows
     elif topic:
-        kw = f"%{topic.lower()}%"
-        return execute(_TOPIC_EPISODES_SQL, (kw,))
+        # Try full topic phrase first, then each individual word
+        keywords = [topic.lower()] + [w for w in topic.lower().split() if len(w) > 3]
+        rows = []
+        for kw_raw in keywords:
+            kw = f"%{kw_raw}%"
+            rows = execute(_TOPIC_EPISODES_SQL, (kw,))
+            if rows:
+                break
+        if not rows:
+            # Fulltext fallback: try each keyword against episode titles + chunk text
+            for kw_raw in keywords:
+                kw = f"%{kw_raw}%"
+                rows = execute(_TOPIC_FULLTEXT_SQL, (kw, kw))
+                if rows:
+                    break
+        return rows
     else:
         # Fallback: recent episodes
         return execute("""
@@ -159,11 +194,11 @@ Here are the most relevant episodes about {context}:
 
 {ep_list}
 
-Write a brief, friendly recommendation (3-4 sentences):
+Write a brief, friendly recommendation (2-3 sentences):
 - Highlight 2-3 standout episodes and why they're relevant
 - Mention the variety of channels if applicable
-- End with the full list of YouTube links so they can click through
-Do NOT mention "database" or "SQL"."""
+- Do NOT include any URLs or links — the UI shows those separately
+- Do NOT mention "database" or "SQL"."""
 
     answer = execute_scalar(
         "SELECT SNOWFLAKE.CORTEX.COMPLETE('llama3.1-70b', %s)",

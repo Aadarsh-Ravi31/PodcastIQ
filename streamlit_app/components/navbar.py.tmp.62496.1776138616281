@@ -1,0 +1,29 @@
+"""
+PodcastIQ — Shared top navigation bar.
+Call render_navbar() at the top of every page.
+"""
+
+import streamlit as st
+
+
+def render_navbar():
+    """Render a horizontal navigation bar with logo + page links."""
+    logo, p1, p2, p3, p4, p5 = st.columns([1.6, 1, 1.2, 1.5, 1.5, 1.4])
+
+    with logo:
+        st.markdown(
+            '<div class="nav-logo">🎙️ PodcastIQ</div>',
+            unsafe_allow_html=True,
+        )
+    with p1:
+        st.page_link("app.py",                       label="💬  Chat",              use_container_width=True)
+    with p2:
+        st.page_link("pages/1_Graph_Explorer.py",    label="🕸️  Graph",             use_container_width=True)
+    with p3:
+        st.page_link("pages/2_Claim_Timeline.py",    label="⏳  Timeline",          use_container_width=True)
+    with p4:
+        st.page_link("pages/3_Channel_Dashboard.py", label="📊  Dashboard",         use_container_width=True)
+    with p5:
+        st.page_link("pages/4_Episode_Detail.py",    label="🎙️  Episodes",          use_container_width=True)
+
+    st.markdown('<div class="nav-divider"></div>', unsafe_allow_html=True)

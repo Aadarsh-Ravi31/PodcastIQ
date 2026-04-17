@@ -16,7 +16,7 @@
 | 4 | Re-Extraction + LangGraph MVP + Claim Extraction | 🔄 In Progress |
 | 5 | Neo4j Knowledge Graph + Graph Agent | ⬜ Not Started |
 | 6 | Temporal Analysis + Claim Evolution | ✅ Completed |
-| 7 | Hybrid Fact-Checking + MCP + Remaining Agents | 🔄 In Progress |
+| 7 | Hybrid Fact-Checking + MCP + Remaining Agents | ✅ Completed |
 | 8 | Streamlit UI (search, graph explorer, timeline, dashboard) | ⬜ Not Started |
 | 9 | Airflow Orchestration + Integration Testing | ⬜ Not Started |
 | 10 | Testing, Optimization, Documentation | ⬜ Not Started |
@@ -293,11 +293,11 @@ python -m langgraph_agents.graph "your question here"
 
 ## ✓ HYBRID FACT-CHECKING + REMAINING AGENTS — Week 7
 
-### MCP Web Search Setup
-- [ ] Sign up for Brave Search API (free tier: 2,000 queries/month)
-- [ ] Install MCP SDK: `npm install -g @modelcontextprotocol/server-brave-search`
-- [ ] Configure API key in environment
-- [ ] Test MCP server: verify search results return
+### MCP Web Search Setup ✅ Complete (via direct API — MCP server not needed)
+- [x] Sign up for Brave Search API (free tier: 2,000 queries/month)
+- [x] Install MCP SDK: `npm install -g @modelcontextprotocol/server-brave-search` — N/A: used direct REST API instead
+- [x] Configure API key in environment (BRAVE_SEARCH in .env)
+- [x] Test MCP server: verify search results return — tested via fact_check.py Stage 2 ✅
 
 ### Fact-Check Agent ✅ Complete (Mar 21, 2026)
 - [x] Create `langgraph_agents/agents/fact_check.py`
@@ -495,7 +495,7 @@ python -m langgraph_agents.graph "your question here"
 | 4 | ✅ Completed | Mar 18 | Mar 20 | Re-extraction + MVP agents + claim extraction + validation |
 | 5 | ✅ Completed | Mar 20 | Mar 20 | Neo4j: 10,610 nodes, 27,807 relationships. Graph agent working. |
 | 6 | ✅ Completed | Mar 20 | Mar 21 | Temporal: 243 pairs (144 CONTRADICTED). Comparison/Recommendation/Insight agents built. |
-| 7 | 🔄 In Progress | Mar 21 | — | Fact-checking + MCP |
+| 7 | ✅ Completed | Mar 21 | Apr 11 | Fact-checking + Brave Search (direct API) + all 9 agents complete |
 | 8 | ⬜ Not Started | — | — | Streamlit UI |
 | 9 | ⬜ Not Started | — | — | Airflow orchestration |
 | 10 | ⬜ Not Started | — | — | Testing + optimization + docs |

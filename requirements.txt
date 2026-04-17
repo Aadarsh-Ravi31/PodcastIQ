@@ -21,6 +21,8 @@ langchain-core>=0.3.0
 
 # Frontend
 streamlit>=1.38.0
+pyvis>=0.3.2
+plotly>=5.18.0
 
 # Utilities
 pandas>=2.2.0

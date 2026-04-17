@@ -18,6 +18,7 @@ log = logging.getLogger(__name__)
 
 _SPEAKER_CLAIMS_SQL = """
 SELECT
+    SPEAKER,
     CLAIM_TEXT,
     CLAIM_TYPE,
     TOPIC,

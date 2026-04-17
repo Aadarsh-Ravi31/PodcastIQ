@@ -41,6 +41,31 @@ ORDER BY ce.TIME_DELTA_DAYS DESC
 LIMIT 10
 """
 
+_SAME_SPEAKER_SQL = """
+SELECT
+    ce.DRIFT_TYPE,
+    ce.ORIGINAL_DATE,
+    ce.EVOLVED_DATE,
+    ce.TIME_DELTA_DAYS,
+    ce.ORIGINAL_SPEAKER,
+    ce.EVOLVED_SPEAKER,
+    ce.CHANNEL_ORIGINAL,
+    ce.CHANNEL_EVOLVED,
+    ce.ANALYSIS,
+    ce.TOPIC,
+    c1.CLAIM_TEXT  AS original_text,
+    c1.YOUTUBE_URL AS original_url,
+    c2.CLAIM_TEXT  AS evolved_text,
+    c2.YOUTUBE_URL AS evolved_url
+FROM SEMANTIC.SEM_CLAIM_EVOLUTION ce
+JOIN SEMANTIC.SEM_CLAIMS c1 ON ce.ORIGINAL_CLAIM_ID = c1.CLAIM_ID
+JOIN SEMANTIC.SEM_CLAIMS c2 ON ce.EVOLVED_CLAIM_ID  = c2.CLAIM_ID
+WHERE LOWER(ce.ORIGINAL_SPEAKER) LIKE %s
+  AND ce.SAME_SPEAKER = TRUE
+ORDER BY ce.TIME_DELTA_DAYS DESC
+LIMIT 10
+"""
+
 _SPEAKER_EVOLUTION_SQL = """
 SELECT
     ce.DRIFT_TYPE,
@@ -114,20 +139,23 @@ LIMIT 10
 
 # ── Keyword extractor ──────────────────────────────────────────────────────────
 
-_EXTRACT_PROMPT = """Extract the key search terms from this temporal query about podcast claims.
+_EXTRACT_PROMPT = """Extract search terms from this temporal podcast query.
 
 Query: "{query}"
 
-Return a JSON object with these fields:
-- topic: keyword to search in topic names (or null if not topic-specific)
-- speaker: person's name to search for (or null if not person-specific)
-- drift_type: one of REVISED/ESCALATED/SOFTENED/CONTRADICTED/CONFIRMED (or null)
+Return JSON with:
+- topic: ONE short keyword (1-2 words max) for the subject — e.g. "AGI", "AI", "crypto", "startups". Never null if query mentions a subject.
+- speaker: person's name (or null)
+- drift_type: REVISED/ESCALATED/SOFTENED/CONTRADICTED/CONFIRMED (or null)
 
 Examples:
-- "How has AGI opinion changed?" → {{"topic": "AGI", "speaker": null, "drift_type": null}}
+- "How have AGI timeline predictions changed?" → {{"topic": "AGI", "speaker": null, "drift_type": null}}
+- "How has AI opinion changed over time?" → {{"topic": "AI", "speaker": null, "drift_type": null}}
 - "Who changed their mind about crypto?" → {{"topic": "crypto", "speaker": null, "drift_type": "REVISED"}}
 - "Show Sam Altman's revised claims" → {{"topic": null, "speaker": "Sam Altman", "drift_type": "REVISED"}}
-- "Contradicted predictions about AI" → {{"topic": "AI", "speaker": null, "drift_type": "CONTRADICTED"}}
+- "Contradicted predictions about startups" → {{"topic": "startups", "speaker": null, "drift_type": "CONTRADICTED"}}
+
+IMPORTANT: topic must be a SHORT keyword, not a full phrase. "AGI timeline predictions" → "AGI".
 
 Respond with ONLY valid JSON — no markdown, no explanation."""
 
@@ -161,10 +189,25 @@ def _fetch_evolutions(intent: dict) -> list[dict]:
     # Priority: speaker → topic → drift_type → recent
     if speaker:
         kw = f"%{speaker.lower()}%"
+        # Prefer same-speaker pairs (person actually changed their mind)
+        rows = execute(_SAME_SPEAKER_SQL, (kw,))
+        if rows:
+            return rows
+        # Fallback: any pair where speaker appears on either side
         return execute(_SPEAKER_EVOLUTION_SQL, (kw, kw))
     elif topic:
+        # Try full topic phrase first, then first keyword, then fall through
         kw = f"%{topic.lower()}%"
-        return execute(_TOPIC_EVOLUTION_SQL, (kw,))
+        rows = execute(_TOPIC_EVOLUTION_SQL, (kw,))
+        if not rows:
+            # try just the first meaningful word (e.g. "AGI timeline" → "agi")
+            first_word = topic.lower().split()[0]
+            rows = execute(_TOPIC_EVOLUTION_SQL, (f"%{first_word}%",))
+        if not rows and drift and drift in {"REVISED", "ESCALATED", "SOFTENED", "CONTRADICTED", "CONFIRMED"}:
+            rows = execute(_DRIFT_TYPE_SQL, (drift,))
+        if not rows:
+            rows = execute(_RECENT_SQL)
+        return rows
     elif drift and drift in {"REVISED", "ESCALATED", "SOFTENED", "CONTRADICTED", "CONFIRMED"}:
         return execute(_DRIFT_TYPE_SQL, (drift,))
     else:
@@ -198,10 +241,11 @@ The user asked: "{query}"
 Here are relevant claim evolution pairs from the knowledge graph:
 {rows_text}
 
-Write a clear, insightful answer (4-6 sentences) explaining how the discourse has evolved.
-- Highlight the most significant shifts (CONTRADICTED, REVISED)
-- Mention specific speakers and timeframes
-- Note if the same person changed their view vs different people disagreeing
+Write a clear, insightful answer (4-6 sentences) explaining how views have evolved.
+- If SAME_SPEAKER pairs: frame it as "X changed their view" or "X contradicted themselves"
+- If cross-speaker pairs: frame it as "the discourse shifted" or "opinions diverged"
+- Highlight the most significant shifts (CONTRADICTED > REVISED > ESCALATED)
+- Mention specific speakers, topics, and timeframes
 - Do NOT mention "database", "SQL", or "knowledge graph" — answer naturally"""
 
     answer = execute_scalar(

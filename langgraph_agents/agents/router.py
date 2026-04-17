@@ -21,24 +21,42 @@ _VALID_TYPES = {"SEARCH", "SUMMARIZE", "COMPARE", "RECOMMEND", "GRAPH", "TEMPORA
 _PROMPT = """You are a query classifier for a podcast intelligence system.
 
 Classify the user's query into exactly ONE of these types:
-- SEARCH     : Find specific clips or quotes about a topic
-- SUMMARIZE  : Synthesize what experts say about a topic across many podcasts
-- COMPARE    : Compare viewpoints of two specific people or channels on a topic
+
+- SUMMARIZE  : User wants to LEARN about a topic — asking what experts say, best practices,
+               strategies, explanations, or insights. These are knowledge/information questions.
+               e.g. "What are the best strategies for building a startup?",
+               "What do experts say about longevity?", "How does intermittent fasting work?",
+               "What is the consensus on AI safety?", "Explain machine learning"
+
+- SEARCH     : User wants specific clips, quotes, or moments about a topic.
+               e.g. "Find clips about AGI", "What did Sam Altman say about GPT-5?"
+
+- RECOMMEND  : User explicitly wants episode/show SUGGESTIONS to watch or listen to.
+               Must contain words like: recommend, suggest, watch, listen, episodes, show me, what should I.
+               e.g. "Recommend episodes about startups", "What should I watch about AI?",
+               "Show me episodes with Sam Altman", "Suggest something from Huberman Lab"
+
+- COMPARE    : Compare viewpoints of two specific people or channels on a topic.
                e.g. "Compare Sam Altman vs Elon Musk on AI", "How do X and Y differ on Z?"
-- RECOMMEND  : Suggest episodes or channels to explore based on topic, guest, or channel
-               e.g. "What should I watch about AI?", "More episodes with Sam Altman"
-- INSIGHT    : Meta-analysis questions about channels, speakers, or topic statistics
-               e.g. "Which channel has the most contradicted claims?", "What are the most debated topics?",
-               "Give me a report on Huberman Lab", "Which speakers make the most predictions?"
-- GRAPH      : Questions about relationships, networks, or connections between people/topics
-               e.g. "Who has discussed X?", "Show X's network", "Who appeared most?",
-               "What topics does X cover?", "Which guests appeared on multiple shows?"
-- TEMPORAL   : Questions about how claims or opinions have evolved over time
+
+- INSIGHT    : Meta-analysis about channels, speakers, or statistics across the corpus.
+               e.g. "Which channel has the most contradicted claims?", "Most debated topics?",
+               "Give me a credibility report on Huberman Lab", "Top speakers by claim volume"
+
+- GRAPH      : Questions about relationships, appearances, networks between people/topics.
+               e.g. "Who has Sam Altman appeared with?", "Show X's network",
+               "Which guests appeared on multiple shows?", "Who discussed AI safety?"
+
+- TEMPORAL   : How claims or opinions have evolved or changed over time.
                e.g. "How has opinion on AGI changed?", "Who changed their mind about crypto?",
-               "Show contradicted predictions", "What claims have been revised on AI?"
-- FACTCHECK  : Verify whether a specific claim is true, false, or outdated
-               e.g. "Is it true that X?", "Fact check: [claim]", "Verify the claim that...",
-               "Did Sam Altman really say AGI arrives by 2025?", "Is this statistic accurate?"
+               "Show contradicted predictions", "What claims have been revised?"
+
+- FACTCHECK  : Verify whether a specific claim is true, false, or outdated.
+               e.g. "Fact check: GPT-5 released in 2024", "Is it true that X?",
+               "Did Sam Altman say AGI arrives by 2025?", "Verify this statistic"
+
+IMPORTANT: "What are strategies/tips/advice about X?" → SUMMARIZE (not RECOMMEND)
+           "Recommend/suggest/show me episodes about X" → RECOMMEND
 
 Respond with ONLY the type word — no explanation, no punctuation.
 

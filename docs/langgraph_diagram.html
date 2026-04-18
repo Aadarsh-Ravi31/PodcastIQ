@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PodcastIQ — LangGraph Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:  #0C0B09; --bg2: #1C1916;
+    --ora: #E8531A; --navy: #2A5298; --teal: #35AFA1;
+    --text: #F0EDE8; --t2: rgba(240,237,232,.62); --t3: rgba(240,237,232,.3);
+    --bdr: rgba(255,255,255,.08);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'DM Sans', system-ui, sans-serif;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 52px 24px 72px;
+  }
+  h1 { font-family: 'Fraunces', serif; font-weight: 700; font-size: 2rem; letter-spacing: -.02em; margin-bottom: 6px; }
+  h1 span { color: var(--ora); }
+  .subtitle { font-family: 'JetBrains Mono', monospace; font-size: .72rem; color: var(--t3); letter-spacing: .06em; margin-bottom: 52px; }
+  svg { width: 100%; max-width: 1200px; display: block; }
+  .legend {
+    display: flex; gap: 28px; justify-content: center; flex-wrap: wrap;
+    margin-top: 40px; padding-top: 22px; border-top: 1px solid var(--bdr);
+  }
+  .li { display: flex; align-items: center; gap: 8px; font-size: .78rem; color: var(--t2); }
+  .ld { width: 12px; height: 12px; border-radius: 3px; border: 1.5px solid; flex-shrink: 0; }
+  .footer { margin-top: 32px; font-family: 'JetBrains Mono', monospace; font-size: .6rem; color: var(--t3); letter-spacing: .05em; }
+</style>
+</head>
+<body>
+
+<h1>PodcastIQ <span>◆</span> LangGraph</h1>
+<p class="subtitle">9-AGENT MULTI-AGENT SYSTEM · SNOWFLAKE CORTEX + NEO4J + MCP</p>
+
+<!--
+  Layout (viewBox 1200 × 640):
+  7 agent columns, centers at x = 86, 236, 386, 536, 686, 836, 986
+  Each node width = 140px  →  x_left = center - 70
+  Router centered at x=600
+-->
+<svg viewBox="0 0 1200 640" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="ao" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3z" fill="rgba(232,83,26,.65)"/>
+  </marker>
+  <marker id="an" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3z" fill="rgba(100,150,230,.8)"/>
+  </marker>
+  <marker id="ad" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3z" fill="rgba(240,237,232,.2)"/>
+  </marker>
+</defs>
+
+<!-- ── USER QUERY ── -->
+<rect x="480" y="16" width="240" height="34" rx="8" fill="#1C1916" stroke="rgba(255,255,255,.1)" stroke-width="1"/>
+<text x="600" y="37" text-anchor="middle" font-family="JetBrains Mono" font-size="12" fill="rgba(240,237,232,.4)" letter-spacing="1">user_query</text>
+
+<!-- user_query → router -->
+<line x1="600" y1="50" x2="600" y2="108" stroke="rgba(232,83,26,.45)" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#ao)"/>
+
+<!-- ── ROUTER ── -->
+<rect x="430" y="110" width="340" height="70" rx="12" fill="rgba(232,83,26,.1)" stroke="#E8531A" stroke-width="1.5"/>
+<text x="600" y="133" text-anchor="middle" font-family="JetBrains Mono" font-size="9" fill="rgba(232,83,26,.6)" letter-spacing="1.5">ORCHESTRATOR</text>
+<text x="600" y="154" text-anchor="middle" font-family="Fraunces" font-size="18" font-weight="600" fill="#F2873A">Router Agent</text>
+<text x="600" y="171" text-anchor="middle" font-family="DM Sans" font-size="11" fill="rgba(240,237,232,.45)">Classifies query intent · routes to specialist agent</text>
+
+<!-- router → horizontal bar -->
+<line x1="600" y1="180" x2="600" y2="218" stroke="rgba(232,83,26,.4)" stroke-width="1.5"/>
+
+<!-- horizontal distribution bar  x: 86 → 986 -->
+<line x1="86" y1="218" x2="986" y2="218" stroke="rgba(232,83,26,.35)" stroke-width="1.5"/>
+
+<!-- vertical drops + query type labels  (cols: 86,236,386,536,686,836,986) -->
+<!-- col 1: 86 -->
+<line x1="86"  y1="218" x2="86"  y2="282" stroke="rgba(232,83,26,.4)" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="86"  y="268" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" fill="rgba(232,83,26,.55)" letter-spacing=".5">SEARCH</text>
+
+<!-- col 2: 236 -->
+<line x1="236" y1="218" x2="236" y2="282" stroke="rgba(232,83,26,.4)" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="236" y="268" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" fill="rgba(232,83,26,.55)" letter-spacing=".5">GRAPH</text>
+
+<!-- col 3: 386 -->
+<line x1="386" y1="218" x2="386" y2="282" stroke="rgba(232,83,26,.4)" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="386" y="268" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" fill="rgba(232,83,26,.55)" letter-spacing=".5">TEMPORAL</text>
+
+<!-- col 4: 536 -->
+<line x1="536" y1="218" x2="536" y2="282" stroke="rgba(232,83,26,.4)" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="536" y="268" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" fill="rgba(232,83,26,.55)" letter-spacing=".5">FACTCHECK</text>
+
+<!-- col 5: 686 -->
+<line x1="686" y1="218" x2="686" y2="282" stroke="rgba(232,83,26,.4)" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="686" y="268" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" fill="rgba(232,83,26,.55)" letter-spacing=".5">COMPARE</text>
+
+<!-- col 6: 836 -->
+<line x1="836" y1="218" x2="836" y2="282" stroke="rgba(232,83,26,.4)" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="836" y="268" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" fill="rgba(232,83,26,.55)" letter-spacing=".5">RECOMMEND</text>
+
+<!-- col 7: 986 -->
+<line x1="986" y1="218" x2="986" y2="282" stroke="rgba(232,83,26,.4)" stroke-width="1.5" marker-end="url(#ao)"/>
+<text x="986" y="268" text-anchor="middle" font-family="JetBrains Mono" font-size="8.5" fill="rgba(232,83,26,.55)" letter-spacing=".5">INSIGHT</text>
+
+
+<!-- ════ AGENT NODES  y=284, height=84 ════ -->
+
+<!-- 1. SEARCH  x=16..156  center=86 -->
+<rect x="16" y="284" width="140" height="84" rx="10" fill="rgba(42,82,152,.2)" stroke="#2A5298" stroke-width="1.5"/>
+<text x="86" y="304" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(107,159,245,.65)" letter-spacing="1">HYBRID RAG</text>
+<text x="86" y="322" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#6b9ff5">Search</text>
+<text x="86" y="339" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#6b9ff5">Agent</text>
+<text x="86" y="357" text-anchor="middle" font-family="DM Sans" font-size="10" fill="rgba(240,237,232,.4)">Cortex + Neo4j</text>
+
+<!-- 2. KNOWLEDGE GRAPH  x=166..306  center=236 -->
+<rect x="166" y="284" width="140" height="84" rx="10" fill="rgba(53,175,161,.1)" stroke="#35AFA1" stroke-width="1.5"/>
+<text x="236" y="304" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(53,175,161,.65)" letter-spacing="1">NEO4J CYPHER</text>
+<text x="236" y="322" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#35AFA1">Knowledge</text>
+<text x="236" y="339" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#35AFA1">Graph Agent</text>
+<text x="236" y="357" text-anchor="middle" font-family="DM Sans" font-size="10" fill="rgba(240,237,232,.4)">Entity queries</text>
+
+<!-- 3. TEMPORAL  x=316..456  center=386 -->
+<rect x="316" y="284" width="140" height="84" rx="10" fill="rgba(53,175,161,.1)" stroke="#35AFA1" stroke-width="1.5"/>
+<text x="386" y="304" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(53,175,161,.65)" letter-spacing="1">DRIFT DETECTION</text>
+<text x="386" y="322" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#35AFA1">Temporal</text>
+<text x="386" y="339" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#35AFA1">Agent</text>
+<text x="386" y="357" text-anchor="middle" font-family="DM Sans" font-size="10" fill="rgba(240,237,232,.4)">Claim evolution</text>
+
+<!-- 4. FACT CHECK  x=466..606  center=536 -->
+<rect x="466" y="284" width="140" height="84" rx="10" fill="rgba(232,83,26,.1)" stroke="rgba(232,83,26,.6)" stroke-width="1.5"/>
+<text x="536" y="304" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(232,83,26,.65)" letter-spacing="1">MCP · BRAVE SEARCH</text>
+<text x="536" y="322" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#F2873A">Fact-Check</text>
+<text x="536" y="339" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#F2873A">Agent</text>
+<text x="536" y="357" text-anchor="middle" font-family="DM Sans" font-size="10" fill="rgba(240,237,232,.4)">2-stage verify</text>
+
+<!-- 5. COMPARISON  x=616..756  center=686 -->
+<rect x="616" y="284" width="140" height="84" rx="10" fill="rgba(53,175,161,.1)" stroke="#35AFA1" stroke-width="1.5"/>
+<text x="686" y="304" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(53,175,161,.65)" letter-spacing="1">CROSS-PODCAST</text>
+<text x="686" y="322" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#35AFA1">Comparison</text>
+<text x="686" y="339" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#35AFA1">Agent</text>
+<text x="686" y="357" text-anchor="middle" font-family="DM Sans" font-size="10" fill="rgba(240,237,232,.4)">Side-by-side claims</text>
+
+<!-- 6. RECOMMENDATION  x=766..906  center=836 -->
+<rect x="766" y="284" width="140" height="84" rx="10" fill="rgba(53,175,161,.1)" stroke="#35AFA1" stroke-width="1.5"/>
+<text x="836" y="304" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(53,175,161,.65)" letter-spacing="1">GRAPH-BASED</text>
+<text x="836" y="322" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#35AFA1">Recommendation</text>
+<text x="836" y="339" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#35AFA1">Agent</text>
+<text x="836" y="357" text-anchor="middle" font-family="DM Sans" font-size="10" fill="rgba(240,237,232,.4)">Related episodes</text>
+
+<!-- 7. INSIGHT  x=916..1056  center=986 -->
+<rect x="916" y="284" width="140" height="84" rx="10" fill="rgba(53,175,161,.1)" stroke="#35AFA1" stroke-width="1.5"/>
+<text x="986" y="304" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(53,175,161,.65)" letter-spacing="1">ANALYTICS</text>
+<text x="986" y="322" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#35AFA1">Insight</text>
+<text x="986" y="339" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#35AFA1">Agent</text>
+<text x="986" y="357" text-anchor="middle" font-family="DM Sans" font-size="10" fill="rgba(240,237,232,.4)">Credibility · debates</text>
+
+
+<!-- ════ SEARCH → SUMMARIZATION chain ════ -->
+<line x1="86" y1="368" x2="86" y2="408" stroke="rgba(100,150,230,.6)" stroke-width="1.5" marker-end="url(#an)"/>
+
+<!-- "chained" label -->
+<rect x="46" y="384" width="80" height="16" rx="4" fill="rgba(42,82,152,.25)" stroke="rgba(42,82,152,.4)" stroke-width="1"/>
+<text x="86" y="395" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(107,159,245,.75)" letter-spacing=".5">chained</text>
+
+<!-- SUMMARIZATION  x=16..156  center=86 -->
+<rect x="16" y="410" width="140" height="84" rx="10" fill="rgba(42,82,152,.2)" stroke="#2A5298" stroke-width="1.5"/>
+<text x="86" y="430" text-anchor="middle" font-family="JetBrains Mono" font-size="8" fill="rgba(107,159,245,.65)" letter-spacing="1">RESPONSE</text>
+<text x="86" y="449" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#6b9ff5">Summarization</text>
+<text x="86" y="466" text-anchor="middle" font-family="Fraunces" font-size="15" font-weight="600" fill="#6b9ff5">Agent</text>
+<text x="86" y="484" text-anchor="middle" font-family="DM Sans" font-size="10" fill="rgba(240,237,232,.4)">Answer + YT links</text>
+
+
+<!-- ════ → END arrows ════ -->
+<!-- Summ → END -->
+<line x1="86"  y1="494" x2="86"  y2="542" stroke="rgba(240,237,232,.15)" stroke-width="1" marker-end="url(#ad)"/>
+<!-- KG → END -->
+<line x1="236" y1="368" x2="236" y2="542" stroke="rgba(240,237,232,.12)" stroke-width="1" marker-end="url(#ad)"/>
+<!-- Temporal → END -->
+<line x1="386" y1="368" x2="386" y2="542" stroke="rgba(240,237,232,.12)" stroke-width="1" marker-end="url(#ad)"/>
+<!-- FactCheck → END -->
+<line x1="536" y1="368" x2="536" y2="542" stroke="rgba(240,237,232,.12)" stroke-width="1" marker-end="url(#ad)"/>
+<!-- Comparison → END -->
+<line x1="686" y1="368" x2="686" y2="542" stroke="rgba(240,237,232,.12)" stroke-width="1" marker-end="url(#ad)"/>
+<!-- Recommendation → END -->
+<line x1="836" y1="368" x2="836" y2="542" stroke="rgba(240,237,232,.12)" stroke-width="1" marker-end="url(#ad)"/>
+<!-- Insight → END -->
+<line x1="986" y1="368" x2="986" y2="542" stroke="rgba(240,237,232,.12)" stroke-width="1" marker-end="url(#ad)"/>
+
+<!-- END boxes -->
+<rect x="56"  y="544" width="60" height="24" rx="6" fill="#1C1916" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+<rect x="206" y="544" width="60" height="24" rx="6" fill="#1C1916" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+<rect x="356" y="544" width="60" height="24" rx="6" fill="#1C1916" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+<rect x="506" y="544" width="60" height="24" rx="6" fill="#1C1916" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+<rect x="656" y="544" width="60" height="24" rx="6" fill="#1C1916" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+<rect x="806" y="544" width="60" height="24" rx="6" fill="#1C1916" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+<rect x="956" y="544" width="60" height="24" rx="6" fill="#1C1916" stroke="rgba(255,255,255,.08)" stroke-width="1"/>
+
+<text x="86"  y="560" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="rgba(240,237,232,.28)" letter-spacing="1">END</text>
+<text x="236" y="560" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="rgba(240,237,232,.28)" letter-spacing="1">END</text>
+<text x="386" y="560" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="rgba(240,237,232,.28)" letter-spacing="1">END</text>
+<text x="536" y="560" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="rgba(240,237,232,.28)" letter-spacing="1">END</text>
+<text x="686" y="560" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="rgba(240,237,232,.28)" letter-spacing="1">END</text>
+<text x="836" y="560" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="rgba(240,237,232,.28)" letter-spacing="1">END</text>
+<text x="986" y="560" text-anchor="middle" font-family="JetBrains Mono" font-size="10" fill="rgba(240,237,232,.28)" letter-spacing="1">END</text>
+
+</svg>
+
+<div class="legend">
+  <div class="li"><div class="ld" style="border-color:#E8531A;background:rgba(232,83,26,.1)"></div>Router / Orchestrator</div>
+  <div class="li"><div class="ld" style="border-color:#2A5298;background:rgba(42,82,152,.18)"></div>Search + Summarization (chained)</div>
+  <div class="li"><div class="ld" style="border-color:#35AFA1;background:rgba(53,175,161,.1)"></div>Specialist agents → END</div>
+  <div class="li"><div class="ld" style="border-color:rgba(255,255,255,.15);background:transparent;border-style:dashed"></div>Terminal state</div>
+</div>
+
+<p class="footer">PodcastIQ · LangGraph 0.2.28 · Snowflake Cortex llama3.1-405b · Neo4j · MCP Brave Search</p>
+</body>
+</html>

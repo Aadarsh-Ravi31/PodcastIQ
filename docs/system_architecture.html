@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PodcastIQ — System Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100vw; height: 100vh; overflow: hidden;
+  background: #0C0B09;
+  font-family: 'DM Sans', system-ui, sans-serif;
+  color: #F0EDE8;
+}
+
+.slide {
+  width: 100vw; height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: 22px 32px 16px;
+  gap: 10px;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.header-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.45rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+.header-title span { color: #E8531A; }
+.header-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .6rem;
+  color: rgba(240,237,232,.35);
+  letter-spacing: .08em;
+}
+
+/* ── Main grid ── */
+.arch {
+  display: grid;
+  grid-template-columns: 1fr 26px 1.15fr 26px 1fr 26px 1.35fr 26px 0.9fr;
+  align-items: stretch;
+  gap: 0;
+  height: 100%;
+}
+
+/* ── Column ── */
+.col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  height: 100%;
+}
+
+.col-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .58rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 4px 0;
+  border-radius: 4px;
+  margin-bottom: 2px;
+}
+
+/* ── Arrow columns ── */
+.arrow-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.arrow-h {
+  width: 100%;
+  height: 1.5px;
+  background: linear-gradient(to right, rgba(232,83,26,.4), rgba(232,83,26,.15));
+  position: relative;
+}
+.arrow-h::after {
+  content:'';
+  position:absolute;
+  right:-4px; top:-3.5px;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 6px solid rgba(232,83,26,.5);
+}
+.arrow-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .52rem;
+  color: rgba(232,83,26,.5);
+  letter-spacing: .04em;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ── Box ── */
+.box {
+  border-radius: 8px;
+  padding: 7px 9px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 0;
+}
+.box-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: .72rem;
+  line-height: 1.2;
+}
+.box-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .52rem;
+  letter-spacing: .04em;
+  opacity: .65;
+  line-height: 1.4;
+}
+.box-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 2px;
+}
+.item {
+  font-size: .62rem;
+  color: rgba(240,237,232,.7);
+  line-height: 1.35;
+  padding-left: 8px;
+  position: relative;
+}
+.item::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  font-size: .38rem;
+  top: 3px;
+  opacity: .5;
+}
+
+/* Colour variants */
+.col-ora .col-label  { color: #E8531A; background: rgba(232,83,26,.08); border: 1px solid rgba(232,83,26,.2); }
+.col-navy .col-label { color: #6b9ff5; background: rgba(42,82,152,.1);  border: 1px solid rgba(42,82,152,.25); }
+.col-teal .col-label { color: #35AFA1; background: rgba(53,175,161,.08); border: 1px solid rgba(53,175,161,.2); }
+.col-purple .col-label { color: #a78bfa; background: rgba(124,58,237,.08); border: 1px solid rgba(124,58,237,.2); }
+.col-green .col-label  { color: #34d399; background: rgba(16,185,129,.08); border: 1px solid rgba(16,185,129,.2); }
+
+.box-ora    { background: rgba(232,83,26,.07);  border: 1px solid rgba(232,83,26,.25); }
+.box-navy   { background: rgba(42,82,152,.1);   border: 1px solid rgba(42,82,152,.28); }
+.box-teal   { background: rgba(53,175,161,.07); border: 1px solid rgba(53,175,161,.22); }
+.box-purple { background: rgba(124,58,237,.08); border: 1px solid rgba(124,58,237,.22); }
+.box-green  { background: rgba(16,185,129,.07); border: 1px solid rgba(16,185,129,.22); }
+.box-dim    { background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.08); }
+
+.box-ora .box-title    { color: #F2873A; }
+.box-navy .box-title   { color: #6b9ff5; }
+.box-teal .box-title   { color: #35AFA1; }
+.box-purple .box-title { color: #a78bfa; }
+.box-green .box-title  { color: #34d399; }
+.box-dim .box-title    { color: rgba(240,237,232,.7); }
+
+/* ── Agents grid (col 4) ── */
+.agents-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  flex: 1;
+  min-height: 0;
+}
+.agent-box {
+  border-radius: 6px;
+  padding: 5px 7px;
+  background: rgba(53,175,161,.07);
+  border: 1px solid rgba(53,175,161,.2);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  justify-content: center;
+}
+.agent-box .a-title {
+  font-family: 'Fraunces', serif;
+  font-size: .63rem;
+  font-weight: 600;
+  color: #35AFA1;
+  line-height: 1.2;
+}
+.agent-box .a-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .48rem;
+  color: rgba(240,237,232,.45);
+  letter-spacing: .03em;
+}
+.agent-router {
+  grid-column: 1 / -1;
+  background: rgba(232,83,26,.08);
+  border-color: rgba(232,83,26,.35);
+}
+.agent-router .a-title { color: #F2873A; }
+
+/* ── Footer ── */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.footer-tech {
+  display: flex;
+  gap: 14px;
+}
+.tech-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .52rem;
+  color: rgba(240,237,232,.35);
+  letter-spacing: .05em;
+  padding: 2px 7px;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 4px;
+}
+.footer-logo {
+  font-family: 'Fraunces', serif;
+  font-size: .85rem;
+  font-weight: 700;
+  color: rgba(240,237,232,.2);
+  letter-spacing: -.01em;
+}
+.footer-logo span { color: rgba(232,83,26,.4); }
+</style>
+</head>
+<body>
+<div class="slide">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-title">PodcastIQ <span>◆</span> System Architecture</div>
+    <div class="header-sub">END-TO-END DATA + AI PIPELINE</div>
+  </div>
+
+  <!-- MAIN ARCH GRID -->
+  <div class="arch">
+
+    <!-- ═══ COL 1 — DATA INGESTION ═══ -->
+    <div class="col col-ora">
+      <div class="col-label">① Data Ingestion</div>
+
+      <div class="box box-ora" style="flex:0.9">
+        <div class="box-title">YouTube Source</div>
+        <div class="box-sub">25 CHANNELS · 290+ EPISODES</div>
+        <div class="box-items">
+          <div class="item">yt-dlp — WebVTT subtitles</div>
+          <div class="item">YouTube Data API v3</div>
+          <div class="item">6 genres indexed</div>
+        </div>
+      </div>
+
+      <div class="box box-ora" style="flex:0.8">
+        <div class="box-title">channel_extraction.py</div>
+        <div class="box-sub">EXTRACTION SCRIPT</div>
+        <div class="box-items">
+          <div class="item">Metadata JSON per episode</div>
+          <div class="item">Transcript JSON per video</div>
+          <div class="item">Stored in data/raw/</div>
+        </div>
+      </div>
+
+      <div class="box box-ora" style="flex:0.8">
+        <div class="box-title">snowflake_loader.py</div>
+        <div class="box-sub">PUT + COPY INTO RAW LAYER</div>
+        <div class="box-items">
+          <div class="item">Key-pair auth</div>
+          <div class="item">Bulk stage upload</div>
+          <div class="item">RAW.EPISODES (VARIANT)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- arrow 1→2 -->
+    <div class="arrow-col">
+      <div class="arrow-label">PUT/COPY</div>
+      <div class="arrow-h"></div>
+    </div>
+
+    <!-- ═══ COL 2 — SNOWFLAKE ═══ -->
+    <div class="col col-navy">
+      <div class="col-label">② Snowflake Data Warehouse</div>
+
+      <div class="box box-navy" style="flex:0.55">
+        <div class="box-title">RAW Layer</div>
+        <div class="box-sub">VARIANT JSON STORAGE</div>
+        <div class="box-items">
+          <div class="item">RAW.EPISODES</div>
+          <div class="item">RAW.CHANNELS</div>
+        </div>
+      </div>
+
+      <div class="box box-navy" style="flex:0.55">
+        <div class="box-title">Staging Layer</div>
+        <div class="box-sub">DBT VIEWS</div>
+        <div class="box-items">
+          <div class="item">STG_EPISODES · STG_SEGMENTS</div>
+          <div class="item">INT_EPISODES · INT_SEGMENTS</div>
+        </div>
+      </div>
+
+      <div class="box box-navy" style="flex:0.55">
+        <div class="box-title">Curated Layer</div>
+        <div class="box-sub">120s CHUNK WINDOWS</div>
+        <div class="box-items">
+          <div class="item">CUR_CHUNKS (~250K chunks)</div>
+          <div class="item">Sliding window + overlap</div>
+        </div>
+      </div>
+
+      <div class="box box-navy" style="flex:1">
+        <div class="box-title">Semantic Layer</div>
+        <div class="box-sub">AI-ENRICHED TABLES</div>
+        <div class="box-items">
+          <div class="item">SEM_CHUNK_EMBEDDINGS (768-dim)</div>
+          <div class="item">SEM_CLAIMS + speaker attr.</div>
+          <div class="item">SEM_CLAIM_EVOLUTION</div>
+          <div class="item">SEM_EPISODE_PARTICIPANTS</div>
+          <div class="item">PODCASTIQ_SEARCH (Cortex)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- arrow 2→3 -->
+    <div class="arrow-col">
+      <div class="arrow-label">Cypher</div>
+      <div class="arrow-h"></div>
+      <div class="arrow-label" style="margin-top:8px">Cortex</div>
+      <div class="arrow-h"></div>
+    </div>
+
+    <!-- ═══ COL 3 — PROCESSING ═══ -->
+    <div class="col col-teal">
+      <div class="col-label">③ Processing & Enrichment</div>
+
+      <div class="box box-teal" style="flex:0.7">
+        <div class="box-title">DBT Transformations</div>
+        <div class="box-sub">SQL-BASED MODELING</div>
+        <div class="box-items">
+          <div class="item">Curated + Semantic models</div>
+          <div class="item">Incremental processing</div>
+          <div class="item">dbt test suite</div>
+        </div>
+      </div>
+
+      <div class="box box-teal" style="flex:0.85">
+        <div class="box-title">Two-Tier Speaker Attribution</div>
+        <div class="box-sub">guest_extractor.py</div>
+        <div class="box-items">
+          <div class="item">Tier 1: Regex title parsing (~80%)</div>
+          <div class="item">Tier 2: llama3.1-8b inference</div>
+          <div class="item">→ SEM_EPISODE_PARTICIPANTS</div>
+        </div>
+      </div>
+
+      <div class="box box-teal" style="flex:0.85">
+        <div class="box-title">Claim Extraction</div>
+        <div class="box-sub">claim_extractor.py</div>
+        <div class="box-items">
+          <div class="item">llama3.1-70b per chunk</div>
+          <div class="item">4 claim types classified</div>
+          <div class="item">→ SEM_CLAIMS</div>
+        </div>
+      </div>
+
+      <div class="box box-teal" style="flex:0.85">
+        <div class="box-title">Neo4j Knowledge Graph</div>
+        <div class="box-sub">GraphRAG LAYER</div>
+        <div class="box-items">
+          <div class="item">Person, Episode, Claim nodes</div>
+          <div class="item">APPEARED_ON · MADE_CLAIM edges</div>
+          <div class="item">Entity resolution</div>
+        </div>
+      </div>
+
+      <div class="box box-teal" style="flex:0.7">
+        <div class="box-title">Temporal Analysis</div>
+        <div class="box-sub">temporal_analyzer.py</div>
+        <div class="box-items">
+          <div class="item">Drift detection across claims</div>
+          <div class="item">→ SEM_CLAIM_EVOLUTION</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- arrow 3→4 -->
+    <div class="arrow-col">
+      <div class="arrow-label">state</div>
+      <div class="arrow-h"></div>
+    </div>
+
+    <!-- ═══ COL 4 — LANGGRAPH AGENTS ═══ -->
+    <div class="col col-teal">
+      <div class="col-label">④ LangGraph Multi-Agent System</div>
+      <div class="agents-grid">
+        <div class="agent-box agent-router">
+          <div class="a-title">Router Agent</div>
+          <div class="a-sub">llama3.1-8b · classifies intent → 8 query types</div>
+        </div>
+        <div class="agent-box">
+          <div class="a-title">Search</div>
+          <div class="a-sub">Cortex Search · vector</div>
+        </div>
+        <div class="agent-box">
+          <div class="a-title">Summarization</div>
+          <div class="a-sub">llama3.1-70b · RAG</div>
+        </div>
+        <div class="agent-box">
+          <div class="a-title">Knowledge Graph</div>
+          <div class="a-sub">Neo4j · Text→Cypher</div>
+        </div>
+        <div class="agent-box">
+          <div class="a-title">Temporal</div>
+          <div class="a-sub">Claim evolution · drift</div>
+        </div>
+        <div class="agent-box" style="background:rgba(232,83,26,.07);border-color:rgba(232,83,26,.3)">
+          <div class="a-title" style="color:#F2873A">Fact-Check</div>
+          <div class="a-sub">Cortex + Brave Search MCP</div>
+        </div>
+        <div class="agent-box">
+          <div class="a-title">Comparison</div>
+          <div class="a-sub">Side-by-side claims</div>
+        </div>
+        <div class="agent-box">
+          <div class="a-title">Recommendation</div>
+          <div class="a-sub">Graph-based episodes</div>
+        </div>
+        <div class="agent-box">
+          <div class="a-title">Insight</div>
+          <div class="a-sub">Credibility · debates</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- arrow 4→5 -->
+    <div class="arrow-col">
+      <div class="arrow-label">summary</div>
+      <div class="arrow-h"></div>
+    </div>
+
+    <!-- ═══ COL 5 — UI + GUARDRAILS ═══ -->
+    <div class="col col-green">
+      <div class="col-label">⑤ UI & Safety</div>
+
+      <div class="box box-green" style="flex:0.7">
+        <div class="box-title">Input Guardrails</div>
+        <div class="box-sub">5-LAYER VALIDATION</div>
+        <div class="box-items">
+          <div class="item">Length · injection · language</div>
+          <div class="item">Scope (medical/legal/financial)</div>
+          <div class="item">llama3.1-8b semantic check</div>
+        </div>
+      </div>
+
+      <div class="box box-green" style="flex:0.7">
+        <div class="box-title">LLM-as-Judge</div>
+        <div class="box-sub">GPT-4o OUTPUT VALIDATOR</div>
+        <div class="box-items">
+          <div class="item">Cross-model hallucination check</div>
+          <div class="item">VERIFIED → UNVERIFIED badges</div>
+          <div class="item">Search + Summarize only</div>
+        </div>
+      </div>
+
+      <div class="box box-green" style="flex:1.1">
+        <div class="box-title">Streamlit UI</div>
+        <div class="box-sub">CHAT INTERFACE</div>
+        <div class="box-items">
+          <div class="item">Conversational query interface</div>
+          <div class="item">YouTube timestamp deep links</div>
+          <div class="item">Fact-check verdict badges</div>
+          <div class="item">Confidence score display</div>
+          <div class="item">Claim timeline view</div>
+        </div>
+      </div>
+
+      <!-- External services -->
+      <div class="box box-dim" style="flex:0.7">
+        <div class="box-title">External Services</div>
+        <div class="box-sub">MCP + APIs</div>
+        <div class="box-items">
+          <div class="item">Brave Search API</div>
+          <div class="item">OpenAI GPT-4o</div>
+          <div class="item">YouTube Data API v3</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /arch -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-tech">
+      <span class="tech-badge">Snowflake Cortex</span>
+      <span class="tech-badge">LangGraph 0.2.28</span>
+      <span class="tech-badge">Neo4j</span>
+      <span class="tech-badge">DBT 1.8</span>
+      <span class="tech-badge">llama3.1-405b · 70b · 8b</span>
+      <span class="tech-badge">Arctic Embed 768-dim</span>
+      <span class="tech-badge">GPT-4o</span>
+      <span class="tech-badge">Streamlit 1.38</span>
+    </div>
+    <div class="footer-logo">PodcastIQ <span>◆</span></div>
+  </div>
+
+</div>
+</body>
+</html>

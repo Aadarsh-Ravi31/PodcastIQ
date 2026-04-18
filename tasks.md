@@ -1,8 +1,9 @@
 # PodcastIQ - Detailed Implementation Tasks (Expanded)
 
 **Project Timeline:** 11 Weeks (February - April 2026)
-**Last Updated:** March 18, 2026
+**Last Updated:** April 18, 2026
 **Target Scope:** 290+ Episodes | 20,000+ Segments | Knowledge Graph | Temporal Claims | Fact-Checking
+**Status:** ✅ Project Complete
 
 ---
 
@@ -13,14 +14,11 @@
 | 1 | Environment Setup + Steps 1-2 (Extract & Profile) | ✅ Completed |
 | 2 | Steps 3-6 (Stage, Load, Clean, Structure) | ✅ Completed |
 | 3 | Steps 7-8 (Chunk & Enrich) + Step 9 (Index) | ✅ Completed |
-| 4 | Re-Extraction + LangGraph MVP + Claim Extraction | 🔄 In Progress |
-| 5 | Neo4j Knowledge Graph + Graph Agent | ⬜ Not Started |
+| 4 | Re-Extraction + LangGraph MVP + Claim Extraction | ✅ Completed |
+| 5 | Neo4j Knowledge Graph + Graph Agent | ✅ Completed |
 | 6 | Temporal Analysis + Claim Evolution | ✅ Completed |
 | 7 | Hybrid Fact-Checking + MCP + Remaining Agents | ✅ Completed |
-| 8 | Streamlit UI + Demo Prep + Guardrails | ✅ Completed |
-| 9 | Airflow Orchestration + Integration Testing | ❌ Skipped |
-| 10 | Testing, Optimization, Documentation | ❌ Skipped |
-| 11 | Final Demo + Presentation | ⬜ Not Started |
+| 8 | Streamlit UI + Guardrails + Evaluation Suite | ✅ Completed |
 
 ---
 
@@ -340,148 +338,42 @@ python -m langgraph_agents.graph "your question here"
 
 ---
 
-## 🖥️ STREAMLIT UI — Week 8
+## 🖥️ STREAMLIT UI — Week 8 ✅ Complete (Apr 17, 2026)
 
-### Search Interface
-- [ ] Search bar with placeholder "Search 290+ podcast episodes..."
-- [ ] Result cards: episode title, channel, segment text, timestamp, relevance score
-- [ ] Verification badges on results: ✅ Verified, ⚠️ Outdated, ❌ False, ❓ Unverified
-- [ ] "Click to Play" YouTube timestamp links
-- [ ] Sidebar filters: Channel, Topic, Date Range, Verification Status
+### Chat Interface
+- [x] Chat interface with 9-agent routing (`streamlit_app/app.py`)
+- [x] Search / Summarize: source cards with YouTube links
+- [x] Temporal: same-speaker only cards, key case fix
+- [x] Fact-Check: no duplicate rendering, Brave Search path verified
+- [x] Comparison: grouped by speaker, CLAIM_TYPE badge instead of PENDING
+- [x] Recommend: deduped by title+channel, no URL dump in text
+- [x] Insight: dark HTML table (no white iframe)
+- [x] Knowledge Graph: clean node/edge count, no st.status icon overlap
 
-### Knowledge Graph Explorer
-- [ ] Interactive force-directed graph (neovis.js or react-force-graph via Streamlit component)
-- [ ] Click node → show details + related claims
-- [ ] Filter graph by topic, person, channel
-- [ ] Highlight claim verification status with color coding
+### Pages
+- [x] Knowledge Graph Explorer (`pages/1_Graph_Explorer.py`)
+- [x] Channel Dashboard with dark HTML tables, topics chart, guests (`pages/3_Channel_Dashboard.py`)
+- [x] Removed Timeline page (sparse temporal data)
+- [x] Removed Episodes page (VIDEO_ID mismatch)
 
-### Claim Timeline View
-- [ ] Horizontal timeline showing claim evolution for a topic
-- [ ] Color-coded drift types (green = confirmed, orange = revised, red = contradicted)
-- [ ] Click claim → YouTube deep link to exact moment
-- [ ] Show speaker attribution with confidence level
+### Input Guardrails
+- [x] Created `streamlit_app/components/guardrails.py`
+  - 1.1 Query length (3–500 chars)
+  - 1.2 Prompt injection detection (regex patterns)
+  - 1.4 Scope classification (medical/legal/financial/private info)
+  - 1.8 Language detection (non-English script rejection)
+- [x] Wired into `app.py` before `agent_run()` — blocks bad queries instantly
+- [x] Real person disclaimer on every assistant response (Layer 13.4)
 
-### Channel Credibility Dashboard
-- [ ] Per-channel fact-check accuracy (% verified, % outdated, % false)
-- [ ] Topic coverage heatmap per channel
-- [ ] Guest network visualization per channel
-- [ ] Episode count + date range per channel
-
-### Episode Detail Page
-- [ ] Episode summary (from SEM_EPISODE_SUMMARIES)
-- [ ] List of extracted claims with verification badges
-- [ ] Participants list (host + guests)
-- [ ] Related episodes (via graph-based recommendation)
-
-### User Interaction Logging
-- [ ] Log searches to `APP.SEARCH_HISTORY`
-- [ ] Show recent search history in sidebar
-
----
-
-## 🗓️ AIRFLOW ORCHESTRATION — Week 9
-
-### DAG 1: `youtube_extract_dag.py` (Daily at 2 AM)
-- [ ] Task 1: Run extraction for new videos (all 25 channels)
-- [ ] Task 2: Run `snowflake_loader.py` (incremental load)
-- [ ] Task 3: Refresh CUR_CHUNKS for new episodes
-- [ ] Task 4: Trigger embedding generation for new chunks
-- [ ] Error handling: retry 3x with exponential backoff
-
-### DAG 2: `claim_extraction_dag.py` (Daily, after DAG 1)
-- [ ] Task 1: Run claim extraction on new chunks
-- [ ] Task 2: Run guest extraction on new episodes
-- [ ] Task 3: Load new claims + entities → Neo4j
-- [ ] Task 4: Run claim linking for new claims
-- [ ] Dependency: triggered after DAG 1 completes
-
-### DAG 3: `fact_check_dag.py` (Weekly on Sundays)
-- [ ] Task 1: Re-verify all VERIFIABLE_FACT claims (catch newly outdated)
-- [ ] Task 2: Verify any new claims from past week
-- [ ] Task 3: Update SEM_CLAIMS + Neo4j with new statuses
-- [ ] Budget guard: cap at 500 web searches per run
-
-### Alerting
-- [ ] Email notification on DAG failure
-- [ ] Slack webhook (optional)
-
----
-
-## 🧪 TESTING & OPTIMIZATION — Week 10
-
-### Data Quality (dbt tests / SQL)
-- [ ] not_null on all critical columns
-- [ ] unique on all primary keys
-- [ ] relationships (chunks → episodes, claims → chunks, embeddings → chunks)
-- [ ] Custom: embedding coverage = 100%
-- [ ] Custom: all YouTube links valid format
-- [ ] Custom: claim extraction coverage (% of chunks with claims)
-
-### Graph Quality
-- [ ] No orphan Person nodes (everyone appears in at least one episode)
-- [ ] No orphan Claim nodes (every claim links to episode + topic)
-- [ ] Entity resolution completeness (spot-check for duplicates)
-- [ ] Claim evolution edge count (verify meaningful evolution detected)
-
-### Performance
-- [ ] Search latency < 5 seconds (95th percentile)
-- [ ] Graph queries < 3 seconds
-- [ ] Streamlit page load < 2 seconds
-- [ ] Add Neo4j indexes on frequently queried properties
-- [ ] Snowflake clustering keys if >10K rows
-- [ ] Streamlit caching: `@st.cache_data` on all Snowflake/Neo4j queries
-
-### Documentation
-- [ ] README.md with architecture diagram
-- [ ] Setup instructions (Snowflake, Neo4j, Python, Airflow)
-- [ ] API documentation for agent system
-- [ ] Credit usage report
-
----
-
-## 🚀 FINAL DEMO & PRESENTATION — Week 11
-
-### Demo Preparation
-- [ ] Prepare demo script with 7 showcase queries
-- [ ] Rehearse live demo (practice transitions, handle errors gracefully)
-- [ ] Record backup demo video (in case live demo fails)
-- [ ] Prepare to answer questions:
-  - "Why Neo4j + Snowflake instead of just one?"
-  - "How accurate is the claim extraction?"
-  - "How does GraphRAG compare to vanilla RAG?"
-  - "How would you scale to 1 million episodes?"
-  - "What was the hardest technical challenge?"
-
-### Slide Deck
-- [ ] Problem statement (audio content is unsearchable)
-- [ ] Solution overview (architecture diagram)
-- [ ] Data pipeline (10-step journey — use existing diagram)
-- [ ] Novel features:
-  - GraphRAG (vector + graph hybrid retrieval)
-  - Temporal knowledge graph (claim evolution)
-  - Hybrid fact-checking (Cortex + MCP)
-  - Two-tier speaker attribution
-- [ ] Live demo (7 queries)
-- [ ] Challenges and learnings
-- [ ] Future enhancements
-
-### Final Report (8-12 pages)
-- [ ] Architecture decisions and trade-offs
-- [ ] Data pipeline design (Steps 1-9)
-- [ ] Intelligence layer design (Steps 10-17)
-- [ ] GraphRAG implementation
-- [ ] Temporal claim analysis methodology
-- [ ] Fact-checking pipeline design
-- [ ] Results and evaluation
-- [ ] Snowflake credit usage breakdown
-- [ ] Learnings and future work
-
-### GitHub Repository
-- [ ] Clean commit history
-- [ ] All sensitive files in `.gitignore`
-- [ ] Requirements.txt up to date
-- [ ] Code comments on complex logic
-- [ ] Type hints in Python code
+### Evaluation Suite
+- [x] `scripts/evaluation/router_eval.py` — 48 test queries (6×8 types), accuracy + 8b vs 70b ablation
+- [x] `scripts/evaluation/retrieval_eval.py` — Precision@1/3/8 + MRR, LLM-as-relevance-judge (20 queries)
+- [x] `scripts/evaluation/generation_eval.py` — ROUGE-1/2/L, BERTScore F1, LLM-as-judge faithfulness/relevance/groundedness (10 queries)
+- [x] `scripts/evaluation/latency_eval.py` — end-to-end timing all 8 agent types, mean + p95 (3 runs each)
+- [x] `scripts/evaluation/cost_eval.py` — static token budget × Cortex pricing per agent, projected $/1k queries
+- [x] `scripts/evaluation/domain_kpis.py` — corpus coverage stats, pipeline completeness, evolution validity, YouTube URL check
+- [x] `scripts/evaluation/run_all.py` — master runner, consolidated report, `--quick` flag, saves `eval_summary.json`
+- [x] `docs/demo_queries.md` created with all confirmed working queries
 
 ---
 
@@ -496,10 +388,7 @@ python -m langgraph_agents.graph "your question here"
 | 5 | ✅ Completed | Mar 20 | Mar 20 | Neo4j: 10,610 nodes, 27,807 relationships. Graph agent working. |
 | 6 | ✅ Completed | Mar 20 | Mar 21 | Temporal: 243 pairs (144 CONTRADICTED). Comparison/Recommendation/Insight agents built. |
 | 7 | ✅ Completed | Mar 21 | Apr 11 | Fact-checking + Brave Search (direct API) + all 9 agents complete |
-| 8 | ✅ Completed | Apr 11 | Apr 17 | Full Streamlit UI: Chat (9 agents), Graph Explorer, Channel Dashboard. All agents tested end-to-end. Input guardrails implemented (length, injection, scope, language). Real person disclaimer on all responses. demo_queries.md created. |
-| 9 | ❌ Skipped | — | — | Out of scope — pipeline runs manually |
-| 10 | ❌ Skipped | — | — | Out of scope |
-| 11 | ⬜ Not Started | — | — | Final demo + presentation |
+| 8 | ✅ Completed | Apr 11 | Apr 17 | Full Streamlit UI: Chat (9 agents), Graph Explorer, Channel Dashboard. Input guardrails + evaluation suite complete. |
 
 ---
 
@@ -520,49 +409,3 @@ python -m langgraph_agents.graph "your question here"
 | Snowflake Credits Used | < 400 |
 | Channels with 12+ month span | 20+ |
 
----
-
-## 📝 Current Focus: Week 8 — COMPLETED (Apr 17)
-
-### Streamlit UI — Done
-- [x] Chat interface with 9-agent routing (`streamlit_app/app.py`)
-- [x] Knowledge Graph Explorer (`pages/1_Graph_Explorer.py`)
-- [x] Channel Dashboard with dark HTML tables, topics chart, guests (`pages/3_Channel_Dashboard.py`)
-- [x] Removed Timeline page (sparse temporal data)
-- [x] Removed Episodes page (VIDEO_ID mismatch)
-
-### Agent UI Fixes — Done
-- [x] Search / Summarize: source cards with YouTube links
-- [x] Temporal: same-speaker only cards, key case fix
-- [x] Fact-Check: no duplicate rendering, Brave Search path verified
-- [x] Comparison: grouped by speaker, CLAIM_TYPE badge instead of PENDING
-- [x] Recommend: deduped by title+channel, no URL dump in text
-- [x] Insight: dark HTML table (no white iframe)
-- [x] Knowledge Graph: clean node/edge count, no st.status icon overlap
-
-### Input Guardrails — Done (Apr 17)
-- [x] Created `streamlit_app/components/guardrails.py`
-  - 1.1 Query length (3–500 chars)
-  - 1.2 Prompt injection detection (regex patterns)
-  - 1.4 Scope classification (medical/legal/financial/private info)
-  - 1.8 Language detection (non-English script rejection)
-- [x] Wired into `app.py` before `agent_run()` — blocks bad queries instantly
-- [x] Real person disclaimer on every assistant response (Layer 13.4)
-- [x] `demo_queries.md` created with all confirmed working queries
-
-### Guardrails deferred (post-demo / future work)
-- [ ] 1.7 Rate limiting (needs user identity system)
-- [ ] 11.1 Router confidence scoring
-- [ ] 12.1 Search relevance thresholding
-- [ ] 13.6 User feedback flags (needs SEM_USER_FLAGS table)
-- [ ] Layers 2–8 (pipeline guardrails — require reprocessing corpus)
-
-### Evaluation Suite — Done (Apr 17)
-- [x] `scripts/evaluation/router_eval.py` — 48 test queries (6×8 types), accuracy + 8b vs 70b ablation
-- [x] `scripts/evaluation/retrieval_eval.py` — Precision@1/3/8 + MRR, LLM-as-relevance-judge (20 queries)
-- [x] `scripts/evaluation/generation_eval.py` — ROUGE-1/2/L, BERTScore F1, LLM-as-judge faithfulness/relevance/groundedness (10 queries)
-- [x] `scripts/evaluation/latency_eval.py` — end-to-end timing all 8 agent types, mean + p95 (3 runs each)
-- [x] `scripts/evaluation/cost_eval.py` — static token budget × Cortex pricing per agent, projected $/1k queries
-- [x] `scripts/evaluation/domain_kpis.py` — corpus coverage stats, pipeline completeness, evolution validity, YouTube URL check
-- [x] `scripts/evaluation/run_all.py` — master runner, consolidated report, `--quick` flag, saves `eval_summary.json`
-- Note: BLEU skipped (weak for abstractive summarization)

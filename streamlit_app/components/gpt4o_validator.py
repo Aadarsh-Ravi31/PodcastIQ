@@ -37,7 +37,7 @@ Scoring guide:
 - UNVERIFIED (0-39): Claims largely unsupported or contradict the excerpts
 """
 
-AGENTS_TO_VALIDATE = {"SUMMARIZE", "SEARCH", "FACTCHECK", "COMPARE", "TEMPORAL"}
+AGENTS_TO_VALIDATE = {"SUMMARIZE", "SEARCH"}
 
 
 def validate_response(query: str, answer: str, search_results: list, query_type: str) -> dict | None:

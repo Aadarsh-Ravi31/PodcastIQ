@@ -13,7 +13,7 @@ sys.path.insert(0, ROOT)
 
 st.set_page_config(
     page_title="Graph Explorer · PodcastIQ",
-    page_icon="🕸️",
+    page_icon="◆",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -26,36 +26,37 @@ with open(_css_path, encoding="utf-8") as f:
 # ── Navbar ────────────────────────────────────────────────────────────────────
 from components.navbar import render_navbar
 render_navbar()
+st.markdown("<style>#piq-loader{display:none!important}</style>", unsafe_allow_html=True)
 
 # ── Imports ───────────────────────────────────────────────────────────────────
 from components.neo4j_queries import (
     get_top_nodes, get_node_neighborhood, search_graph_nodes, get_graph_stats
 )
 
-# ── Node colours ──────────────────────────────────────────────────────────────
+# ── Node colours  (aligned to slides palette: orange · teal · navy · gold) ────
 NODE_COLORS = {
-    "Person":  "#f472b6",
-    "Topic":   "#818cf8",
-    "Channel": "#fbbf24",
-    "Episode": "#34d399",
-    "Claim":   "#64748b",
+    "Person":  "#E8531A",   # orange — main entities
+    "Topic":   "#35AFA1",   # teal — conceptual nodes
+    "Channel": "#F2873A",   # light orange — broadcast sources
+    "Episode": "#4A8FD4",   # muted blue — content items
+    "Claim":   "#8B7E76",   # warm grey — leaf data
 }
 
 VERIFY_COLORS = {
-    "VERIFIED":   "#34d399",
+    "VERIFIED":   "#35AFA1",
     "FALSE":      "#f87171",
     "OUTDATED":   "#fbbf24",
     "DISPUTED":   "#fbbf24",
-    "UNVERIFIED": "#64748b",
-    "PENDING":    "#475569",
+    "UNVERIFIED": "#8B7E76",
+    "PENDING":    "#6B6259",
 }
 
 
 def build_pyvis_graph(nodes: list, edges: list, height: str = "620px") -> str:
     from pyvis.network import Network
 
-    net = Network(height=height, width="100%", bgcolor="#0d0d1a",
-                  font_color="#94a3b8", directed=False)
+    net = Network(height=height, width="100%", bgcolor="#0C0B09",
+                  font_color="rgba(240,237,232,0.55)", directed=False)
     net.set_options("""
     {
       "physics": {
@@ -69,7 +70,7 @@ def build_pyvis_graph(nodes: list, edges: list, height: str = "620px") -> str:
         "stabilization": { "iterations": 150 }
       },
       "edges": {
-        "color": { "color": "rgba(255,255,255,0.08)", "highlight": "#a855f7" },
+        "color": { "color": "rgba(255,255,255,0.07)", "highlight": "#F2873A" },
         "width": 1,
         "smooth": { "type": "continuous" }
       },
@@ -95,13 +96,13 @@ def build_pyvis_graph(nodes: list, edges: list, height: str = "620px") -> str:
         else:
             color = NODE_COLORS.get(label, "#64748b")
 
-        title = f"<b style='color:#e2e8f0'>{label}</b>: {name}<br><span style='color:#64748b'>Connections: {deg}</span>"
+        title = f"<b style='color:#F0EDE8'>{label}</b>: {name}<br><span style='color:rgba(240,237,232,.4)'>Connections: {deg}</span>"
         url   = n.get("youtube_url", "")
         if url:
-            title += f"<br><a href='{url}' target='_blank' style='color:#a855f7'>▶ Watch</a>"
+            title += f"<br><a href='{url}' target='_blank' style='color:#F2873A'>▶ Watch</a>"
 
         net.add_node(nid, label=name[:30], title=title,
-                     color=color, size=size, font={"size": 11, "color": "#94a3b8"})
+                     color=color, size=size, font={"size": 11, "color": "rgba(240,237,232,0.55)"})
         added_ids.add(nid)
 
     for e in edges:
@@ -131,7 +132,7 @@ try:
     if gstats:
         cols = st.columns(len(gstats))
         for i, (label, count) in enumerate(gstats.items()):
-            color = NODE_COLORS.get(label, "#7c3aed")
+            color = NODE_COLORS.get(label, "#8B7E76")
             with cols[i]:
                 st.markdown(f"""
 <div class="stat-tile">
@@ -162,7 +163,7 @@ with col_ctrl3:
 
 # ── Legend ────────────────────────────────────────────────────────────────────
 legend_html = " &nbsp; ".join(
-    f'<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;color:#64748b;">'
+    f'<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.75rem;color:rgba(240,237,232,.5);">'
     f'<span style="width:9px;height:9px;border-radius:50%;background:{c};display:inline-block;"></span>'
     f'{l}</span>'
     for l, c in NODE_COLORS.items()
@@ -198,8 +199,8 @@ try:
                         f'<span style="display:inline-flex;align-items:center;gap:7px;">'
                         f'<span style="width:9px;height:9px;border-radius:50%;background:{color};'
                         f'display:inline-block;flex-shrink:0;"></span>'
-                        f'<b style="font-size:0.875rem;color:#e2e8f0;">{name}</b>'
-                        f'<span style="font-size:0.75rem;color:#475569;">{lbl} · {deg} connections</span>'
+                        f'<b style="font-size:0.875rem;color:#F0EDE8;">{name}</b>'
+                        f'<span style="font-size:0.75rem;color:rgba(240,237,232,.38);">{lbl} · {deg} connections</span>'
                         f'</span>',
                         unsafe_allow_html=True,
                     )
@@ -218,7 +219,7 @@ try:
         with col_h:
             st.markdown(
                 f'<div class="section-label">Neighborhood of: '
-                f'<span style="color:#c4b5fd;">{name}</span></div>',
+                f'<span style="color:#F2873A;">{name}</span></div>',
                 unsafe_allow_html=True,
             )
         with col_x:
@@ -229,7 +230,7 @@ try:
         with st.spinner("Building neighborhood graph..."):
             nodes, edges = get_node_neighborhood(nid)
         st.markdown(
-            f'<div style="font-size:.75rem;color:#64748b;margin-bottom:.5rem;">'
+            f'<div style="font-size:.75rem;color:rgba(240,237,232,.38);margin-bottom:.5rem;">'
             f'{len(nodes)} nodes · {len(edges)} edges loaded</div>',
             unsafe_allow_html=True,
         )
@@ -238,7 +239,7 @@ try:
         with st.spinner("Loading knowledge graph..."):
             nodes, edges = get_top_nodes(node_limit)
         st.markdown(
-            f'<div style="font-size:.75rem;color:#64748b;margin-bottom:.5rem;">'
+            f'<div style="font-size:.75rem;color:rgba(240,237,232,.38);margin-bottom:.5rem;">'
             f'{len(nodes)} nodes · {len(edges)} edges loaded</div>',
             unsafe_allow_html=True,
         )

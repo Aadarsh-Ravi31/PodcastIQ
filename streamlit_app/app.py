@@ -13,7 +13,7 @@ sys.path.insert(0, ROOT)
 
 st.set_page_config(
     page_title="PodcastIQ",
-    page_icon="🎙️",
+    page_icon="◆",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -23,11 +23,16 @@ _css_path = os.path.join(os.path.dirname(__file__), "components", "styles.css")
 _css = open(_css_path, encoding="utf-8").read()
 st.markdown(f"<style>{_css}</style>", unsafe_allow_html=True)
 
-# ── Navbar ───────────────────────────────────────────────────────────────────
+# ── Navbar renders first — loader is visible while heavy imports run ──────────
 from components.navbar import render_navbar
+render_navbar()
+
+# ── Heavy imports (guardrails + OpenAI SDK) — loader covers this gap ──────────
 from components.guardrails import validate_query, RESPONSE_DISCLAIMER
 from components.gpt4o_validator import validate_response, AGENTS_TO_VALIDATE
-render_navbar()
+
+# ── Imports done — kill the loader ────────────────────────────────────────────
+st.markdown("<style>#piq-loader{display:none!important}</style>", unsafe_allow_html=True)
 
 # ── Session state ────────────────────────────────────────────────────────────
 if "messages" not in st.session_state:
@@ -55,8 +60,14 @@ def badge(status: str) -> str:
 
 
 def verdict_icon(status: str) -> str:
-    return {"VERIFIED": "✅", "FALSE": "❌", "OUTDATED": "⚠️",
-            "DISPUTED": "⚠️", "UNVERIFIED": "❓"}.get(status.upper(), "❓")
+    icons = {
+        "VERIFIED": '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#35AFA1" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8"/><path d="M6.5 10.5l2.5 2.5 4.5-5"/></svg>',
+        "FALSE":    '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#f87171" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><line x1="7" y1="7" x2="13" y2="13"/><line x1="13" y1="7" x2="7" y2="13"/></svg>',
+        "OUTDATED": '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#fbbf24" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><polyline points="10,5.5 10,10 13.5,12.5"/></svg>',
+        "DISPUTED": '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="#fbbf24" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L18.5 17H1.5L10 3z"/><line x1="10" y1="9" x2="10" y2="13"/><circle cx="10" cy="15" r="0.7" fill="#fbbf24" stroke="none"/></svg>',
+        "UNVERIFIED": '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="rgba(240,237,232,.45)" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M8 8a2 2 0 0 1 4 0c0 1.5-2 2-2 3.5"/><circle cx="10" cy="14.8" r="0.7" fill="rgba(240,237,232,.45)" stroke="none"/></svg>',
+    }
+    return icons.get(status.upper(), icons["UNVERIFIED"])
 
 
 def verdict_color(status: str) -> str:
@@ -156,8 +167,10 @@ def render_factcheck(results: list):
     web_n   = ev.get("web_results_used", 0)
     icon    = verdict_icon(status)
     color   = verdict_color(status)
-    src_note = (f"🌐 Verified via {web_n} web sources"
-                if web_n else "🤖 Verified from AI training knowledge")
+    globe_svg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" style="vertical-align:middle;margin-right:4px"><circle cx="6" cy="6" r="4.5"/><path d="M1.5 6h9M6 1.5a6.5 6.5 0 0 1 0 9M6 1.5a6.5 6.5 0 0 0 0 9"/></svg>'
+    ai_svg    = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" style="vertical-align:middle;margin-right:4px"><rect x="1.5" y="3.5" width="9" height="6.5" rx="1.5"/><circle cx="4" cy="6.5" r="0.7" fill="currentColor" stroke="none"/><circle cx="8" cy="6.5" r="0.7" fill="currentColor" stroke="none"/><path d="M4.5 8.5h3"/><line x1="6" y1="3.5" x2="6" y2="2"/><circle cx="6" cy="1.3" r="0.5" fill="currentColor" stroke="none"/></svg>'
+    src_note = (f"{globe_svg}Verified via {web_n} web sources"
+                if web_n else f"{ai_svg}Verified from AI training knowledge")
     v_cls = f"verdict-{status.lower()}"
     st.markdown(f"""
 <div class="verdict-card {v_cls}">
@@ -173,10 +186,11 @@ def render_factcheck(results: list):
     if urls:
         st.markdown('<div class="section-label">Evidence</div>', unsafe_allow_html=True)
         st.markdown('<div class="evidence-links">', unsafe_allow_html=True)
+        link_svg = '<svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:4px;flex-shrink:0"><path d="M5 6.5a2.8 2.8 0 0 0 3.9 0l1.4-1.4a2.8 2.8 0 0 0-3.9-3.9L5.2 2.4"/><path d="M7 5.5a2.8 2.8 0 0 0-3.9 0L1.7 6.9a2.8 2.8 0 0 0 3.9 3.9L6.8 9.6"/></svg>'
         for u in urls[:4]:
             st.markdown(
                 f'<a class="evidence-link" href="{esc(u)}" target="_blank">'
-                f'🔗 {esc(u)}</a>',
+                f'{link_svg}{esc(u)}</a>',
                 unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -243,7 +257,7 @@ def render_comparison(results: list):
     st.markdown('<div class="section-label">Claims Compared</div>', unsafe_allow_html=True)
     for spk_name, rows in by_speaker.items():
         st.markdown(
-            f'<div style="color:#a855f7;font-size:.7rem;font-weight:700;'
+            f'<div style="color:#E8531A;font-size:.7rem;font-weight:700;'
             f'letter-spacing:.08em;text-transform:uppercase;margin:.8rem 0 .3rem;">'
             f'{esc(spk_name)}</div>',
             unsafe_allow_html=True)
@@ -274,27 +288,27 @@ def render_insight(results: list):
     cols = list(results[0].keys())
     headers = "".join(
         f'<th style="padding:.55rem .9rem;text-align:left;font-size:.72rem;'
-        f'font-weight:600;color:#a855f7;letter-spacing:.06em;text-transform:uppercase;'
-        f'border-bottom:1px solid rgba(168,85,247,.25);white-space:nowrap;">'
+        f'font-weight:600;color:#E8531A;letter-spacing:.06em;text-transform:uppercase;'
+        f'border-bottom:1px solid rgba(232,83,26,.25);white-space:nowrap;">'
         f'{esc(c.replace("_"," ").title())}</th>'
         for c in cols
     )
     rows_html = ""
     for i, r in enumerate(results):
-        bg = "rgba(255,255,255,.025)" if i % 2 == 0 else "transparent"
+        bg = "rgba(255,255,255,.03)" if i % 2 == 0 else "transparent"
         cells = "".join(
-            f'<td style="padding:.5rem .9rem;font-size:.8rem;color:#dde1ea;'
-            f'border-bottom:1px solid rgba(255,255,255,.04);">'
+            f'<td style="padding:.5rem .9rem;font-size:.8rem;color:rgba(240,237,232,.75);'
+            f'border-bottom:1px solid rgba(255,255,255,.05);">'
             f'{esc(str(r.get(c, "")))}</td>'
             for c in cols
         )
         rows_html += f'<tr style="background:{bg};">{cells}</tr>'
 
     st.markdown(f"""
-<div style="overflow-x:auto;border-radius:.8rem;border:1px solid rgba(255,255,255,.07);
-            background:#0d0d1f;margin-top:.4rem;">
+<div style="overflow-x:auto;border-radius:.8rem;border:1px solid rgba(255,255,255,.08);
+            background:#141210;margin-top:.4rem;">
   <table style="width:100%;border-collapse:collapse;">
-    <thead><tr style="background:rgba(109,40,217,.15);">{headers}</tr></thead>
+    <thead><tr style="background:rgba(232,83,26,.08);">{headers}</tr></thead>
     <tbody>{rows_html}</tbody>
   </table>
 </div>""", unsafe_allow_html=True)
@@ -316,9 +330,14 @@ AGENT_LABELS = {
 }
 
 AGENT_ICONS = {
-    "SEARCH": "🔍", "SUMMARIZE": "📝", "GRAPH": "🕸️",
-    "TEMPORAL": "⏳", "COMPARE": "⚖️", "RECOMMEND": "🎯",
-    "INSIGHT": "📊", "FACTCHECK": "✅",
+    "SEARCH":    '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="4.8" cy="4.8" r="3.2"/><line x1="7.2" y1="7.2" x2="9.5" y2="9.5"/></svg>',
+    "SUMMARIZE": '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="1.5" y="1" width="8" height="9" rx="1"/><line x1="3.5" y1="4" x2="7.5" y2="4"/><line x1="3.5" y1="6" x2="7.5" y2="6"/><line x1="3.5" y1="8" x2="6" y2="8"/></svg>',
+    "GRAPH":     '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="5.5" cy="1.8" r="0.9" fill="currentColor" stroke="none"/><circle cx="1.5" cy="9" r="0.9" fill="currentColor" stroke="none"/><circle cx="9.5" cy="9" r="0.9" fill="currentColor" stroke="none"/><line x1="5.5" y1="2.7" x2="1.5" y2="8.1"/><line x1="5.5" y1="2.7" x2="9.5" y2="8.1"/><line x1="1.5" y1="8.1" x2="9.5" y2="8.1"/></svg>',
+    "TEMPORAL":  '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="5.5" cy="5.5" r="4"/><polyline points="5.5,3 5.5,5.5 7.2,6.8"/></svg>',
+    "COMPARE":   '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="1" y="2" width="3.5" height="7" rx="0.5"/><rect x="6.5" y="2" width="3.5" height="7" rx="0.5"/></svg>',
+    "RECOMMEND": '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="5.5" cy="5.5" r="4"/><circle cx="5.5" cy="5.5" r="1.8"/><circle cx="5.5" cy="5.5" r="0.5" fill="currentColor" stroke="none"/></svg>',
+    "INSIGHT":   '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="1.5" y="7" width="2" height="2.5" rx="0.3"/><rect x="4.5" y="4.5" width="2" height="5" rx="0.3"/><rect x="7.5" y="2" width="2" height="7.5" rx="0.3"/></svg>',
+    "FACTCHECK": '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 1L1.5 2.5v3.2a4.8 4.8 0 0 0 4 4.8 4.8 4.8 0 0 0 4-4.8V2.5L5.5 1z"/><path d="M3.5 5.5l1.5 1.5 2.5-2.5"/></svg>',
 }
 
 
@@ -332,34 +351,31 @@ def render_message(msg: dict, is_new: bool = False):
     meta    = msg.get("meta", {})
 
     if role == "user":
-        st.markdown(f"""
-<div class="chat-wrap">
-  <div class="msg-user">
-    <div class="msg-user-bubble">{esc(content)}</div>
-  </div>
-</div>""", unsafe_allow_html=True)
+        # Pure HTML — no st.columns() needed, CSS handles right-alignment
+        st.markdown(
+            f'<div class="msg-user"><div class="msg-user-bubble">{esc(content)}</div></div>',
+            unsafe_allow_html=True,
+        )
 
     else:
         qt = meta.get("query_type", "")
         sr = meta.get("search_results", [])
         gr = meta.get("graph_results", [])
 
-        # Avatar + body in narrow/wide columns
-        col_icon, col_body = st.columns([0.06, 0.94])
+        # Two columns only — no empty spacer that confuses Streamlit after many messages
+        col_icon, col_body = st.columns([1, 14], gap="small")
         with col_icon:
-            st.markdown('<div class="msg-avatar">🎙️</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div class="msg-avatar"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="rgba(240,237,232,.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="1" width="6" height="9" rx="3"/><path d="M3 8a5 5 0 0 0 10 0"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="5.5" y1="15" x2="10.5" y2="15"/></svg></div>',
+                unsafe_allow_html=True,
+            )
         with col_body:
-            # Native Streamlit markdown so bold/italic/code/links render correctly
-            st.markdown(f'<div class="msg-body">', unsafe_allow_html=True)
-            # For FACTCHECK, the verdict card already shows claim + verdict + summary,
-            # so skip the markdown text to avoid duplicate rendering.
+            # For FACTCHECK, the verdict card already shows claim + verdict + summary
             if not (qt == "FACTCHECK" and gr):
-                # Stream word-by-word for text-heavy responses; render instantly otherwise
                 if is_new and qt in ("SUMMARIZE", "SEARCH", ""):
                     st.write_stream(stream_words(content))
                 else:
                     st.markdown(content)
-            st.markdown("</div>", unsafe_allow_html=True)
 
             # Rich result block
             if qt in ("SEARCH", "SUMMARIZE"):   render_sources(sr)
@@ -374,7 +390,7 @@ def render_message(msg: dict, is_new: bool = False):
                 st.markdown(
                     f'<div class="response-disclaimer">{RESPONSE_DISCLAIMER}</div>',
                     unsafe_allow_html=True)
-                icon  = AGENT_ICONS.get(qt, "⚡")
+                icon  = AGENT_ICONS.get(qt, '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><polygon points="5.5,1 7,5 11,5 7.8,7.5 9,11 5.5,8.5 2,11 3.2,7.5 0,5 4,5"/></svg>')
                 label = AGENT_LABELS.get(qt, qt)
                 st.markdown(
                     f'<div class="agent-tag">{icon} {label}</div>',
@@ -388,37 +404,20 @@ def render_message(msg: dict, is_new: bool = False):
 if not st.session_state.messages:
     st.markdown("""
 <div class="hero-wrap">
+  <div class="eq-decor">
+    <span style="height:40%;animation-delay:0s;animation-duration:1.6s"></span>
+    <span style="height:70%;animation-delay:.3s;animation-duration:1.1s"></span>
+    <span style="height:55%;animation-delay:.6s;animation-duration:1.8s"></span>
+    <span style="height:85%;animation-delay:.1s;animation-duration:1.3s"></span>
+    <span style="height:35%;animation-delay:.4s;animation-duration:1.5s"></span>
+    <span style="height:65%;animation-delay:.7s;animation-duration:1.2s"></span>
+    <span style="height:48%;animation-delay:.2s;animation-duration:1.7s"></span>
+  </div>
   <div class="hero-eyebrow">
     <span class="hero-eyebrow-dot"></span>
     AI Podcast Intelligence Platform
   </div>
-  <div class="hero-title">PodcastIQ</div>
-  <div class="hero-sub">
-    Search, summarize, fact-check, and explore 290+ episodes
-    from 25 channels — powered by 9 specialized AI agents.
-  </div>
-  <div class="hero-stats">
-    <div class="hero-stat">
-      <span class="hero-stat-value">290+</span>
-      <span class="hero-stat-label">Episodes</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-value">25</span>
-      <span class="hero-stat-label">Channels</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-value">13.8K</span>
-      <span class="hero-stat-label">Chunks</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-value">8.6K</span>
-      <span class="hero-stat-label">Claims</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-value">9</span>
-      <span class="hero-stat-label">AI Agents</span>
-    </div>
-  </div>
+  <div class="hero-title">Podcast<em>IQ</em></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -464,12 +463,10 @@ if user_input:
     # Thinking indicator
     ph = st.empty()
     ph.markdown("""
-<div class="chat-wrap">
-  <div class="thinking-row">
-    <div class="msg-avatar">🎙️</div>
-    <div class="thinking-dots">
-      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
-    </div>
+<div class="thinking-row">
+  <div class="msg-avatar"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="rgba(240,237,232,.8)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="1" width="6" height="9" rx="3"/><path d="M3 8a5 5 0 0 0 10 0"/><line x1="8" y1="13" x2="8" y2="15"/><line x1="5.5" y1="15" x2="10.5" y2="15"/></svg></div>
+  <div class="thinking-dots">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
   </div>
 </div>""", unsafe_allow_html=True)
 
@@ -496,7 +493,7 @@ if user_input:
         if qt in AGENTS_TO_VALIDATE:
             gpt_placeholder = st.empty()
             gpt_placeholder.markdown(
-                '<div style="font-size:.78rem;color:#6B7280;padding:.4rem 0 0 3.5rem;">'
+                '<div style="font-size:.78rem;color:rgba(240,237,232,.4);padding:.4rem 0 0 0;">'
                 '🤖 Verifying with GPT-4o...</div>',
                 unsafe_allow_html=True,
             )
@@ -518,25 +515,25 @@ if user_input:
                     "#DC2626"
                 )
                 icon = (
-                    "✅" if verdict == "VERIFIED" else
-                    "🔵" if verdict == "MOSTLY_ACCURATE" else
-                    "⚠️" if verdict == "PARTIALLY_ACCURATE" else
-                    "❌"
+                    '<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="#35AFA1" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><circle cx="6.5" cy="6.5" r="5"/><path d="M4 6.5l2 2 3.5-3.5"/></svg>' if verdict == "VERIFIED" else
+                    '<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="#4A8FD4" stroke-width="1.4" stroke-linecap="round" style="vertical-align:middle"><circle cx="6.5" cy="6.5" r="5"/><path d="M4.5 8.5l4-4M4.5 4.5l4 4" opacity=".5"/><path d="M4 6.5l2 2 3.5-3.5"/></svg>' if verdict == "MOSTLY_ACCURATE" else
+                    '<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="#fbbf24" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle"><path d="M6.5 2L12 11H1L6.5 2z"/><line x1="6.5" y1="6" x2="6.5" y2="8.5"/><circle cx="6.5" cy="9.8" r="0.5" fill="#fbbf24" stroke="none"/></svg>' if verdict == "PARTIALLY_ACCURATE" else
+                    '<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="#f87171" stroke-width="1.4" stroke-linecap="round" style="vertical-align:middle"><circle cx="6.5" cy="6.5" r="5"/><line x1="4.5" y1="4.5" x2="8.5" y2="8.5"/><line x1="8.5" y1="4.5" x2="4.5" y2="8.5"/></svg>'
                 )
                 label = verdict.replace("_", " ").title()
                 flag_html = (
-                    f'<span style="color:#6B7280;font-size:.72rem;margin-left:.5rem;">'
+                    f'<span style="color:rgba(240,237,232,.45);font-size:.72rem;margin-left:.5rem;">'
                     f'· {esc(flag)}</span>'
                 ) if flag else ""
 
                 gpt_placeholder.markdown(
                     f'<div style="display:flex;align-items:center;gap:.4rem;'
-                    f'padding:.4rem 0 0 3.5rem;font-size:.78rem;">'
+                    f'padding:.4rem 0 0 0;font-size:.78rem;">'
                     f'{icon} <span style="font-weight:600;color:{color};">{label}</span>'
                     f'<span style="color:{color};font-family:\'JetBrains Mono\',monospace;'
                     f'font-size:.72rem;background:{color}18;padding:.1rem .4rem;'
                     f'border-radius:.3rem;border:1px solid {color}44;">{conf}%</span>'
-                    f'<span style="color:#9CA3AF;font-size:.7rem;">GPT-4o verified</span>'
+                    f'<span style="color:rgba(240,237,232,.38);font-size:.7rem;">GPT-4o verified</span>'
                     f'{flag_html}</div>',
                     unsafe_allow_html=True,
                 )

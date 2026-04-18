@@ -15,7 +15,7 @@ sys.path.insert(0, ROOT)
 
 st.set_page_config(
     page_title="Channel Dashboard · PodcastIQ",
-    page_icon="📊",
+    page_icon="◆",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -26,6 +26,7 @@ with open(_css_path, encoding="utf-8") as f:
 
 from components.navbar import render_navbar
 render_navbar()
+st.markdown("<style>#piq-loader{display:none!important}</style>", unsafe_allow_html=True)
 
 from components.snowflake_queries import (
     get_channels, get_channel_top_topics, get_channel_guests,
@@ -59,8 +60,8 @@ st.markdown('<div class="section-label">All Channels — Overview</div>', unsafe
 cols_def = ["Channel", "Genre", "Episodes", "Coverage"]
 headers  = "".join(
     f'<th style="padding:.55rem .9rem;text-align:left;font-size:.72rem;font-weight:600;'
-    f'color:#a855f7;letter-spacing:.06em;text-transform:uppercase;'
-    f'border-bottom:1px solid rgba(168,85,247,.25);white-space:nowrap;">{c}</th>'
+    f'color:#E8531A;letter-spacing:.06em;text-transform:uppercase;'
+    f'border-bottom:1px solid rgba(232,83,26,.25);white-space:nowrap;">{c}</th>'
     for c in cols_def
 )
 rows_html = ""
@@ -71,24 +72,24 @@ for i, ch in enumerate(sorted(channels, key=lambda x: x.get("EPISODE_COUNT", 0),
     earliest  = str(ch.get("EARLIEST", ""))[:10]
     latest    = str(ch.get("LATEST", ""))[:10]
     coverage  = f"{earliest} → {latest}" if earliest and latest else "—"
-    bg        = "rgba(255,255,255,.025)" if i % 2 == 0 else "transparent"
+    bg        = "rgba(255,255,255,.03)" if i % 2 == 0 else "transparent"
     rows_html += f"""
 <tr style="background:{bg};">
-  <td style="padding:.5rem .9rem;font-size:.82rem;color:#e2e8f0;
-             border-bottom:1px solid rgba(255,255,255,.04);font-weight:500;">{name}</td>
-  <td style="padding:.5rem .9rem;font-size:.8rem;color:#94a3b8;
-             border-bottom:1px solid rgba(255,255,255,.04);">{genre}</td>
-  <td style="padding:.5rem .9rem;font-size:.8rem;color:#c4b5fd;
-             border-bottom:1px solid rgba(255,255,255,.04);text-align:right;">{eps}</td>
-  <td style="padding:.5rem .9rem;font-size:.76rem;color:#64748b;
-             border-bottom:1px solid rgba(255,255,255,.04);">{coverage}</td>
+  <td style="padding:.5rem .9rem;font-size:.82rem;color:#F0EDE8;
+             border-bottom:1px solid rgba(255,255,255,.05);font-weight:500;">{name}</td>
+  <td style="padding:.5rem .9rem;font-size:.8rem;color:rgba(240,237,232,.55);
+             border-bottom:1px solid rgba(255,255,255,.05);">{genre}</td>
+  <td style="padding:.5rem .9rem;font-size:.8rem;color:#F2873A;
+             border-bottom:1px solid rgba(255,255,255,.05);text-align:right;">{eps}</td>
+  <td style="padding:.5rem .9rem;font-size:.76rem;color:rgba(240,237,232,.38);
+             border-bottom:1px solid rgba(255,255,255,.05);">{coverage}</td>
 </tr>"""
 
 st.markdown(f"""
-<div style="overflow-x:auto;border-radius:.8rem;border:1px solid rgba(255,255,255,.07);
-            background:#0d0d1f;margin-top:.4rem;">
+<div style="overflow-x:auto;border-radius:.8rem;border:1px solid rgba(255,255,255,.08);
+            background:#141210;margin-top:.4rem;">
   <table style="width:100%;border-collapse:collapse;">
-    <thead><tr style="background:rgba(109,40,217,.15);">{headers}</tr></thead>
+    <thead><tr style="background:rgba(232,83,26,.08);">{headers}</tr></thead>
     <tbody>{rows_html}</tbody>
   </table>
 </div>""", unsafe_allow_html=True)
@@ -140,7 +141,7 @@ if selected_channel:
                 x=df_topics["CLAIM_COUNT"],
                 y=df_topics["TOPIC"],
                 orientation="h",
-                marker_color="#7c3aed",
+                marker_color="#E8531A",
                 marker_line_width=0,
                 opacity=0.85,
             ))
@@ -149,12 +150,12 @@ if selected_channel:
                 margin=dict(l=0, r=0, t=5, b=10),
                 paper_bgcolor="rgba(0,0,0,0)",
                 plot_bgcolor="rgba(255,255,255,.02)",
-                xaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,.05)",
-                           title="", color="#64748b",
-                           tickfont=dict(color="#64748b")),
+                xaxis=dict(showgrid=True, gridcolor="rgba(255,255,255,.06)",
+                           title="", color="rgba(240,237,232,.4)",
+                           tickfont=dict(color="rgba(240,237,232,.4)")),
                 yaxis=dict(showgrid=False, autorange="reversed", title="",
-                           tickfont=dict(size=11, color="#94a3b8")),
-                font=dict(family="Inter", size=11, color="#94a3b8"),
+                           tickfont=dict(size=11, color="rgba(240,237,232,.62)")),
+                font=dict(family="DM Sans", size=11, color="rgba(240,237,232,.55)"),
             )
             st.plotly_chart(fig_bar, use_container_width=True)
         else:
@@ -177,14 +178,14 @@ if selected_channel:
                     st.markdown(f"""
 <div class="result-card" style="padding:0.7rem 0.875rem;text-align:center;">
   <div style="width:36px;height:36px;border-radius:50%;
-    background:rgba(109,40,217,.2);border:1px solid rgba(109,40,217,.3);
+    background:rgba(232,83,26,.15);border:1px solid rgba(232,83,26,.28);
     display:flex;align-items:center;justify-content:center;
-    font-size:0.9rem;font-weight:700;color:#a78bfa;
+    font-size:0.9rem;font-weight:700;color:#F2873A;
     margin:0 auto 0.5rem;">
     {esc(name[0].upper()) if name else "?"}
   </div>
-  <div style="font-size:0.825rem;font-weight:600;color:#e2e8f0;">{esc(name)}</div>
-  <div style="font-size:0.68rem;color:#475569;margin-top:0.15rem;">
+  <div style="font-size:0.825rem;font-weight:600;color:#F0EDE8;">{esc(name)}</div>
+  <div style="font-size:0.68rem;color:rgba(240,237,232,.38);margin-top:0.15rem;">
     {ep_cnt} episode{"s" if ep_cnt != 1 else ""}
   </div>
 </div>""", unsafe_allow_html=True)

@@ -18,8 +18,8 @@
 | 6 | Temporal Analysis + Claim Evolution | ✅ Completed |
 | 7 | Hybrid Fact-Checking + MCP + Remaining Agents | ✅ Completed |
 | 8 | Streamlit UI + Demo Prep + Guardrails | ✅ Completed |
-| 9 | Airflow Orchestration + Integration Testing | ⬜ Not Started |
-| 10 | Testing, Optimization, Documentation | ⬜ Not Started |
+| 9 | Airflow Orchestration + Integration Testing | ❌ Skipped |
+| 10 | Testing, Optimization, Documentation | ❌ Skipped |
 | 11 | Final Demo + Presentation | ⬜ Not Started |
 
 ---
@@ -497,8 +497,8 @@ python -m langgraph_agents.graph "your question here"
 | 6 | ✅ Completed | Mar 20 | Mar 21 | Temporal: 243 pairs (144 CONTRADICTED). Comparison/Recommendation/Insight agents built. |
 | 7 | ✅ Completed | Mar 21 | Apr 11 | Fact-checking + Brave Search (direct API) + all 9 agents complete |
 | 8 | ✅ Completed | Apr 11 | Apr 17 | Full Streamlit UI: Chat (9 agents), Graph Explorer, Channel Dashboard. All agents tested end-to-end. Input guardrails implemented (length, injection, scope, language). Real person disclaimer on all responses. demo_queries.md created. |
-| 9 | ⬜ Not Started | — | — | Airflow orchestration |
-| 10 | ⬜ Not Started | — | — | Testing + optimization + docs |
+| 9 | ❌ Skipped | — | — | Out of scope — pipeline runs manually |
+| 10 | ❌ Skipped | — | — | Out of scope |
 | 11 | ⬜ Not Started | — | — | Final demo + presentation |
 
 ---

@@ -4,6 +4,7 @@ PodcastIQ — Chat Interface  v2.0
 
 import os
 import sys
+import time
 import html as html_lib
 import streamlit as st
 
@@ -24,6 +25,8 @@ st.markdown(f"<style>{_css}</style>", unsafe_allow_html=True)
 
 # ── Navbar ───────────────────────────────────────────────────────────────────
 from components.navbar import render_navbar
+from components.guardrails import validate_query, RESPONSE_DISCLAIMER
+from components.gpt4o_validator import validate_response, AGENTS_TO_VALIDATE
 render_navbar()
 
 # ── Session state ────────────────────────────────────────────────────────────
@@ -37,6 +40,13 @@ if "messages" not in st.session_state:
 def esc(text: str) -> str:
     """HTML-escape a value safely."""
     return html_lib.escape(str(text or ""))
+
+
+def stream_words(text: str):
+    """Yield words one at a time for a typewriter effect."""
+    for word in text.split(" "):
+        yield word + " "
+        time.sleep(0.025)
 
 
 def badge(status: str) -> str:
@@ -70,6 +80,21 @@ def render_sources(results: list):
         text   = esc(r.get("CHUNK_TEXT")   or r.get("chunk_text", ""))[:300]
         url    = r.get("YOUTUBE_URL")  or r.get("youtube_url", "")
         date   = str(r.get("PUBLISH_DATE") or r.get("publish_date", ""))[:10]
+        score_raw = r.get("relevance_score") or r.get("@scores")
+        if isinstance(score_raw, dict):
+            score_raw = score_raw.get("cosine_similarity", 0)
+        score_pct = int(float(score_raw) * 100) if score_raw else None
+        score_color = (
+            "#10b981" if score_pct and score_pct >= 80 else
+            "#f59e0b" if score_pct and score_pct >= 60 else
+            "#94a3b8"
+        )
+        score_pill = (
+            f'<span style="font-size:.65rem;font-weight:700;padding:.15rem .5rem;'
+            f'border-radius:999px;background:{score_color}22;color:{score_color};'
+            f'border:1px solid {score_color}55;font-family:\'JetBrains Mono\',monospace;">'
+            f'{score_pct}% match</span>'
+        ) if score_pct is not None else ""
         yt_btn = (f'<a class="sc-link" href="{esc(url)}" target="_blank">'
                   f'▶ Watch on YouTube</a>') if url else ""
         st.markdown(f"""
@@ -81,6 +106,7 @@ def render_sources(results: list):
   <div class="sc-meta">
     <span class="sc-channel-pill">{chan}</span>
     <span>{date}</span>
+    {score_pill}
   </div>
   <div class="sc-text">{text}</div>
   {yt_btn}
@@ -300,7 +326,7 @@ AGENT_ICONS = {
 # Message renderer
 # ─────────────────────────────────────────────────────────────────────────────
 
-def render_message(msg: dict):
+def render_message(msg: dict, is_new: bool = False):
     role    = msg["role"]
     content = msg["content"]
     meta    = msg.get("meta", {})
@@ -328,7 +354,11 @@ def render_message(msg: dict):
             # For FACTCHECK, the verdict card already shows claim + verdict + summary,
             # so skip the markdown text to avoid duplicate rendering.
             if not (qt == "FACTCHECK" and gr):
-                st.markdown(content)
+                # Stream word-by-word for text-heavy responses; render instantly otherwise
+                if is_new and qt in ("SUMMARIZE", "SEARCH", ""):
+                    st.write_stream(stream_words(content))
+                else:
+                    st.markdown(content)
             st.markdown("</div>", unsafe_allow_html=True)
 
             # Rich result block
@@ -339,7 +369,11 @@ def render_message(msg: dict):
             elif qt == "COMPARE":               render_comparison(gr)
             elif qt == "INSIGHT":               render_insight(gr)
 
+            # Disclaimer — shown whenever real people / claims are involved
             if qt:
+                st.markdown(
+                    f'<div class="response-disclaimer">{RESPONSE_DISCLAIMER}</div>',
+                    unsafe_allow_html=True)
                 icon  = AGENT_ICONS.get(qt, "⚡")
                 label = AGENT_LABELS.get(qt, qt)
                 st.markdown(
@@ -410,6 +444,20 @@ if st.session_state.messages:
 user_input = st.chat_input("Ask anything about podcasts")
 
 if user_input:
+    # ── Guardrails ────────────────────────────────────────────────────────────
+    guard = validate_query(user_input)
+    if not guard.passed:
+        st.session_state.messages.append({"role": "user", "content": user_input, "meta": {}})
+        render_message({"role": "user", "content": user_input})
+        blocked = {
+            "role": "assistant",
+            "content": guard.message,
+            "meta": {},
+        }
+        st.session_state.messages.append(blocked)
+        render_message(blocked)
+        st.stop()
+
     st.session_state.messages.append({"role": "user", "content": user_input, "meta": {}})
     render_message({"role": "user", "content": user_input})
 
@@ -442,7 +490,58 @@ if user_input:
             },
         }
         st.session_state.messages.append(msg)
-        render_message(msg)
+        render_message(msg, is_new=True)
+
+        # ── GPT-4o validator (runs after llama answer is visible) ─────────────
+        if qt in AGENTS_TO_VALIDATE:
+            gpt_placeholder = st.empty()
+            gpt_placeholder.markdown(
+                '<div style="font-size:.78rem;color:#6B7280;padding:.4rem 0 0 3.5rem;">'
+                '🤖 Verifying with GPT-4o...</div>',
+                unsafe_allow_html=True,
+            )
+            validation = validate_response(
+                query        = user_input,
+                answer       = ans,
+                search_results = result.get("search_results", []),
+                query_type   = qt,
+            )
+            if validation and validation.get("verdict") != "ERROR":
+                conf    = validation["confidence"]
+                verdict = validation["verdict"]
+                flag    = validation.get("flag")
+
+                color = (
+                    "#0B8A7C" if conf and conf >= 85 else
+                    "#2563EB" if conf and conf >= 65 else
+                    "#D97706" if conf and conf >= 40 else
+                    "#DC2626"
+                )
+                icon = (
+                    "✅" if verdict == "VERIFIED" else
+                    "🔵" if verdict == "MOSTLY_ACCURATE" else
+                    "⚠️" if verdict == "PARTIALLY_ACCURATE" else
+                    "❌"
+                )
+                label = verdict.replace("_", " ").title()
+                flag_html = (
+                    f'<span style="color:#6B7280;font-size:.72rem;margin-left:.5rem;">'
+                    f'· {esc(flag)}</span>'
+                ) if flag else ""
+
+                gpt_placeholder.markdown(
+                    f'<div style="display:flex;align-items:center;gap:.4rem;'
+                    f'padding:.4rem 0 0 3.5rem;font-size:.78rem;">'
+                    f'{icon} <span style="font-weight:600;color:{color};">{label}</span>'
+                    f'<span style="color:{color};font-family:\'JetBrains Mono\',monospace;'
+                    f'font-size:.72rem;background:{color}18;padding:.1rem .4rem;'
+                    f'border-radius:.3rem;border:1px solid {color}44;">{conf}%</span>'
+                    f'<span style="color:#9CA3AF;font-size:.7rem;">GPT-4o verified</span>'
+                    f'{flag_html}</div>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                gpt_placeholder.empty()
 
     except Exception as e:
         ph.empty()

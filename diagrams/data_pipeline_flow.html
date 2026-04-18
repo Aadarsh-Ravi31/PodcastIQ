@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PodcastIQ — Data Pipeline Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:    #F8F5F1;
+  --bg2:   #FFFFFF;
+  --bg3:   #F2EEE8;
+  --ora:   #E8531A;
+  --ora-d: #B83E10;
+  --ora-l: #FFF2EC;
+  --ora-m: rgba(232,83,26,.13);
+  --navy:  #1A3560;
+  --navy-l:#EEF2FA;
+  --teal:  #0B8A7C;
+  --teal-l:#E8F5F4;
+  --grn:   #2E7D52;
+  --grn-l: #EBF5EF;
+  --text:  #1A1714;
+  --t2:    #6A6258;
+  --t3:    #A8A09A;
+  --bdr:   rgba(0,0,0,.09);
+  --mono:  'JetBrains Mono', monospace;
+  --sans:  'DM Sans', sans-serif;
+  --serif: 'Fraunces', serif;
+}
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+}
+
+/* ── HEADER ─────────────────────────────────── */
+.page-head {
+  padding: 36px 48px 0;
+  border-bottom: 1px solid var(--bdr);
+  background: var(--bg2);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-bottom: 20px;
+}
+.tape {
+  height: 4px;
+  background: linear-gradient(90deg, var(--ora), #F2873A, var(--ora-d));
+}
+.brand {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -.01em;
+  color: var(--text);
+}
+.brand span { color: var(--ora); }
+.head-title h1 {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -.025em;
+  line-height: 1;
+}
+.head-title h1 em { font-style: italic; font-weight: 300; color: var(--teal); }
+.head-sub {
+  font-family: var(--mono);
+  font-size: .68rem;
+  letter-spacing: .12em;
+  color: var(--t3);
+  margin-top: 5px;
+}
+.head-chips {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.chip {
+  font-family: var(--mono);
+  font-size: .62rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+.chip-o { background: var(--ora-l); border: 1px solid rgba(232,83,26,.25); color: var(--ora-d); }
+.chip-t { background: var(--teal-l); border: 1px solid rgba(11,138,124,.2); color: var(--teal); }
+.chip-n { background: var(--navy-l); border: 1px solid rgba(26,53,96,.18); color: var(--navy); }
+
+/* ── MAIN CANVAS ─────────────────────────────── */
+.canvas {
+  padding: 40px 48px 48px;
+  overflow-x: auto;
+}
+
+/* ── FLOW RAIL ───────────────────────────────── */
+.flow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  min-width: 1300px;
+}
+
+/* ── ARROW CONNECTOR ─────────────────────────── */
+.connector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 68px;
+  width: 44px;
+  flex-shrink: 0;
+}
+.conn-line {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: relative;
+}
+.conn-line::before {
+  content: '';
+  display: block;
+  flex: 1;
+  height: 1.5px;
+  background: var(--t3);
+}
+.conn-line::after {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 8px solid var(--t3);
+  flex-shrink: 0;
+}
+.conn-label {
+  font-family: var(--mono);
+  font-size: .55rem;
+  letter-spacing: .1em;
+  color: var(--t3);
+  text-transform: uppercase;
+  margin-top: 4px;
+  text-align: center;
+}
+
+/* ── STAGE CARD BASE ─────────────────────────── */
+.stage {
+  flex: 1;
+  background: var(--bg2);
+  border: 1px solid var(--bdr);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow .2s, transform .2s;
+  min-width: 190px;
+}
+.stage:hover {
+  box-shadow: 0 8px 28px rgba(0,0,0,.10);
+  transform: translateY(-3px);
+}
+
+/* Stage header bar */
+.stage-head {
+  padding: 10px 14px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stage-step {
+  font-family: var(--mono);
+  font-size: .58rem;
+  letter-spacing: .18em;
+  font-weight: 500;
+  opacity: .85;
+}
+.stage-title {
+  font-family: var(--serif);
+  font-size: .92rem;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  line-height: 1.1;
+}
+
+/* Stage body */
+.stage-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── COLOUR SCHEMES ──────────────────────────── */
+/* Sources — Navy */
+.s-navy .stage-head { background: var(--navy); color: #fff; }
+/* Extraction — Orange */
+.s-ora .stage-head { background: var(--ora); color: #fff; }
+/* Profiling — Teal */
+.s-teal .stage-head { background: var(--teal); color: #fff; }
+/* Staging & Load — Navy */
+.s-navy2 .stage-head { background: #2A5298; color: #fff; }
+/* Clean & Structure — Warm Brown */
+.s-warm .stage-head { background: #7B4F2E; color: #fff; }
+/* Chunk — Orange-Red */
+.s-chunk .stage-head { background: var(--ora-d); color: #fff; }
+
+/* ── SUB-BOX ─────────────────────────────────── */
+.sub-box {
+  background: var(--bg3);
+  border: 1px solid var(--bdr);
+  border-radius: 8px;
+  padding: 9px 11px;
+  transition: border-color .2s;
+}
+.sub-box:hover { border-color: rgba(232,83,26,.3); }
+.sub-box-title {
+  font-family: var(--mono);
+  font-size: .65rem;
+  font-weight: 500;
+  letter-spacing: .06em;
+  margin-bottom: 4px;
+}
+.sub-box-items {
+  list-style: none;
+  font-size: .68rem;
+  color: var(--t2);
+  line-height: 1.75;
+}
+.sub-box-items li::before { content: '· '; color: var(--ora); }
+.sub-box.dashed { background: transparent; border-style: dashed; }
+
+/* ── STAT PILL ───────────────────────────────── */
+.stat-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-family: var(--mono);
+  font-size: .65rem;
+  font-weight: 500;
+  text-align: center;
+}
+.stat-pill .pill-num {
+  font-size: .88rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+
+/* ── MINI ARROW DOWN (inside stage) ─────────── */
+.down-arr {
+  text-align: center;
+  color: var(--t3);
+  font-size: .9rem;
+  line-height: 1;
+}
+
+/* ── FILE BOX (dashed) ───────────────────────── */
+.file-box {
+  border: 1.5px dashed var(--t3);
+  border-radius: 8px;
+  padding: 8px 11px;
+  background: transparent;
+}
+.file-box .file-name {
+  font-family: var(--mono);
+  font-size: .62rem;
+  font-weight: 500;
+  color: var(--navy);
+  margin-bottom: 3px;
+}
+.file-box .file-desc {
+  font-size: .66rem;
+  color: var(--t2);
+  line-height: 1.5;
+}
+
+/* ── CYLINDER (database) ─────────────────────── */
+.cylinder {
+  border: 1.5px solid #2A5298;
+  border-radius: 8px;
+  padding: 0;
+  overflow: hidden;
+  background: var(--bg2);
+}
+.cyl-top {
+  background: #2A5298;
+  color: #fff;
+  padding: 5px 10px;
+  font-family: var(--mono);
+  font-size: .62rem;
+  font-weight: 500;
+  letter-spacing: .1em;
+  text-align: center;
+}
+.cyl-body {
+  padding: 8px 11px;
+}
+.cyl-table {
+  font-family: var(--mono);
+  font-size: .63rem;
+  color: var(--navy);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+.cyl-note {
+  font-size: .63rem;
+  color: var(--t2);
+  line-height: 1.4;
+}
+
+/* ── TEST BOX ────────────────────────────────── */
+.test-box {
+  background: #FFF8EC;
+  border: 1.5px solid #C09A3E;
+  border-radius: 50px;
+  padding: 6px 12px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: .62rem;
+  color: #7A5C10;
+  font-weight: 500;
+}
+
+/* ── SECTION LABEL (floating above group) ────── */
+.group-label {
+  font-family: var(--mono);
+  font-size: .58rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--t3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+.group-label::before {
+  content: '';
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--ora);
+  flex-shrink: 0;
+}
+
+/* ── OUTER GROUP (dashed wrapper for sources) ── */
+.outer-group {
+  border: 1.5px dashed var(--bdr);
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1.4;
+  min-width: 220px;
+  background: transparent;
+}
+
+/* ── FLOW DIVIDER LINE AT TOP ─────────────────── */
+.flow-track {
+  position: relative;
+  margin-bottom: 32px;
+}
+.flow-track-line {
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  height: 1.5px;
+  background: var(--bdr);
+  z-index: 0;
+}
+.flow-track-steps {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+.track-step {
+  background: var(--bg2);
+  border: 1.5px solid var(--bdr);
+  border-radius: 20px;
+  padding: 4px 14px;
+  font-family: var(--mono);
+  font-size: .6rem;
+  letter-spacing: .1em;
+  color: var(--t2);
+  white-space: nowrap;
+}
+.track-step.active {
+  background: var(--ora);
+  border-color: var(--ora);
+  color: #fff;
+}
+
+/* ── FOOTER ──────────────────────────────────── */
+.page-foot {
+  border-top: 1px solid var(--bdr);
+  padding: 16px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg2);
+}
+.foot-note {
+  font-family: var(--mono);
+  font-size: .6rem;
+  color: var(--t3);
+  letter-spacing: .08em;
+}
+</style>
+</head>
+<body>
+
+<!-- TOP TAPE -->
+<div class="tape"></div>
+
+<!-- PAGE HEADER -->
+<div class="page-head">
+  <div class="head-title">
+    <div class="brand">Podcast<span>IQ</span></div>
+    <h1>Data <em>Pipeline</em> Flow</h1>
+    <div class="head-sub">RAW YOUTUBE → EXTRACTION → PROFILING → STAGING → CLEANING → CHUNKING</div>
+  </div>
+  <div class="head-chips">
+    <span class="chip chip-o">286 Episodes</span>
+    <span class="chip chip-n">25 Channels</span>
+    <span class="chip chip-t">13,807 Chunks</span>
+  </div>
+</div>
+
+<!-- CANVAS -->
+<div class="canvas">
+
+  <!-- STEP TRACK -->
+  <div class="flow-track">
+    <div class="flow-track-line"></div>
+    <div class="flow-track-steps">
+      <div class="track-step active">1 · Data Sources</div>
+      <div class="track-step active">2 · Extraction</div>
+      <div class="track-step active">3 · Profiling</div>
+      <div class="track-step active">4 · Staging &amp; Loading</div>
+      <div class="track-step active">5 · Cleaning &amp; Structuring</div>
+      <div class="track-step active">6 · Chunking</div>
+    </div>
+  </div>
+
+  <!-- MAIN FLOW -->
+  <div class="flow">
+
+    <!-- ══════════════════════════════════════════
+         STAGE A — SOURCES OUTER GROUP
+    ══════════════════════════════════════════ -->
+    <div class="outer-group">
+      <div class="group-label">Data Sources</div>
+
+      <!-- YouTube Data API -->
+      <div class="sub-box">
+        <div class="sub-box-title" style="color:var(--navy)">YouTube Data API v3</div>
+        <ul class="sub-box-items">
+          <li>Metadata + statistics</li>
+          <li>26 Channels · 6 Genres</li>
+          <li>Title, date, description, tags</li>
+        </ul>
+      </div>
+
+      <!-- yt-dlp Transcripts -->
+      <div class="sub-box">
+        <div class="sub-box-title" style="color:var(--navy)">yt-dlp Transcripts</div>
+        <ul class="sub-box-items">
+          <li>WebVTT auto-captions</li>
+          <li>English (EN) only</li>
+          <li>~90% accuracy</li>
+        </ul>
+      </div>
+
+      <!-- channels.json config -->
+      <div class="file-box">
+        <div class="file-name">channels.json</div>
+        <div class="file-desc">26 channel configs<br>IDs · genre tags · flags</div>
+      </div>
+    </div>
+
+    <!-- ARROW 1 -->
+    <div class="connector">
+      <div class="conn-line"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         STAGE B — EXTRACTION
+    ══════════════════════════════════════════ -->
+    <div class="stage s-ora">
+      <div class="stage-head">
+        <div class="stage-step">Step 1 · Extract</div>
+        <div class="stage-title">Extraction</div>
+      </div>
+      <div class="stage-body">
+
+        <div class="sub-box">
+          <div class="sub-box-title" style="color:var(--ora-d)">channel_extraction.py</div>
+          <ul class="sub-box-items">
+            <li>Batch processing (all 26 channels)</li>
+            <li>Resume capability on failure</li>
+            <li>Merge metadata + transcript</li>
+            <li>Error handling + retry logic</li>
+          </ul>
+        </div>
+
+        <div class="down-arr">↓</div>
+
+        <!-- Output files -->
+        <div class="file-box">
+          <div class="file-name">Local JSON Files</div>
+          <div class="file-desc">
+            290+ episodes<br>
+            *_metadata.json<br>
+            *_transcript.json<br>
+            <strong style="color:var(--ora)">~146 MB total</strong>
+          </div>
+        </div>
+
+        <div class="stat-pill" style="background:var(--ora-l);color:var(--ora-d)">
+          <span class="pill-num">286</span>
+          <span>episodes · 25 channels</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARROW 2 -->
+    <div class="connector">
+      <div class="conn-line"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         STAGE C — DATA PROFILING
+    ══════════════════════════════════════════ -->
+    <div class="stage s-teal">
+      <div class="stage-head">
+        <div class="stage-step">Step 2 · Profile</div>
+        <div class="stage-title">Data Profiling</div>
+      </div>
+      <div class="stage-body">
+
+        <div class="sub-box">
+          <div class="sub-box-title" style="color:var(--teal)">Quality Assessment</div>
+          <ul class="sub-box-items">
+            <li>Word count distribution</li>
+            <li>Transcript completeness check</li>
+            <li>Language detection (EN only)</li>
+            <li>Duplicate episode detection</li>
+          </ul>
+        </div>
+
+        <div class="sub-box">
+          <div class="sub-box-title" style="color:var(--teal)">Validation Rules</div>
+          <ul class="sub-box-items">
+            <li>Min 500 words per episode</li>
+            <li>Valid VIDEO_ID format</li>
+            <li>Publish date not null</li>
+            <li>Channel genre mapping check</li>
+          </ul>
+        </div>
+
+        <div class="stat-pill" style="background:var(--teal-l);color:var(--teal)">
+          <span>TRANSCRIPT_QUALITY flag per episode</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ARROW 3 — PUT -->
+    <div class="connector">
+      <div class="conn-line"></div>
+      <div class="conn-label">PUT</div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         STAGE D — STAGING & LOADING
+    ══════════════════════════════════════════ -->
+    <div class="stage s-navy2">
+      <div class="stage-head">
+        <div class="stage-step">Steps 3 – 4 · Stage &amp; Load</div>
+        <div class="stage-title">Staging &amp; Loading</div>
+      </div>
+      <div class="stage-body">
+
+        <!-- Internal Stage -->
+        <div class="sub-box">
+          <div class="sub-box-title" style="color:#2A5298">Step 3 · @JSON_STAGE</div>
+          <ul class="sub-box-items">
+            <li>Snowflake internal stage</li>
+            <li>JSON file format</li>
+            <li>STRIP_OUTER_ARRAY = TRUE</li>
+            <li>Key-pair auth (no password)</li>
+          </ul>
+        </div>
+
+        <div class="down-arr">↓ COPY INTO</div>
+
+        <!-- RAW Database cylinder -->
+        <div class="cylinder">
+          <div class="cyl-top">Step 4 · RAW Layer</div>
+          <div class="cyl-body">
+            <div class="cyl-table">RAW.EPISODES</div>
+            <div class="cyl-note">raw_data VARIANT · full JSON<br>1 row per video · 286 rows</div>
+            <div style="margin-top:6px">
+              <div class="cyl-table">RAW.CHANNELS</div>
+              <div class="cyl-note">25 channel records</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-pill" style="background:var(--navy-l);color:var(--navy)">
+          <span>~50ms per episode load</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ARROW 4 — dbt run -->
+    <div class="connector">
+      <div class="conn-line"></div>
+      <div class="conn-label">dbt run</div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         STAGE E — CLEANING & STRUCTURING
+    ══════════════════════════════════════════ -->
+    <div class="stage s-warm">
+      <div class="stage-head">
+        <div class="stage-step">Steps 5 – 6 · Clean &amp; Structure</div>
+        <div class="stage-title">Cleaning &amp; Structuring</div>
+      </div>
+      <div class="stage-body">
+
+        <!-- Staging views -->
+        <div class="sub-box">
+          <div class="sub-box-title" style="color:#7B4F2E">Step 5 · Staging (Views)</div>
+          <ul class="sub-box-items">
+            <li>STG_EPISODES — VARIANT → 22 typed cols</li>
+            <li>STG_SEGMENTS — LATERAL FLATTEN → 1 row/cue</li>
+            <li>Parse JSON · Fix text encoding</li>
+            <li>Dedup · Remove noise [Music][Applause]</li>
+          </ul>
+        </div>
+
+        <!-- Tests -->
+        <div class="test-box">dbt Tests · not_null · unique · accepted_values</div>
+
+        <!-- Intermediate -->
+        <div class="sub-box">
+          <div class="sub-box-title" style="color:#7B4F2E">Step 6 · Intermediate (Views)</div>
+          <ul class="sub-box-items">
+            <li>INT_EPISODES — join channels + quality</li>
+            <li>INT_SEGMENTS — YouTube timestamp URL</li>
+            <li>Type casting · guest name extraction</li>
+            <li>ENGAGEMENT_RATE · WORD_COUNT</li>
+          </ul>
+        </div>
+
+        <div class="stat-pill" style="background:#F5EBE0;color:#7B4F2E">
+          <span>Zero extra storage — all SQL views</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ARROW 5 -->
+    <div class="connector">
+      <div class="conn-line"></div>
+    </div>
+
+    <!-- ══════════════════════════════════════════
+         STAGE F — CHUNKING
+    ══════════════════════════════════════════ -->
+    <div class="stage s-chunk">
+      <div class="stage-head">
+        <div class="stage-step">Step 7 · Chunk</div>
+        <div class="stage-title">Chunking</div>
+      </div>
+      <div class="stage-body">
+
+        <div class="sub-box">
+          <div class="sub-box-title" style="color:var(--ora-d)">CURATED.CUR_CHUNKS</div>
+          <ul class="sub-box-items">
+            <li>120s sliding windows</li>
+            <li>15-20s overlap (context continuity)</li>
+            <li>YouTube deep-link per chunk (&amp;t=Ns)</li>
+            <li>CHUNK_ID · VIDEO_ID · CHANNEL_NAME</li>
+            <li>CHUNK_TEXT · PUBLISH_DATE · WORD_COUNT</li>
+          </ul>
+        </div>
+
+        <div class="sub-box">
+          <div class="sub-box-title" style="color:var(--ora-d)">Ready For</div>
+          <ul class="sub-box-items">
+            <li>Arctic-embed-m 768-dim vectors</li>
+            <li>Cortex Search indexing</li>
+            <li>Claim extraction via LLM</li>
+          </ul>
+        </div>
+
+        <div class="stat-pill" style="background:var(--ora-l);color:var(--ora-d)">
+          <span class="pill-num">13,807</span>
+          <span>chunks · 286 episodes</span>
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /flow -->
+</div><!-- /canvas -->
+
+<!-- FOOTER -->
+<div class="page-foot">
+  <div class="foot-note">PodcastIQ · Data Engineering Pipeline · Snowflake + dbt + yt-dlp</div>
+  <div style="display:flex;gap:8px">
+    <span class="chip chip-o">yt-dlp + YouTube Data API v3</span>
+    <span class="chip chip-n">Snowflake Cortex</span>
+    <span class="chip chip-t">dbt Core</span>
+  </div>
+</div>
+
+</body>
+</html>

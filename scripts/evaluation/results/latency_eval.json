@@ -1,0 +1,111 @@
+{
+  "overall_mean_s": 12.622,
+  "overall_p95_s": 16.302,
+  "total_queries": 24,
+  "per_agent": {
+    "SEARCH": {
+      "queries_run": 3,
+      "successes": 3,
+      "mean_s": 25.699,
+      "p95_s": 49.135,
+      "min_s": 12.805,
+      "max_s": 49.135,
+      "raw_s": [
+        12.805,
+        49.135,
+        15.157
+      ]
+    },
+    "SUMMARIZE": {
+      "queries_run": 3,
+      "successes": 3,
+      "mean_s": 12.514,
+      "p95_s": 13.654,
+      "min_s": 11.848,
+      "max_s": 13.654,
+      "raw_s": [
+        11.848,
+        12.041,
+        13.654
+      ]
+    },
+    "RECOMMEND": {
+      "queries_run": 3,
+      "successes": 3,
+      "mean_s": 11.482,
+      "p95_s": 16.302,
+      "min_s": 8.383,
+      "max_s": 16.302,
+      "raw_s": [
+        8.383,
+        16.302,
+        9.763
+      ]
+    },
+    "COMPARE": {
+      "queries_run": 3,
+      "successes": 3,
+      "mean_s": 12.441,
+      "p95_s": 13.11,
+      "min_s": 11.944,
+      "max_s": 13.11,
+      "raw_s": [
+        12.268,
+        13.11,
+        11.944
+      ]
+    },
+    "TEMPORAL": {
+      "queries_run": 3,
+      "successes": 3,
+      "mean_s": 10.968,
+      "p95_s": 12.49,
+      "min_s": 10.17,
+      "max_s": 12.49,
+      "raw_s": [
+        10.244,
+        10.17,
+        12.49
+      ]
+    },
+    "FACTCHECK": {
+      "queries_run": 3,
+      "successes": 3,
+      "mean_s": 10.183,
+      "p95_s": 14.373,
+      "min_s": 7.663,
+      "max_s": 14.373,
+      "raw_s": [
+        8.513,
+        7.663,
+        14.373
+      ]
+    },
+    "INSIGHT": {
+      "queries_run": 3,
+      "successes": 3,
+      "mean_s": 9.374,
+      "p95_s": 10.314,
+      "min_s": 7.824,
+      "max_s": 10.314,
+      "raw_s": [
+        7.824,
+        9.984,
+        10.314
+      ]
+    },
+    "GRAPH": {
+      "queries_run": 3,
+      "successes": 3,
+      "mean_s": 8.313,
+      "p95_s": 9.905,
+      "min_s": 7.131,
+      "max_s": 9.905,
+      "raw_s": [
+        9.905,
+        7.904,
+        7.131
+      ]
+    }
+  }
+}

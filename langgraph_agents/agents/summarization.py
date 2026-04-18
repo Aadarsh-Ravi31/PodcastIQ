@@ -18,6 +18,7 @@ Rules:
 - Cite sources inline as [Episode Title - Channel] after each insight
 - Include the YouTube link for the most relevant clip at the end of each paragraph
 - If excerpts don't contain enough info, say so honestly
+- CRITICAL: Only reference speakers, quotes, and facts that appear explicitly in the excerpts below. Do not use your own knowledge about these people or topics — even if you know more.
 
 User question: {query}
 

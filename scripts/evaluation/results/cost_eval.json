@@ -1,0 +1,297 @@
+{
+  "per_agent": {
+    "SEARCH": {
+      "query": "What did Sam Altman say about GPT-5?",
+      "static_model_estimate": {
+        "total_input_tokens": 250,
+        "total_output_tokens": 10,
+        "total_tokens": 260,
+        "total_cost_usd": 1.8e-05,
+        "breakdown": [
+          {
+            "step": "routing",
+            "model": "llama3.1-8b",
+            "input_tokens": 200,
+            "output_tokens": 10,
+            "cost_usd": 1.3e-05
+          },
+          {
+            "step": "retrieval",
+            "model": "arctic-embed",
+            "input_tokens": 50,
+            "output_tokens": 0,
+            "cost_usd": 5e-06
+          }
+        ]
+      },
+      "live_validation": {
+        "elapsed_s": 6.79,
+        "approx_output_tokens": 2495,
+        "summary_chars": 575,
+        "num_chunks_returned": 8
+      }
+    },
+    "SUMMARIZE": {
+      "query": "What are the best strategies for building a startup?",
+      "static_model_estimate": {
+        "total_input_tokens": 3250,
+        "total_output_tokens": 610,
+        "total_tokens": 3860,
+        "total_cost_usd": 0.002178,
+        "breakdown": [
+          {
+            "step": "routing",
+            "model": "llama3.1-8b",
+            "input_tokens": 200,
+            "output_tokens": 10,
+            "cost_usd": 1.3e-05
+          },
+          {
+            "step": "retrieval",
+            "model": "arctic-embed",
+            "input_tokens": 50,
+            "output_tokens": 0,
+            "cost_usd": 5e-06
+          },
+          {
+            "step": "summarization",
+            "model": "llama3.1-70b",
+            "input_tokens": 3000,
+            "output_tokens": 600,
+            "cost_usd": 0.00216
+          }
+        ]
+      },
+      "live_validation": {
+        "elapsed_s": 15.64,
+        "approx_output_tokens": 3132,
+        "summary_chars": 1413,
+        "num_chunks_returned": 8
+      }
+    },
+    "RECOMMEND": {
+      "query": "Recommend episodes about longevity and health",
+      "static_model_estimate": {
+        "total_input_tokens": 2250,
+        "total_output_tokens": 410,
+        "total_tokens": 2660,
+        "total_cost_usd": 0.001458,
+        "breakdown": [
+          {
+            "step": "routing",
+            "model": "llama3.1-8b",
+            "input_tokens": 200,
+            "output_tokens": 10,
+            "cost_usd": 1.3e-05
+          },
+          {
+            "step": "retrieval",
+            "model": "arctic-embed",
+            "input_tokens": 50,
+            "output_tokens": 0,
+            "cost_usd": 5e-06
+          },
+          {
+            "step": "recommendation",
+            "model": "llama3.1-70b",
+            "input_tokens": 2000,
+            "output_tokens": 400,
+            "cost_usd": 0.00144
+          }
+        ]
+      },
+      "live_validation": {
+        "elapsed_s": 9.99,
+        "approx_output_tokens": 130,
+        "summary_chars": 520,
+        "num_chunks_returned": 0
+      }
+    },
+    "COMPARE": {
+      "query": "Compare Sam Altman and Elon Musk on AI",
+      "static_model_estimate": {
+        "total_input_tokens": 3250,
+        "total_output_tokens": 510,
+        "total_tokens": 3760,
+        "total_cost_usd": 0.002118,
+        "breakdown": [
+          {
+            "step": "routing",
+            "model": "llama3.1-8b",
+            "input_tokens": 200,
+            "output_tokens": 10,
+            "cost_usd": 1.3e-05
+          },
+          {
+            "step": "retrieval",
+            "model": "arctic-embed",
+            "input_tokens": 50,
+            "output_tokens": 0,
+            "cost_usd": 5e-06
+          },
+          {
+            "step": "comparison",
+            "model": "llama3.1-70b",
+            "input_tokens": 3000,
+            "output_tokens": 500,
+            "cost_usd": 0.0021
+          }
+        ]
+      },
+      "live_validation": {
+        "elapsed_s": 16.62,
+        "approx_output_tokens": 317,
+        "summary_chars": 1268,
+        "num_chunks_returned": 0
+      }
+    },
+    "TEMPORAL": {
+      "query": "How has opinion on AGI changed over time?",
+      "static_model_estimate": {
+        "total_input_tokens": 1800,
+        "total_output_tokens": 430,
+        "total_tokens": 2230,
+        "total_cost_usd": 0.00116,
+        "breakdown": [
+          {
+            "step": "routing",
+            "model": "llama3.1-8b",
+            "input_tokens": 200,
+            "output_tokens": 10,
+            "cost_usd": 1.3e-05
+          },
+          {
+            "step": "keyword-extract",
+            "model": "llama3.1-8b",
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "cost_usd": 7e-06
+          },
+          {
+            "step": "temporal-summary",
+            "model": "llama3.1-70b",
+            "input_tokens": 1500,
+            "output_tokens": 400,
+            "cost_usd": 0.00114
+          }
+        ]
+      },
+      "live_validation": {
+        "elapsed_s": 7.88,
+        "approx_output_tokens": 205,
+        "summary_chars": 822,
+        "num_chunks_returned": 0
+      }
+    },
+    "FACTCHECK": {
+      "query": "Fact check: GPT-5 was released in 2024",
+      "static_model_estimate": {
+        "total_input_tokens": 2250,
+        "total_output_tokens": 310,
+        "total_tokens": 2560,
+        "total_cost_usd": 0.001398,
+        "breakdown": [
+          {
+            "step": "routing",
+            "model": "llama3.1-8b",
+            "input_tokens": 200,
+            "output_tokens": 10,
+            "cost_usd": 1.3e-05
+          },
+          {
+            "step": "retrieval",
+            "model": "arctic-embed",
+            "input_tokens": 50,
+            "output_tokens": 0,
+            "cost_usd": 5e-06
+          },
+          {
+            "step": "fact-check",
+            "model": "llama3.1-70b",
+            "input_tokens": 2000,
+            "output_tokens": 300,
+            "cost_usd": 0.00138
+          }
+        ]
+      },
+      "live_validation": {
+        "elapsed_s": 10.53,
+        "approx_output_tokens": 47,
+        "summary_chars": 191,
+        "num_chunks_returned": 0
+      }
+    },
+    "INSIGHT": {
+      "query": "Which podcast channel has the most contradicted claims?",
+      "static_model_estimate": {
+        "total_input_tokens": 1700,
+        "total_output_tokens": 410,
+        "total_tokens": 2110,
+        "total_cost_usd": 0.001153,
+        "breakdown": [
+          {
+            "step": "routing",
+            "model": "llama3.1-8b",
+            "input_tokens": 200,
+            "output_tokens": 10,
+            "cost_usd": 1.3e-05
+          },
+          {
+            "step": "insight-summary",
+            "model": "llama3.1-70b",
+            "input_tokens": 1500,
+            "output_tokens": 400,
+            "cost_usd": 0.00114
+          }
+        ]
+      },
+      "live_validation": {
+        "elapsed_s": 8.04,
+        "approx_output_tokens": 163,
+        "summary_chars": 652,
+        "num_chunks_returned": 0
+      }
+    },
+    "GRAPH": {
+      "query": "Who has Sam Altman appeared with across podcasts?",
+      "static_model_estimate": {
+        "total_input_tokens": 250,
+        "total_output_tokens": 10,
+        "total_tokens": 260,
+        "total_cost_usd": 1.8e-05,
+        "breakdown": [
+          {
+            "step": "routing",
+            "model": "llama3.1-8b",
+            "input_tokens": 200,
+            "output_tokens": 10,
+            "cost_usd": 1.3e-05
+          },
+          {
+            "step": "retrieval",
+            "model": "arctic-embed",
+            "input_tokens": 50,
+            "output_tokens": 0,
+            "cost_usd": 5e-06
+          }
+        ]
+      },
+      "live_validation": {
+        "elapsed_s": 10.27,
+        "approx_output_tokens": 124,
+        "summary_chars": 498,
+        "num_chunks_returned": 0
+      }
+    }
+  },
+  "total_cost_usd": 0.009501,
+  "avg_cost_per_query": 0.001188,
+  "projected_per_1k": 1.1876,
+  "pricing_model": {
+    "llama3.1-70b": 0.0006,
+    "llama3.1-8b": 6e-05,
+    "llama3.1-405b": 0.0035,
+    "arctic-embed": 0.0001
+  },
+  "note": "Token counts are estimated from prompt templates. Actual Cortex billing depends on model-specific tokenization. See Snowflake ACCOUNT_USAGE.QUERY_HISTORY for exact credit usage."
+}

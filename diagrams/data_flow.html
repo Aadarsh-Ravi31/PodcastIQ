@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PodcastIQ — Data Flow Diagrams</title>
+<style>
+:root {
+  --bg:          #07071a;
+  --bg2:         #0d0d22;
+  --bg3:         #111128;
+  --border:      rgba(255,255,255,0.07);
+  --border-hi:   rgba(168,85,247,0.45);
+  --purple:      #a855f7;
+  --purple-dim:  rgba(168,85,247,0.18);
+  --blue:        #3b82f6;
+  --indigo:      #6366f1;
+  --violet:      #8b5cf6;
+  --green:       #10b981;
+  --teal:        #14b8a6;
+  --amber:       #f59e0b;
+  --red:         #ef4444;
+  --pink:        #ec4899;
+  --sky:         #38bdf8;
+  --text:        #e2e8f0;
+  --text-dim:    #94a3b8;
+  --text-muted:  #475569;
+  --mono:        'Consolas','Courier New',monospace;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Segoe UI',system-ui,sans-serif;
+  font-size:14px;
+  line-height:1.6;
+}
+
+/* ── NAV ─────────────────────────────────────────────────── */
+nav{
+  position:sticky;top:0;
+  background:rgba(7,7,26,0.96);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:10px 28px;
+  display:flex;align-items:center;gap:6px;
+  z-index:999;flex-wrap:wrap;
+}
+.nav-brand{
+  font-weight:800;font-size:1rem;
+  background:linear-gradient(120deg,#a855f7,#3b82f6);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-right:12px;white-space:nowrap;
+}
+nav a{
+  color:var(--text-dim);text-decoration:none;
+  font-size:0.74rem;padding:4px 10px;border-radius:6px;
+  transition:all .2s;white-space:nowrap;
+}
+nav a:hover{background:rgba(168,85,247,.14);color:var(--purple)}
+
+/* ── HEADER ──────────────────────────────────────────────── */
+.hero{
+  text-align:center;
+  padding:56px 24px 40px;
+  background:radial-gradient(ellipse 80% 40% at 50% 0%,rgba(168,85,247,.13) 0%,transparent 70%);
+  border-bottom:1px solid var(--border);
+}
+.hero h1{
+  font-size:2.5rem;font-weight:800;letter-spacing:-.02em;
+  background:linear-gradient(135deg,#fff 40%,#a855f7 80%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:10px;
+}
+.hero p{color:var(--text-dim);font-size:1rem;max-width:580px;margin:0 auto 20px}
+.hero-tags{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
+.hero-tag{
+  font-size:.72rem;font-weight:600;padding:4px 12px;border-radius:20px;
+  background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.3);color:#d8b4fe;
+}
+
+/* ── SECTION ─────────────────────────────────────────────── */
+.section{
+  max-width:1360px;margin:0 auto;
+  padding:44px 28px;
+}
+.section + .section{border-top:1px solid var(--border)}
+
+.sec-label{
+  display:inline-block;
+  font-size:.65rem;font-weight:700;letter-spacing:.12em;
+  padding:3px 10px;border-radius:20px;
+  background:linear-gradient(135deg,var(--purple),var(--blue));
+  color:#fff;margin-bottom:10px;
+}
+.sec-title{
+  font-size:1.45rem;font-weight:700;color:#fff;
+  margin-bottom:6px;
+}
+.sec-sub{color:var(--text-dim);font-size:.88rem;margin-bottom:28px}
+
+/* ── KPI ROW ─────────────────────────────────────────────── */
+.kpi-row{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:10px;margin-bottom:36px;
+}
+.kpi{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;padding:14px 12px;text-align:center;
+  transition:border-color .2s,transform .2s;
+}
+.kpi:hover{border-color:var(--border-hi);transform:translateY(-2px)}
+.kpi-val{
+  font-size:1.5rem;font-weight:800;
+  font-family:var(--mono);
+  display:block;margin-bottom:4px;
+}
+.kpi-lbl{font-size:.65rem;color:var(--text-muted);line-height:1.3}
+.kpi.c-blue .kpi-val{color:#93c5fd}
+.kpi.c-purple .kpi-val{color:#d8b4fe}
+.kpi.c-green .kpi-val{color:#6ee7b7}
+.kpi.c-amber .kpi-val{color:#fcd34d}
+.kpi.c-pink .kpi-val{color:#f9a8d4}
+.kpi.c-teal .kpi-val{color:#5eead4}
+.kpi.c-sky .kpi-val{color:#7dd3fc}
+
+/* ── PIPELINE CHEVRONS (Diagram 1) ───────────────────────── */
+.pipeline{
+  display:flex;align-items:stretch;
+  overflow-x:auto;padding-bottom:4px;
+  gap:0;
+}
+.pstage{
+  flex:1;min-width:158px;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  padding:18px 14px;
+  position:relative;
+  transition:transform .2s,border-color .2s;
+  cursor:default;
+}
+.pstage:not(:last-child){
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 50%,calc(100% - 20px) 100%,0 100%);
+  margin-right:1px;
+  padding-right:28px;
+}
+.pstage:first-child{border-radius:10px 0 0 10px}
+.pstage:last-child{border-radius:0 10px 10px 0}
+.pstage:hover{transform:scaleY(1.03);z-index:2;border-color:rgba(168,85,247,.5)}
+
+.ps-step{font-size:.6rem;font-weight:700;letter-spacing:.14em;color:var(--text-muted);margin-bottom:4px}
+.ps-icon{font-size:1.4rem;margin-bottom:6px}
+.ps-title{font-size:.9rem;font-weight:700;margin-bottom:4px}
+.ps-tech{font-size:.68rem;color:var(--text-muted);margin-bottom:10px;font-family:var(--mono)}
+.ps-items{list-style:none;font-size:.69rem;color:var(--text-dim);line-height:1.85}
+.ps-items li::before{content:'▸ ';color:var(--purple);font-size:.6rem}
+.ps-stat{
+  margin-top:12px;padding:5px 8px;border-radius:6px;
+  font-size:.69rem;font-weight:700;text-align:center;
+}
+
+.ps1{border-top:2px solid #3b82f6}.ps1 .ps-title{color:#93c5fd}.ps1 .ps-stat{background:rgba(59,130,246,.12);color:#93c5fd}
+.ps2{border-top:2px solid #6366f1}.ps2 .ps-title{color:#a5b4fc}.ps2 .ps-stat{background:rgba(99,102,241,.12);color:#a5b4fc}
+.ps3{border-top:2px solid #8b5cf6}.ps3 .ps-title{color:#c4b5fd}.ps3 .ps-stat{background:rgba(139,92,246,.12);color:#c4b5fd}
+.ps4{border-top:2px solid #a855f7}.ps4 .ps-title{color:#d8b4fe}.ps4 .ps-stat{background:rgba(168,85,247,.12);color:#d8b4fe}
+.ps5{border-top:2px solid #ec4899}.ps5 .ps-title{color:#f9a8d4}.ps5 .ps-stat{background:rgba(236,72,153,.12);color:#f9a8d4}
+.ps6{border-top:2px solid #f43f5e}.ps6 .ps-title{color:#fda4af}.ps6 .ps-stat{background:rgba(244,63,94,.12);color:#fda4af}
+.ps7{border-top:2px solid #10b981}.ps7 .ps-title{color:#6ee7b7}.ps7 .ps-stat{background:rgba(16,185,129,.12);color:#6ee7b7}
+
+/* ── SNOWFLAKE LAYERS (Diagram 2) ────────────────────────── */
+.sf-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:2px;background:var(--border);
+  border-radius:12px;overflow:hidden;
+}
+.sf-layer{background:var(--bg3);padding:18px 14px}
+.sf-lh{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:14px;padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+}
+.sf-badge{
+  font-size:.62rem;font-weight:700;letter-spacing:.1em;
+  padding:2px 8px;border-radius:4px;
+}
+.sf-lh h3{font-size:.82rem;font-weight:700}
+.sf-note{font-size:.65rem;color:var(--text-muted);font-style:italic;margin-top:6px}
+
+.sf-tbl{
+  background:rgba(255,255,255,.025);
+  border:1px solid var(--border);
+  border-radius:8px;padding:9px 11px;
+  margin-bottom:7px;
+  transition:border-color .2s;
+}
+.sf-tbl:hover{border-color:rgba(168,85,247,.4)}
+.sf-tbl-name{
+  font-size:.74rem;font-weight:700;
+  font-family:var(--mono);margin-bottom:3px;
+}
+.sf-tbl-desc{font-size:.65rem;color:var(--text-muted);line-height:1.5}
+.sf-cnt{
+  display:inline-block;margin-top:5px;
+  font-size:.65rem;font-weight:700;
+  padding:1px 7px;border-radius:3px;
+}
+
+.l-raw .sf-badge{background:rgba(59,130,246,.18);color:#93c5fd}
+.l-raw .sf-tbl-name{color:#93c5fd}
+.l-raw .sf-cnt{background:rgba(59,130,246,.14);color:#93c5fd}
+
+.l-stg .sf-badge{background:rgba(99,102,241,.18);color:#a5b4fc}
+.l-stg .sf-tbl-name{color:#a5b4fc}
+.l-stg .sf-cnt{background:rgba(99,102,241,.14);color:#a5b4fc}
+
+.l-cur .sf-badge{background:rgba(139,92,246,.18);color:#c4b5fd}
+.l-cur .sf-tbl-name{color:#c4b5fd}
+.l-cur .sf-cnt{background:rgba(139,92,246,.14);color:#c4b5fd}
+
+.l-sem .sf-badge{background:rgba(168,85,247,.18);color:#d8b4fe}
+.l-sem .sf-tbl-name{color:#d8b4fe}
+.l-sem .sf-cnt{background:rgba(168,85,247,.14);color:#d8b4fe}
+
+/* ── AGENT SYSTEM (Diagram 3) ────────────────────────────── */
+.agent-sys{
+  display:grid;
+  grid-template-columns:190px 1fr;
+  gap:24px;align-items:start;
+}
+.router-card{
+  background:linear-gradient(160deg,rgba(168,85,247,.14),rgba(99,102,241,.1));
+  border:1px solid rgba(168,85,247,.4);
+  border-radius:12px;padding:20px;
+  text-align:center;position:sticky;top:70px;
+}
+.router-card h3{font-size:1rem;font-weight:700;color:#d8b4fe;margin-bottom:8px}
+.rc-model{
+  font-size:.65rem;font-family:var(--mono);
+  background:rgba(168,85,247,.2);color:#d8b4fe;
+  padding:2px 8px;border-radius:4px;
+  display:inline-block;margin-bottom:10px;
+}
+.rc-acc{font-size:.72rem;color:var(--text-dim);line-height:1.8;text-align:left}
+.rc-bar{height:5px;border-radius:3px;margin-top:4px;margin-bottom:10px;overflow:hidden}
+.rc-bar-inner{height:100%;border-radius:3px}
+
+.agents-g{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.ac{
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:10px;padding:14px;
+  transition:all .2s;cursor:default;
+}
+.ac:hover{border-color:var(--border-hi);transform:translateY(-2px);background:rgba(168,85,247,.06)}
+.ac-icon{font-size:1.3rem;margin-bottom:7px}
+.ac-name{font-size:.83rem;font-weight:700;color:#fff;margin-bottom:4px}
+.ac-trigger{font-size:.67rem;color:var(--text-muted);margin-bottom:8px;line-height:1.4}
+.ac-model{font-size:.63rem;color:var(--text-muted);font-family:var(--mono);margin-bottom:8px}
+.ac-out{
+  font-size:.63rem;font-weight:600;
+  padding:2px 8px;border-radius:4px;
+  display:inline-block;margin-top:4px;
+}
+
+/* ── SEMANTIC ENRICHMENT (Diagram 4) ─────────────────────── */
+.enrich-wrap{
+  display:grid;
+  grid-template-columns:170px 32px 1fr;
+  gap:0;align-items:center;
+}
+.enrich-src{
+  background:linear-gradient(160deg,rgba(99,102,241,.14),rgba(139,92,246,.1));
+  border:1px solid rgba(99,102,241,.35);
+  border-radius:12px;padding:18px;text-align:center;
+}
+.enrich-src h3{font-size:.85rem;font-weight:700;color:#a5b4fc;margin-bottom:6px}
+.enrich-src .e-stat{font-size:.72rem;color:var(--text-dim)}
+.enrich-arrow{display:flex;align-items:center;justify-content:center}
+.arr-h{
+  width:32px;height:2px;
+  background:linear-gradient(90deg,rgba(168,85,247,.6),rgba(168,85,247,.15));
+  position:relative;
+}
+.arr-h::after{
+  content:'';position:absolute;right:-6px;top:-4px;
+  border-left:8px solid rgba(168,85,247,.6);
+  border-top:5px solid transparent;border-bottom:5px solid transparent;
+}
+.pipes-g{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+.pc{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;padding:14px;transition:all .2s;
+}
+.pc:hover{border-color:var(--border-hi);transform:translateY(-2px)}
+.pc-head{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.pc-icon{font-size:1.1rem}
+.pc h4{font-size:.78rem;font-weight:700}
+.pc-model{font-size:.62rem;color:var(--text-muted);font-family:var(--mono);margin-bottom:8px}
+.pc-fields{font-size:.63rem;color:var(--text-dim);line-height:1.8;font-family:var(--mono)}
+.pc-count{
+  margin-top:9px;font-size:.68rem;font-weight:700;
+  padding:2px 9px;border-radius:4px;display:inline-block;
+}
+
+/* ── RETRIEVAL (Diagram 5) ────────────────────────────────── */
+.ret-top{
+  background:linear-gradient(135deg,rgba(59,130,246,.1),rgba(99,102,241,.07));
+  border:1px solid rgba(59,130,246,.28);
+  border-radius:10px;padding:14px 24px;
+  text-align:center;
+  font-size:.9rem;font-weight:700;
+  margin-bottom:20px;
+}
+.ret-arrow-row{
+  display:flex;justify-content:space-around;
+  margin-bottom:12px;color:var(--text-muted);font-size:1.2rem;
+}
+.ret-paths{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:14px;margin-bottom:20px;
+}
+.rp{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;padding:16px;transition:all .2s;
+}
+.rp:hover{border-color:var(--border-hi);transform:translateY(-2px)}
+.rp-head{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:12px;padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+}
+.rp-head h4{font-size:.83rem;font-weight:700}
+.rp-icon{font-size:1.2rem}
+.rp-step{
+  font-size:.7rem;color:var(--text-dim);
+  padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.035);
+  line-height:1.5;display:flex;align-items:flex-start;gap:7px;
+}
+.rp-step:last-child{border-bottom:none}
+.step-n{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:18px;height:18px;border-radius:50%;
+  font-size:.58rem;font-weight:700;flex-shrink:0;margin-top:1px;
+}
+.ret-merge{
+  background:linear-gradient(135deg,rgba(168,85,247,.11),rgba(236,72,153,.07));
+  border:1px solid rgba(168,85,247,.28);
+  border-radius:10px;padding:14px 24px;
+  text-align:center;
+  font-size:.85rem;
+}
+.ret-merge strong{color:#d8b4fe}
+
+/* ── FACT-CHECK (Diagram 6) ──────────────────────────────── */
+.fc-grid{
+  display:grid;
+  grid-template-columns:1fr 52px 1fr 52px 1fr;
+  align-items:start;gap:0;
+}
+.fc-box{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;padding:16px;
+}
+.fc-head{
+  padding:5px 10px;border-radius:6px;
+  font-size:.68rem;font-weight:700;letter-spacing:.07em;
+  margin-bottom:12px;text-align:center;
+}
+.fc-item{
+  font-size:.7rem;color:var(--text-dim);
+  padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  line-height:1.5;
+}
+.fc-item:last-child{border-bottom:none}
+.fc-arr{
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;color:var(--text-muted);padding-top:70px;
+}
+.vd-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:7px;margin-top:8px;
+}
+.vd{
+  border-radius:6px;padding:6px 8px;
+  font-size:.7rem;font-weight:700;text-align:center;
+}
+
+/* ── NEO4J GRAPH (Diagram 7) ─────────────────────────────── */
+.neo-wrap{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:20px;
+}
+.neo-panel{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+}
+.neo-panel-head{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  font-size:.8rem;font-weight:700;
+  background:rgba(16,185,129,.06);color:#6ee7b7;
+}
+.neo-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 16px;
+  border-bottom:1px solid rgba(255,255,255,.04);
+  transition:background .2s;
+}
+.neo-item:hover{background:rgba(255,255,255,.025)}
+.neo-item:last-child{border-bottom:none}
+.neo-dot{
+  width:10px;height:10px;border-radius:50%;
+  flex-shrink:0;margin-top:4px;
+}
+.neo-item h4{font-size:.76rem;font-weight:700;margin-bottom:2px}
+.neo-item p{font-size:.65rem;color:var(--text-muted)}
+.neo-cypher{
+  background:#07071a;
+  border:1px solid rgba(16,185,129,.2);
+  border-radius:8px;margin:12px 16px;
+  padding:12px;
+  font-family:var(--mono);font-size:.68rem;
+  color:#6ee7b7;line-height:1.8;
+}
+.cy-kw{color:#a5b4fc}
+.cy-fn{color:#f9a8d4}
+.cy-str{color:#fcd34d}
+
+/* ── EVAL DASHBOARD (Diagram 8) ──────────────────────────── */
+.eval-g{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+.ev-card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:12px;padding:18px;transition:all .2s;
+}
+.ev-card:hover{border-color:var(--border-hi);transform:translateY(-2px)}
+.ev-head{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:14px;padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+}
+.ev-icon{font-size:1.4rem}
+.ev-head h3{font-size:.85rem;font-weight:700}
+.ev-script{font-size:.62rem;color:var(--text-muted);font-family:var(--mono)}
+.mrow{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);
+}
+.mrow:last-child{border-bottom:none}
+.mlbl{font-size:.73rem;color:var(--text-dim)}
+.mval{font-size:.85rem;font-weight:700;font-family:var(--mono)}
+
+/* ── PROGRESS BAR ────────────────────────────────────────── */
+.prog-wrap{margin-top:6px}
+.prog-label{
+  display:flex;justify-content:space-between;
+  font-size:.65rem;color:var(--text-muted);margin-bottom:3px;
+}
+.prog-bar{height:5px;background:rgba(255,255,255,.07);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;transition:width 1s ease}
+
+/* ── DATA TABLE ───────────────────────────────────────────── */
+.tbl-wrap{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:12px;overflow:hidden;
+}
+table{width:100%;border-collapse:collapse;font-size:.8rem}
+thead th{
+  background:rgba(168,85,247,.1);color:#d8b4fe;
+  font-size:.68rem;font-weight:700;letter-spacing:.07em;
+  text-align:left;padding:10px 14px;
+  border-bottom:1px solid rgba(168,85,247,.2);
+}
+tbody td{
+  padding:9px 14px;
+  border-bottom:1px solid var(--border);
+  color:var(--text-dim);vertical-align:top;
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(255,255,255,.018)}
+.mono{font-family:var(--mono);font-size:.76rem;color:#a5b4fc}
+.num{color:#6ee7b7;font-weight:700;font-family:var(--mono)}
+.badge{
+  display:inline-block;padding:2px 8px;border-radius:4px;
+  font-size:.65rem;font-weight:600;
+}
+.b-blue{background:rgba(59,130,246,.15);color:#93c5fd}
+.b-purple{background:rgba(168,85,247,.15);color:#d8b4fe}
+.b-green{background:rgba(16,185,129,.15);color:#6ee7b7}
+.b-amber{background:rgba(245,158,11,.15);color:#fcd34d}
+.b-red{background:rgba(239,68,68,.15);color:#fca5a5}
+.b-teal{background:rgba(20,184,166,.15);color:#5eead4}
+.b-sky{background:rgba(56,189,248,.15);color:#7dd3fc}
+.b-pink{background:rgba(236,72,153,.15);color:#f9a8d4}
+
+/* ── MISC ─────────────────────────────────────────────────── */
+.down-arr{
+  display:flex;justify-content:center;
+  padding:8px 0;color:var(--text-muted);font-size:1.3rem;
+}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.card{
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:12px;padding:20px;
+}
+.card-head{
+  font-size:.78rem;font-weight:700;color:#d8b4fe;
+  margin-bottom:12px;padding-bottom:10px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-brand">PodcastIQ</span>
+  <a href="#overview">Overview</a>
+  <a href="#pipeline">Pipeline</a>
+  <a href="#snowflake">Snowflake Schema</a>
+  <a href="#agents">Agent System</a>
+  <a href="#enrichment">Enrichment</a>
+  <a href="#retrieval">Retrieval</a>
+  <a href="#factcheck">Fact-Check</a>
+  <a href="#neo4j">Knowledge Graph</a>
+  <a href="#evaluation">Evaluation</a>
+  <a href="#tables">Data Tables</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>PodcastIQ — Data Flow Diagrams</h1>
+  <p>Complete data flow from raw YouTube audio to AI-generated insights across 8 specialized agents</p>
+  <div class="hero-tags">
+    <span class="hero-tag">286 Episodes</span>
+    <span class="hero-tag">25 Channels</span>
+    <span class="hero-tag">84,260 Claims</span>
+    <span class="hero-tag">13,807 Chunks</span>
+    <span class="hero-tag">88,823 Graph Nodes</span>
+    <span class="hero-tag">9 LangGraph Agents</span>
+    <span class="hero-tag">Snowflake Cortex</span>
+    <span class="hero-tag">Neo4j GraphRAG</span>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 0 — CORPUS AT A GLANCE
+═══════════════════════════════════════════════════════ -->
+<div id="overview" class="section">
+  <div class="sec-label">CORPUS OVERVIEW</div>
+  <h2 class="sec-title">System at a Glance</h2>
+  <p class="sec-sub">Key numbers across the full PodcastIQ data pipeline</p>
+
+  <div class="kpi-row">
+    <div class="kpi c-blue">
+      <span class="kpi-val">286</span>
+      <div class="kpi-lbl">Episodes indexed<br>25 channels · 6 genres</div>
+    </div>
+    <div class="kpi c-purple">
+      <span class="kpi-val">13,807</span>
+      <div class="kpi-lbl">Transcript chunks<br>120s windows</div>
+    </div>
+    <div class="kpi c-green">
+      <span class="kpi-val">84,260</span>
+      <div class="kpi-lbl">Claims extracted<br>100% speaker-attributed</div>
+    </div>
+    <div class="kpi c-amber">
+      <span class="kpi-val">823</span>
+      <div class="kpi-lbl">Evolution pairs<br>temporal drift tracked</div>
+    </div>
+    <div class="kpi c-pink">
+      <span class="kpi-val">88,823</span>
+      <div class="kpi-lbl">Graph nodes<br>Neo4j knowledge graph</div>
+    </div>
+    <div class="kpi c-teal">
+      <span class="kpi-val">253,740</span>
+      <div class="kpi-lbl">Graph edges<br>relationships mapped</div>
+    </div>
+    <div class="kpi c-sky">
+      <span class="kpi-val">44mo</span>
+      <div class="kpi-lbl">Temporal coverage<br>Jan 2022 – Feb 2026</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 1 — END-TO-END PIPELINE
+═══════════════════════════════════════════════════════ -->
+<div id="pipeline" class="section">
+  <div class="sec-label">DIAGRAM 1</div>
+  <h2 class="sec-title">End-to-End Data Pipeline</h2>
+  <p class="sec-sub">Raw YouTube audio → structured intelligence, across 7 pipeline stages</p>
+
+  <div class="pipeline">
+
+    <!-- Stage 1: Extract -->
+    <div class="pstage ps1">
+      <div class="ps-step">STAGE 1</div>
+      <div class="ps-icon">📥</div>
+      <div class="ps-title">EXTRACT</div>
+      <div class="ps-tech">yt-dlp + YouTube Data API v3</div>
+      <ul class="ps-items">
+        <li>25 curated channels</li>
+        <li>6 genres (AI, Health, VC, Business, Science, Society)</li>
+        <li>WebVTT auto-captions download</li>
+        <li>Metadata: title, date, guests, description, tags</li>
+        <li>~90% transcript accuracy</li>
+      </ul>
+      <div class="ps-stat">286 episodes · 25 channels</div>
+    </div>
+
+    <!-- Stage 2: Load -->
+    <div class="pstage ps2">
+      <div class="ps-step">STAGE 2</div>
+      <div class="ps-icon">📦</div>
+      <div class="ps-title">LOAD</div>
+      <div class="ps-tech">snowflake_loader.py</div>
+      <ul class="ps-items">
+        <li>PUT → Snowflake internal stage</li>
+        <li>COPY INTO RAW.EPISODES</li>
+        <li>VARIANT column (full JSON)</li>
+        <li>Key-pair auth (no password)</li>
+        <li>~50ms per episode</li>
+      </ul>
+      <div class="ps-stat">RAW.EPISODES · 286 VARIANT rows</div>
+    </div>
+
+    <!-- Stage 3: Transform -->
+    <div class="pstage ps3">
+      <div class="ps-step">STAGE 3</div>
+      <div class="ps-icon">🔧</div>
+      <div class="ps-title">TRANSFORM</div>
+      <div class="ps-tech">Snowflake SQL Views</div>
+      <ul class="ps-items">
+        <li>STG_EPISODES: VARIANT → 22 typed cols</li>
+        <li>STG_SEGMENTS: LATERAL FLATTEN → 1 row/cue</li>
+        <li>INT_EPISODES: + quality + engagement rate</li>
+        <li>INT_SEGMENTS: + YouTube timestamp URL</li>
+        <li>Views = zero storage cost</li>
+      </ul>
+      <div class="ps-stat">4 SQL views (zero storage cost)</div>
+    </div>
+
+    <!-- Stage 4: Chunk -->
+    <div class="pstage ps4">
+      <div class="ps-step">STAGE 4</div>
+      <div class="ps-icon">✂️</div>
+      <div class="ps-title">CHUNK</div>
+      <div class="ps-tech">CUR_CHUNKS · Snowflake SQL</div>
+      <ul class="ps-items">
+        <li>120-second sliding windows</li>
+        <li>15-second overlap (context continuity)</li>
+        <li>Deep-link per chunk: youtube.com/watch?v=ID&amp;t=SEC</li>
+        <li>Word count + quality score per chunk</li>
+        <li>~48 chunks per episode avg</li>
+      </ul>
+      <div class="ps-stat">13,807 chunks · 100% with embeddings</div>
+    </div>
+
+    <!-- Stage 5: Enrich -->
+    <div class="pstage ps5">
+      <div class="ps-step">STAGE 5</div>
+      <div class="ps-icon">🧠</div>
+      <div class="ps-title">ENRICH</div>
+      <div class="ps-tech">Snowflake Cortex · llama3.1-70b</div>
+      <ul class="ps-items">
+        <li>Arctic-embed-m → 768-dim vectors</li>
+        <li>Topic extraction (2–5 per chunk)</li>
+        <li>Named entity recognition (people, orgs)</li>
+        <li>Structured claim extraction + speaker attribution</li>
+        <li>Temporal evolution detection + drift scoring</li>
+      </ul>
+      <div class="ps-stat">84,260 claims · 823 evolution pairs</div>
+    </div>
+
+    <!-- Stage 6: Index -->
+    <div class="pstage ps6">
+      <div class="ps-step">STAGE 6</div>
+      <div class="ps-icon">🔍</div>
+      <div class="ps-title">INDEX</div>
+      <div class="ps-tech">Cortex Search + Neo4j</div>
+      <ul class="ps-items">
+        <li>PODCASTIQ_SEARCH: hybrid BM25 + vector</li>
+        <li>Auto re-ranking via Cortex cross-encoder</li>
+        <li>Neo4j: 88,823 nodes, 253,740 edges</li>
+        <li>Node types: Person, Episode, Topic, Claim, Channel</li>
+        <li>Cypher queries for graph traversal</li>
+      </ul>
+      <div class="ps-stat">Cortex Search + Neo4j live</div>
+    </div>
+
+    <!-- Stage 7: Serve -->
+    <div class="pstage ps7">
+      <div class="ps-step">STAGE 7</div>
+      <div class="ps-icon">🖥️</div>
+      <div class="ps-title">SERVE</div>
+      <div class="ps-tech">LangGraph + Streamlit</div>
+      <ul class="ps-items">
+        <li>Router → 8 specialized agents</li>
+        <li>Input guardrails (length, injection, scope, language)</li>
+        <li>Chat interface with source cards</li>
+        <li>Graph Explorer (pyvis force-directed)</li>
+        <li>Channel Dashboard + real-person disclaimer</li>
+      </ul>
+      <div class="ps-stat">3 UI pages · 9 agents · &lt;5s p95</div>
+    </div>
+
+  </div><!-- /pipeline -->
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 2 — SNOWFLAKE SCHEMA
+═══════════════════════════════════════════════════════ -->
+<div id="snowflake" class="section">
+  <div class="sec-label">DIAGRAM 2</div>
+  <h2 class="sec-title">Snowflake 4-Layer Data Architecture</h2>
+  <p class="sec-sub">Progressive enrichment from raw VARIANT payloads to AI-annotated semantic tables</p>
+
+  <div class="sf-grid">
+
+    <!-- RAW -->
+    <div class="sf-layer l-raw">
+      <div class="sf-lh">
+        <span class="sf-badge">RAW</span>
+        <h3>Source Layer</h3>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">EPISODES</div>
+        <div class="sf-tbl-desc">One row per video.<br>raw_data VARIANT (full merged JSON payload)<br>video_id PK · loaded_at TIMESTAMP</div>
+        <span class="sf-cnt">286 rows</span>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">CHANNELS</div>
+        <div class="sf-tbl-desc">channel_id · channel_name · genre · youtube_url</div>
+        <span class="sf-cnt">25 rows</span>
+      </div>
+      <div class="sf-note">Source of truth. Never modified after load.</div>
+    </div>
+
+    <!-- STAGING -->
+    <div class="sf-layer l-stg">
+      <div class="sf-lh">
+        <span class="sf-badge">STAGING</span>
+        <h3>View Layer</h3>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">STG_EPISODES</div>
+        <div class="sf-tbl-desc">raw_data:title::VARCHAR<br>raw_data:publish_date::DATE<br>22 typed flat columns from VARIANT</div>
+        <span class="sf-cnt">View — no storage</span>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">STG_SEGMENTS</div>
+        <div class="sf-tbl-desc">LATERAL FLATTEN(raw_data:transcript)<br>1 row per WebVTT cue → text, start, duration</div>
+        <span class="sf-cnt">View — no storage</span>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">INT_EPISODES</div>
+        <div class="sf-tbl-desc">JOIN STG_EPISODES + CHANNELS<br>+ TRANSCRIPT_QUALITY (word count check)<br>+ ENGAGEMENT_RATE (views/day)</div>
+        <span class="sf-cnt">View — no storage</span>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">INT_SEGMENTS</div>
+        <div class="sf-tbl-desc">+ YOUTUBE_TIMESTAMP_URL (&amp;t=Ns)<br>+ WORD_COUNT per segment<br>+ CUMULATIVE_SECONDS</div>
+        <span class="sf-cnt">View — no storage</span>
+      </div>
+      <div class="sf-note">All views. Zero additional storage cost.</div>
+    </div>
+
+    <!-- CURATED -->
+    <div class="sf-layer l-cur">
+      <div class="sf-lh">
+        <span class="sf-badge">CURATED</span>
+        <h3>Chunked Layer</h3>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">CUR_CHUNKS</div>
+        <div class="sf-tbl-desc">
+          chunk_id VARCHAR PK<br>
+          video_id · channel_name<br>
+          episode_title · genre<br>
+          chunk_text VARCHAR (merged cues)<br>
+          chunk_window FLOAT (window #)<br>
+          publish_date TIMESTAMP<br>
+          youtube_url VARCHAR (deep-link)<br>
+          word_count · transcript_quality
+        </div>
+        <span class="sf-cnt">13,807 rows</span>
+      </div>
+      <div class="sf-note">120s sliding windows, 15s overlap. One YouTube deep-link per chunk.</div>
+    </div>
+
+    <!-- SEMANTIC -->
+    <div class="sf-layer l-sem">
+      <div class="sf-lh">
+        <span class="sf-badge">SEMANTIC</span>
+        <h3>AI-Enriched Layer</h3>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">SEM_CHUNK_EMBEDDINGS</div>
+        <div class="sf-tbl-desc">chunk_id FK<br>embedding VECTOR(FLOAT, 768)<br>Arctic-embed-m model</div>
+        <span class="sf-cnt">13,807 rows · 100%</span>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">SEM_CLAIMS</div>
+        <div class="sf-tbl-desc">claim_id PK · chunk_id FK<br>claim_text · claim_type · speaker<br>speaker_role · attribution_confidence<br>verification_status · youtube_url</div>
+        <span class="sf-cnt">84,260 rows</span>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">SEM_CLAIM_EVOLUTION</div>
+        <div class="sf-tbl-desc">original_claim_id → evolved_claim_id<br>drift_type · similarity_score<br>time_delta_days · analysis text</div>
+        <span class="sf-cnt">823 pairs</span>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">SEM_EPISODE_PARTICIPANTS</div>
+        <div class="sf-tbl-desc">participant_name · role HOST/GUEST<br>extraction_method · confidence</div>
+        <span class="sf-cnt">683 records</span>
+      </div>
+      <div class="sf-tbl">
+        <div class="sf-tbl-name">PODCASTIQ_SEARCH</div>
+        <div class="sf-tbl-desc">Cortex Search Service<br>Hybrid BM25 + vector over CUR_CHUNKS<br>Auto LLM re-ranking</div>
+        <span class="sf-cnt">Live service</span>
+      </div>
+    </div>
+
+  </div><!-- /sf-grid -->
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 3 — AGENT SYSTEM
+═══════════════════════════════════════════════════════ -->
+<div id="agents" class="section">
+  <div class="sec-label">DIAGRAM 3</div>
+  <h2 class="sec-title">LangGraph Multi-Agent Routing System</h2>
+  <p class="sec-sub">Router classifies each query into one of 8 intent types and dispatches to the correct specialized agent</p>
+
+  <div class="agent-sys">
+
+    <!-- Router -->
+    <div class="router-card">
+      <div style="font-size:1.8rem;margin-bottom:8px">🎯</div>
+      <h3>Router Agent</h3>
+      <div class="rc-model">llama3.1-8b</div>
+      <div class="rc-acc">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span>8b accuracy</span><span style="color:#6ee7b7;font-weight:700">87.5%</span>
+        </div>
+        <div class="rc-bar"><div class="rc-bar-inner" style="width:87.5%;background:linear-gradient(90deg,#10b981,#3b82f6)"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span>70b accuracy</span><span style="color:#6ee7b7;font-weight:700">93.8%</span>
+        </div>
+        <div class="rc-bar"><div class="rc-bar-inner" style="width:93.8%;background:linear-gradient(90deg,#10b981,#a855f7)"></div></div>
+        <br>
+        <div style="font-size:.65rem;color:var(--text-muted)">Input guardrails run <em>before</em> routing: length · injection · scope · language</div>
+      </div>
+    </div>
+
+    <!-- 8 Agent cards -->
+    <div class="agents-g">
+
+      <div class="ac">
+        <div class="ac-icon">🔎</div>
+        <div class="ac-name">Search Agent</div>
+        <div class="ac-trigger">Specific clips, quotes, or moments about a topic</div>
+        <div class="ac-model">Cortex Search · SEARCH_PREVIEW</div>
+        <div class="ac-model">Top-8 hybrid results (BM25 + vector)</div>
+        <span class="ac-out b-blue">→ search_results[ ]</span>
+      </div>
+
+      <div class="ac">
+        <div class="ac-icon">📝</div>
+        <div class="ac-name">Summarization Agent</div>
+        <div class="ac-trigger">Learn about a topic — knowledge questions</div>
+        <div class="ac-model">Cortex Search → llama3.1-70b</div>
+        <div class="ac-model">Top-5 chunks → synthesis</div>
+        <span class="ac-out b-purple">→ summary str</span>
+      </div>
+
+      <div class="ac">
+        <div class="ac-icon">🕸️</div>
+        <div class="ac-name">Knowledge Graph Agent</div>
+        <div class="ac-trigger">Relationships, appearances, networks</div>
+        <div class="ac-model">Neo4j Cypher queries</div>
+        <div class="ac-model">CO_APPEARED_WITH edges</div>
+        <span class="ac-out b-green">→ graph_results{ }</span>
+      </div>
+
+      <div class="ac">
+        <div class="ac-icon">⏳</div>
+        <div class="ac-name">Temporal Agent</div>
+        <div class="ac-trigger">How claims evolved or changed over time</div>
+        <div class="ac-model">SEM_CLAIM_EVOLUTION SQL</div>
+        <div class="ac-model">Same-speaker pairs preferred · llama3.1-70b</div>
+        <span class="ac-out b-amber">→ temporal_pairs[ ]</span>
+      </div>
+
+      <div class="ac">
+        <div class="ac-icon">✅</div>
+        <div class="ac-name">Fact-Check Agent</div>
+        <div class="ac-trigger">Verify whether a specific claim is true/false</div>
+        <div class="ac-model">Stage 1: llama3.1-70b pre-filter</div>
+        <div class="ac-model">Stage 2: Brave Search MCP (5 sources)</div>
+        <span class="ac-out b-red">→ factcheck_result{ }</span>
+      </div>
+
+      <div class="ac">
+        <div class="ac-icon">⚖️</div>
+        <div class="ac-name">Comparison Agent</div>
+        <div class="ac-trigger">Compare viewpoints of two speakers</div>
+        <div class="ac-model">SEM_CLAIMS WHERE speaker IN (A, B)</div>
+        <div class="ac-model">Group by speaker · llama3.1-70b</div>
+        <span class="ac-out b-teal">→ comparison str</span>
+      </div>
+
+      <div class="ac">
+        <div class="ac-icon">💡</div>
+        <div class="ac-name">Recommendation Agent</div>
+        <div class="ac-trigger">Episode or show suggestions to watch</div>
+        <div class="ac-model">SEM_EPISODE_PARTICIPANTS + topic match</div>
+        <div class="ac-model">Dedup by (title, channel) · llama3.1-70b</div>
+        <span class="ac-out b-sky">→ recommendations[ ]</span>
+      </div>
+
+      <div class="ac">
+        <div class="ac-icon">📊</div>
+        <div class="ac-name">Insight Agent</div>
+        <div class="ac-trigger">Meta-analysis about channels or speakers</div>
+        <div class="ac-model">SEM_CLAIMS GROUP BY channel</div>
+        <div class="ac-model">COUNT contradictions · llama3.1-70b</div>
+        <span class="ac-out b-pink">→ insight_summary str</span>
+      </div>
+
+    </div><!-- /agents-g -->
+  </div><!-- /agent-sys -->
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 4 — SEMANTIC ENRICHMENT
+═══════════════════════════════════════════════════════ -->
+<div id="enrichment" class="section">
+  <div class="sec-label">DIAGRAM 4</div>
+  <h2 class="sec-title">Semantic Enrichment Pipelines</h2>
+  <p class="sec-sub">Six parallel Cortex AI pipelines run against CUR_CHUNKS to produce the full SEMANTIC layer</p>
+
+  <div class="enrich-wrap">
+    <div class="enrich-src">
+      <div style="font-size:1.6rem;margin-bottom:8px">✂️</div>
+      <h3>CUR_CHUNKS</h3>
+      <div class="e-stat" style="margin:8px 0">13,807 rows<br>120s windows<br>YouTube deep-links</div>
+      <div style="font-size:.65rem;color:var(--text-muted)">Input to all 6 enrichment pipelines simultaneously</div>
+    </div>
+
+    <div class="enrich-arrow" style="height:100%;align-items:center">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+        <div style="font-size:.65rem;color:var(--text-muted)">6×</div>
+        <div class="arr-h"></div>
+      </div>
+    </div>
+
+    <div class="pipes-g">
+
+      <div class="pc">
+        <div class="pc-head">
+          <span class="pc-icon">🔢</span>
+          <h4 style="color:#93c5fd">Embedding Pipeline</h4>
+        </div>
+        <div class="pc-model">SNOWFLAKE.CORTEX.EMBED_TEXT_768<br>arctic-embed-m model</div>
+        <div class="pc-fields">
+          chunk_id  VARCHAR<br>
+          embedding VECTOR(FLOAT, 768)
+        </div>
+        <span class="pc-count b-blue">13,807 vectors · 100%</span>
+      </div>
+
+      <div class="pc">
+        <div class="pc-head">
+          <span class="pc-icon">🏷️</span>
+          <h4 style="color:#a5b4fc">Topic Extraction</h4>
+        </div>
+        <div class="pc-model">llama3.1-70b<br>"Extract 2-5 topics from this chunk"</div>
+        <div class="pc-fields">
+          chunk_id · topic<br>
+          confidence (HIGH/MED/LOW)
+        </div>
+        <span class="pc-count b-purple">SEM_CHUNK_TOPICS</span>
+      </div>
+
+      <div class="pc">
+        <div class="pc-head">
+          <span class="pc-icon">👤</span>
+          <h4 style="color:#c4b5fd">Named Entity Recognition</h4>
+        </div>
+        <div class="pc-model">llama3.1-70b<br>PERSON · ORG · TECH · PRODUCT</div>
+        <div class="pc-fields">
+          chunk_id · entity_name<br>
+          entity_type · confidence
+        </div>
+        <span class="pc-count b-violet" style="background:rgba(139,92,246,.15);color:#c4b5fd">SEM_CHUNK_ENTITIES</span>
+      </div>
+
+      <div class="pc">
+        <div class="pc-head">
+          <span class="pc-icon">💬</span>
+          <h4 style="color:#d8b4fe">Claim Extraction</h4>
+        </div>
+        <div class="pc-model">llama3.1-70b · structured JSON output<br>2-tier speaker attribution</div>
+        <div class="pc-fields">
+          claim_text · claim_type<br>
+          speaker · speaker_role<br>
+          attribution_confidence<br>
+          sentiment · claim_date
+        </div>
+        <span class="pc-count b-purple">84,260 claims · 100% attributed</span>
+      </div>
+
+      <div class="pc">
+        <div class="pc-head">
+          <span class="pc-icon">👥</span>
+          <h4 style="color:#f9a8d4">Participant Extraction</h4>
+        </div>
+        <div class="pc-model">Title parsing + LLM inference<br>when title is ambiguous</div>
+        <div class="pc-fields">
+          participant_name<br>
+          role  HOST / GUEST<br>
+          extraction_method<br>
+          confidence score
+        </div>
+        <span class="pc-count b-pink">683 host/guest records</span>
+      </div>
+
+      <div class="pc">
+        <div class="pc-head">
+          <span class="pc-icon">🔄</span>
+          <h4 style="color:#fcd34d">Temporal Evolution</h4>
+        </div>
+        <div class="pc-model">Cosine similarity scan → drift classifier<br>llama3.1-70b</div>
+        <div class="pc-fields">
+          original_claim_id<br>
+          evolved_claim_id<br>
+          drift_type · similarity_score<br>
+          time_delta_days · analysis
+        </div>
+        <span class="pc-count b-amber">823 pairs · 5 drift types</span>
+      </div>
+
+    </div><!-- /pipes-g -->
+  </div><!-- /enrich-wrap -->
+
+  <!-- Drift types breakdown -->
+  <div style="margin-top:20px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+    <div style="background:var(--bg3);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:1.3rem;font-weight:800;color:#fca5a5;font-family:var(--mono)">396</div>
+      <div style="font-size:.68rem;color:var(--text-muted);margin-top:4px">CONTRADICTED<br>Complete reversal</div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:1.3rem;font-weight:800;color:#fcd34d;font-family:var(--mono)">237</div>
+      <div style="font-size:.68rem;color:var(--text-muted);margin-top:4px">ESCALATED<br>Stronger claim</div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:1.3rem;font-weight:800;color:#6ee7b7;font-family:var(--mono)">128</div>
+      <div style="font-size:.68rem;color:var(--text-muted);margin-top:4px">CONFIRMED<br>Reinforced later</div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid rgba(56,189,248,.25);border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:1.3rem;font-weight:800;color:#7dd3fc;font-family:var(--mono)">39</div>
+      <div style="font-size:.68rem;color:var(--text-muted);margin-top:4px">SOFTENED<br>Walked back</div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid rgba(168,85,247,.25);border-radius:8px;padding:12px;text-align:center">
+      <div style="font-size:1.3rem;font-weight:800;color:#d8b4fe;font-family:var(--mono)">23</div>
+      <div style="font-size:.68rem;color:var(--text-muted);margin-top:4px">REVISED<br>Refined wording</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 5 — HYBRID RETRIEVAL
+═══════════════════════════════════════════════════════ -->
+<div id="retrieval" class="section">
+  <div class="sec-label">DIAGRAM 5</div>
+  <h2 class="sec-title">Hybrid Retrieval Architecture</h2>
+  <p class="sec-sub">Three independent retrieval paths converge into LLM context — vector search, graph traversal, and SQL analytics</p>
+
+  <div class="ret-top">
+    🔍 &nbsp; User Query &nbsp;→&nbsp; Router selects retrieval strategy based on intent type
+  </div>
+
+  <div class="ret-arrow-row">
+    <span>↓</span><span>↓</span><span>↓</span>
+  </div>
+
+  <div class="ret-paths">
+
+    <!-- Path 1: Cortex Search -->
+    <div class="rp" style="border-top:2px solid #3b82f6">
+      <div class="rp-head">
+        <span class="rp-icon">⚡</span>
+        <div>
+          <h4 style="color:#93c5fd">Cortex Search</h4>
+          <div style="font-size:.65rem;color:var(--text-muted)">Used by: Search · Summarize · Compare · Recommend · FactCheck</div>
+        </div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(59,130,246,.2);color:#93c5fd">1</span>
+        <div><strong>BM25 Keyword Index</strong><br>TF-IDF sparse matching on CHUNK_TEXT for exact term overlap</div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(59,130,246,.2);color:#93c5fd">2</span>
+        <div><strong>Vector Search (ANN)</strong><br>Approximate nearest neighbour over 13,807 Arctic-embed-m 768-dim vectors</div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(59,130,246,.2);color:#93c5fd">3</span>
+        <div><strong>Cortex Re-Ranker</strong><br>LLM cross-encoder re-scores combined candidates, boosts semantic matches</div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(59,130,246,.2);color:#93c5fd">4</span>
+        <div><strong>Top-8 Results</strong><br>Returns CHUNK_TEXT + EPISODE_TITLE + CHANNEL_NAME + YOUTUBE_URL</div>
+      </div>
+    </div>
+
+    <!-- Path 2: Neo4j -->
+    <div class="rp" style="border-top:2px solid #10b981">
+      <div class="rp-head">
+        <span class="rp-icon">🕸️</span>
+        <div>
+          <h4 style="color:#6ee7b7">Neo4j Graph Traversal</h4>
+          <div style="font-size:.65rem;color:var(--text-muted)">Used by: Knowledge Graph · Recommendation</div>
+        </div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(16,185,129,.2);color:#6ee7b7">1</span>
+        <div><strong>Entity Lookup</strong><br>Match query entities to Person/Topic nodes in graph</div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(16,185,129,.2);color:#6ee7b7">2</span>
+        <div><strong>Cypher Traversal</strong><br>MATCH (p)-[:CO_APPEARED_WITH|MADE_CLAIM|DISCUSSED]-&gt;(n) RETURN n</div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(16,185,129,.2);color:#6ee7b7">3</span>
+        <div><strong>Relationship Scoring</strong><br>Count + weight edges by appearance frequency and recency</div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(16,185,129,.2);color:#6ee7b7">4</span>
+        <div><strong>Subgraph Return</strong><br>Connected nodes + edge metadata → structured context for LLM</div>
+      </div>
+    </div>
+
+    <!-- Path 3: SQL Analytics -->
+    <div class="rp" style="border-top:2px solid #a855f7">
+      <div class="rp-head">
+        <span class="rp-icon">📊</span>
+        <div>
+          <h4 style="color:#d8b4fe">Direct SQL Analytics</h4>
+          <div style="font-size:.65rem;color:var(--text-muted)">Used by: Temporal · Comparison · Insight</div>
+        </div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(168,85,247,.2);color:#d8b4fe">1</span>
+        <div><strong>SEM_CLAIMS Query</strong><br>Filter by speaker, topic, date range; return structured claim rows</div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(168,85,247,.2);color:#d8b4fe">2</span>
+        <div><strong>SEM_CLAIM_EVOLUTION JOIN</strong><br>Link original→evolved claim pairs, filter by DRIFT_TYPE</div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(168,85,247,.2);color:#d8b4fe">3</span>
+        <div><strong>Aggregation</strong><br>GROUP BY channel/speaker, COUNT contradictions, rank by frequency</div>
+      </div>
+      <div class="rp-step">
+        <span class="step-n" style="background:rgba(168,85,247,.2);color:#d8b4fe">4</span>
+        <div><strong>Structured Results</strong><br>Typed rows with YouTube URLs passed directly to LLM prompt</div>
+      </div>
+    </div>
+
+  </div><!-- /ret-paths -->
+
+  <div class="ret-arrow-row">
+    <span>↓</span><span>↓</span><span>↓</span>
+  </div>
+
+  <div class="ret-merge">
+    <strong>Retrieved Context</strong> passed to <strong>llama3.1-70b</strong> via Cortex COMPLETE() with agent-specific system prompt →
+    structured response returned to Streamlit renderer
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 6 — FACT-CHECK PIPELINE
+═══════════════════════════════════════════════════════ -->
+<div id="factcheck" class="section">
+  <div class="sec-label">DIAGRAM 6</div>
+  <h2 class="sec-title">Hybrid Fact-Check Pipeline</h2>
+  <p class="sec-sub">Two-stage verification: LLM pre-filter resolves ~60–70% of claims without web search; Brave Search MCP handles the rest</p>
+
+  <div class="fc-grid">
+
+    <!-- Input -->
+    <div class="fc-box" style="border-top:2px solid #3b82f6">
+      <div class="fc-head" style="background:rgba(59,130,246,.12);color:#93c5fd">INPUT CLAIM</div>
+      <div class="fc-item">User submits claim for verification<br><em style="color:var(--text-muted)">"GPT-5 was released in 2024"</em></div>
+      <div class="fc-item">Guardrails pass (scope + injection check)</div>
+      <div class="fc-item">Router classifies as FACTCHECK</div>
+      <div class="fc-item">Cortex Search retrieves related chunks for context</div>
+      <div class="fc-item">Claim sent to Stage 1</div>
+    </div>
+
+    <div class="fc-arr">→</div>
+
+    <!-- Stage 1 -->
+    <div class="fc-box" style="border-top:2px solid #a855f7">
+      <div class="fc-head" style="background:rgba(168,85,247,.12);color:#d8b4fe">STAGE 1 — LLM PRE-FILTER</div>
+      <div class="fc-item"><strong style="color:#d8b4fe">Model:</strong> llama3.1-70b via Cortex</div>
+      <div class="fc-item"><strong style="color:#d8b4fe">Input:</strong> Claim text + retrieved podcast context chunks</div>
+      <div class="fc-item"><strong style="color:#d8b4fe">Task:</strong> Assess claim using training knowledge</div>
+      <div class="fc-item"><strong style="color:#d8b4fe">Output:</strong> Verdict + confidence score (0–1)</div>
+      <div class="fc-item"><strong style="color:#d8b4fe">Route:</strong> If confidence ≥ 0.85 → resolve here (~60-70%)<br>If confidence &lt; 0.85 → escalate to Stage 2</div>
+      <div class="vd-grid">
+        <div class="vd" style="background:rgba(16,185,129,.15);color:#6ee7b7">VERIFIED</div>
+        <div class="vd" style="background:rgba(239,68,68,.15);color:#fca5a5">FALSE</div>
+      </div>
+    </div>
+
+    <div class="fc-arr">→</div>
+
+    <!-- Stage 2 -->
+    <div class="fc-box" style="border-top:2px solid #10b981">
+      <div class="fc-head" style="background:rgba(16,185,129,.1);color:#6ee7b7">STAGE 2 — WEB VERIFICATION</div>
+      <div class="fc-item"><strong style="color:#6ee7b7">Tool:</strong> MCP Brave Search API</div>
+      <div class="fc-item"><strong style="color:#6ee7b7">Query:</strong> Claim text → 5 web results (title + URL + snippet)</div>
+      <div class="fc-item"><strong style="color:#6ee7b7">Synthesis:</strong> llama3.1-70b reads web evidence + podcast context → final verdict</div>
+      <div class="fc-item"><strong style="color:#6ee7b7">Stored in:</strong> SEM_CLAIMS.EVIDENCE_URLS array</div>
+      <div class="vd-grid">
+        <div class="vd" style="background:rgba(16,185,129,.15);color:#6ee7b7">VERIFIED</div>
+        <div class="vd" style="background:rgba(245,158,11,.15);color:#fcd34d">OUTDATED</div>
+        <div class="vd" style="background:rgba(99,102,241,.15);color:#a5b4fc">DISPUTED</div>
+        <div class="vd" style="background:rgba(100,116,139,.15);color:#94a3b8">UNVERIFIED</div>
+      </div>
+    </div>
+
+  </div><!-- /fc-grid -->
+
+  <!-- Examples -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px">
+    <div style="background:var(--bg3);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:14px">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;color:#fca5a5;margin-bottom:6px">LLM-ONLY EXAMPLE</div>
+      <div style="font-size:.78rem;margin-bottom:6px"><strong>Claim:</strong> "GPT-5 was released in 2024"</div>
+      <div style="font-size:.72rem;color:var(--text-muted)">LLM confident from training knowledge → <strong style="color:#fca5a5">FALSE</strong> (resolved in Stage 1, no web call)</div>
+    </div>
+    <div style="background:var(--bg3);border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:14px">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.1em;color:#6ee7b7;margin-bottom:6px">BRAVE SEARCH EXAMPLE</div>
+      <div style="font-size:.78rem;margin-bottom:6px"><strong>Claim:</strong> "Sam Altman was fired from OpenAI in November 2023"</div>
+      <div style="font-size:.72rem;color:var(--text-muted)">Web search → 5 sources (Wikipedia, CNBC, Livemint) → <strong style="color:#6ee7b7">VERIFIED</strong> with evidence URLs displayed</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 7 — NEO4J KNOWLEDGE GRAPH
+═══════════════════════════════════════════════════════ -->
+<div id="neo4j" class="section">
+  <div class="sec-label">DIAGRAM 7</div>
+  <h2 class="sec-title">Neo4j Knowledge Graph Schema</h2>
+  <p class="sec-sub">88,823 nodes and 253,740 relationships enabling GraphRAG — relationship reasoning beyond what vector search can provide</p>
+
+  <div class="neo-wrap">
+
+    <!-- Nodes panel -->
+    <div class="neo-panel">
+      <div class="neo-panel-head">🔵 Node Types</div>
+
+      <div class="neo-item">
+        <div class="neo-dot" style="background:#3b82f6"></div>
+        <div><h4 style="color:#93c5fd">Person</h4><p>name, type (HOST/GUEST/EXPERT). Entity-resolved to merge duplicate name variants.</p></div>
+      </div>
+      <div class="neo-item">
+        <div class="neo-dot" style="background:#a855f7"></div>
+        <div><h4 style="color:#d8b4fe">Episode</h4><p>video_id, title, channel, publish_date. Links hosts → guests → topics → claims.</p></div>
+      </div>
+      <div class="neo-item">
+        <div class="neo-dot" style="background:#ec4899"></div>
+        <div><h4 style="color:#f9a8d4">Claim</h4><p>claim_text, claim_type, date, speaker. Includes EVOLVED_FROM edges for temporal linking.</p></div>
+      </div>
+      <div class="neo-item">
+        <div class="neo-dot" style="background:#10b981"></div>
+        <div><h4 style="color:#6ee7b7">Topic</h4><p>name (e.g. "AI Safety", "Longevity"). Connected to episodes + persons via DISCUSSED edges.</p></div>
+      </div>
+      <div class="neo-item">
+        <div class="neo-dot" style="background:#f59e0b"></div>
+        <div><h4 style="color:#fcd34d">Channel</h4><p>name, genre. Hub node — every episode and host belongs to exactly one channel.</p></div>
+      </div>
+      <div class="neo-item">
+        <div class="neo-dot" style="background:#38bdf8"></div>
+        <div><h4 style="color:#7dd3fc">Organization</h4><p>name (e.g. "OpenAI", "Anthropic"). Linked to persons via AFFILIATED_WITH.</p></div>
+      </div>
+    </div>
+
+    <!-- Edges + Cypher -->
+    <div>
+      <div class="neo-panel" style="margin-bottom:14px">
+        <div class="neo-panel-head">🔗 Edge Types (253,740 total)</div>
+        <div class="neo-item"><div class="neo-dot" style="background:#6366f1"></div><div><h4 style="color:#a5b4fc">APPEARED_ON</h4><p>Person → Episode. role: HOST or GUEST</p></div></div>
+        <div class="neo-item"><div class="neo-dot" style="background:#6366f1"></div><div><h4 style="color:#a5b4fc">CO_APPEARED_WITH</h4><p>Person ↔ Person. count + episodes[] array. Bidirectional.</p></div></div>
+        <div class="neo-item"><div class="neo-dot" style="background:#6366f1"></div><div><h4 style="color:#a5b4fc">MADE_CLAIM</h4><p>Person → Claim. attribution_confidence score</p></div></div>
+        <div class="neo-item"><div class="neo-dot" style="background:#6366f1"></div><div><h4 style="color:#a5b4fc">DISCUSSED</h4><p>Episode → Topic. frequency count</p></div></div>
+        <div class="neo-item"><div class="neo-dot" style="background:#6366f1"></div><div><h4 style="color:#a5b4fc">EVOLVED_FROM</h4><p>Claim → Claim. drift_type + time_delta_days</p></div></div>
+        <div class="neo-item"><div class="neo-dot" style="background:#6366f1"></div><div><h4 style="color:#a5b4fc">AFFILIATED_WITH</h4><p>Person → Organization</p></div></div>
+      </div>
+
+      <!-- Cypher examples -->
+      <div class="neo-panel">
+        <div class="neo-panel-head">⌨️ Example Cypher Queries</div>
+        <div class="neo-cypher">
+<span class="cy-kw">// Guest network query</span><br>
+<span class="cy-kw">MATCH</span> (p:Person {name: <span class="cy-str">'Sam Altman'</span>})<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-[r:CO_APPEARED_WITH]-&gt;(co:Person)<br>
+<span class="cy-kw">RETURN</span> co.name, r.count<br>
+<span class="cy-kw">ORDER BY</span> r.count <span class="cy-kw">DESC LIMIT</span> 10</div>
+        <div class="neo-cypher">
+<span class="cy-kw">// Temporal contradiction query</span><br>
+<span class="cy-kw">MATCH</span> (c1:Claim)-[e:EVOLVED_FROM]-&gt;(c2:Claim)<br>
+<span class="cy-kw">WHERE</span> e.drift_type = <span class="cy-str">'CONTRADICTED'</span><br>
+&nbsp;&nbsp;&nbsp;<span class="cy-kw">AND</span> c1.speaker = <span class="cy-str">'Marc Andreessen'</span><br>
+<span class="cy-kw">RETURN</span> c1.claim_text, c2.claim_text,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e.time_delta_days<br>
+<span class="cy-kw">ORDER BY</span> e.time_delta_days</div>
+      </div>
+    </div>
+
+  </div><!-- /neo-wrap -->
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 8 — EVALUATION DASHBOARD
+═══════════════════════════════════════════════════════ -->
+<div id="evaluation" class="section">
+  <div class="sec-label">DIAGRAM 8</div>
+  <h2 class="sec-title">Evaluation Results Dashboard</h2>
+  <p class="sec-sub">Automated evaluation suite across 6 dimensions — router accuracy, retrieval quality, generation quality, latency, cost, and domain KPIs</p>
+
+  <div class="eval-g">
+
+    <!-- Router -->
+    <div class="ev-card" style="border-top:2px solid #a855f7">
+      <div class="ev-head">
+        <span class="ev-icon">🎯</span>
+        <div>
+          <h3>Router Accuracy</h3>
+          <div class="ev-script">router_eval.py · 48 queries × 8 types</div>
+        </div>
+      </div>
+      <div class="mrow"><span class="mlbl">llama3.1-8b overall</span><span class="mval" style="color:#d8b4fe">87.5%</span></div>
+      <div style="margin:4px 0 10px">
+        <div class="prog-bar"><div class="prog-fill" style="width:87.5%;background:linear-gradient(90deg,#7c3aed,#a855f7)"></div></div>
+      </div>
+      <div class="mrow"><span class="mlbl">llama3.1-70b (ablation)</span><span class="mval" style="color:#d8b4fe">93.8%</span></div>
+      <div style="margin:4px 0 10px">
+        <div class="prog-bar"><div class="prog-fill" style="width:93.8%;background:linear-gradient(90deg,#a855f7,#ec4899)"></div></div>
+      </div>
+      <div class="mrow"><span class="mlbl">Ablation delta (70b vs 8b)</span><span class="mval" style="color:#6ee7b7">+6.3%</span></div>
+      <div class="mrow"><span class="mlbl">Perfect types (8b)</span><span class="mval" style="color:#fcd34d">COMPARE · FACTCHECK · TEMPORAL</span></div>
+      <div class="mrow"><span class="mlbl">Weakest type (8b)</span><span class="mval" style="color:#fca5a5">SEARCH 66.7%</span></div>
+    </div>
+
+    <!-- Retrieval -->
+    <div class="ev-card" style="border-top:2px solid #3b82f6">
+      <div class="ev-head">
+        <span class="ev-icon">🔍</span>
+        <div>
+          <h3>Retrieval Quality</h3>
+          <div class="ev-script">retrieval_eval.py · 20 queries · LLM judge</div>
+        </div>
+      </div>
+      <div class="mrow"><span class="mlbl">Mean Precision@1</span><span class="mval" style="color:#93c5fd">0.700</span></div>
+      <div style="margin:4px 0 10px">
+        <div class="prog-bar"><div class="prog-fill" style="width:70%;background:linear-gradient(90deg,#1d4ed8,#3b82f6)"></div></div>
+      </div>
+      <div class="mrow"><span class="mlbl">Mean Precision@3</span><span class="mval" style="color:#93c5fd">0.550</span></div>
+      <div style="margin:4px 0 10px">
+        <div class="prog-bar"><div class="prog-fill" style="width:55%;background:linear-gradient(90deg,#1d4ed8,#3b82f6)"></div></div>
+      </div>
+      <div class="mrow"><span class="mlbl">Mean Precision@8</span><span class="mval" style="color:#93c5fd">0.419</span></div>
+      <div style="margin:4px 0 10px">
+        <div class="prog-bar"><div class="prog-fill" style="width:41.9%;background:linear-gradient(90deg,#1d4ed8,#3b82f6)"></div></div>
+      </div>
+      <div class="mrow"><span class="mlbl">Mean MRR</span><span class="mval" style="color:#6ee7b7">0.800</span></div>
+      <div style="margin:4px 0 0">
+        <div class="prog-bar"><div class="prog-fill" style="width:80%;background:linear-gradient(90deg,#059669,#10b981)"></div></div>
+      </div>
+    </div>
+
+    <!-- Generation -->
+    <div class="ev-card" style="border-top:2px solid #ec4899">
+      <div class="ev-head">
+        <span class="ev-icon">✍️</span>
+        <div>
+          <h3>Generation Quality</h3>
+          <div class="ev-script">generation_eval.py · 10 SUMMARIZE queries</div>
+        </div>
+      </div>
+      <div class="mrow"><span class="mlbl">ROUGE-1 F1</span><span class="mval" style="color:#f9a8d4">vs extracted chunks</span></div>
+      <div class="mrow"><span class="mlbl">ROUGE-2 F1</span><span class="mval" style="color:#f9a8d4">bigram precision</span></div>
+      <div class="mrow"><span class="mlbl">ROUGE-L F1</span><span class="mval" style="color:#f9a8d4">longest common subseq</span></div>
+      <div class="mrow"><span class="mlbl">BERTScore F1</span><span class="mval" style="color:#f9a8d4">contextual similarity</span></div>
+      <div style="background:rgba(236,72,153,.07);border:1px solid rgba(236,72,153,.2);border-radius:6px;padding:8px;margin-top:8px;font-size:.68rem;color:var(--text-muted)">
+        LLM-as-judge (llama3.1-70b):<br>
+        Faithfulness · Relevance · Groundedness (1–5)<br>
+        BLEU excluded — weak for abstractive summarization
+      </div>
+    </div>
+
+    <!-- Latency -->
+    <div class="ev-card" style="border-top:2px solid #f59e0b">
+      <div class="ev-head">
+        <span class="ev-icon">⏱️</span>
+        <div>
+          <h3>Latency Benchmarks</h3>
+          <div class="ev-script">latency_eval.py · 8 types × 3 runs each</div>
+        </div>
+      </div>
+      <div class="mrow"><span class="mlbl">Target p95</span><span class="mval" style="color:#fcd34d">&lt; 5.0s</span></div>
+      <div class="mrow"><span class="mlbl">Fastest agents</span><span class="mval" style="color:#6ee7b7">SEARCH · GRAPH (SQL only)</span></div>
+      <div class="mrow"><span class="mlbl">Slowest agents</span><span class="mval" style="color:#fca5a5">SUMMARIZE · FACTCHECK (web)</span></div>
+      <div class="mrow"><span class="mlbl">Metric reported</span><span class="mval" style="color:#fcd34d">mean + p95 per type</span></div>
+      <div style="background:rgba(245,158,11,.07);border:1px solid rgba(245,158,11,.2);border-radius:6px;padding:8px;margin-top:8px;font-size:.68rem;color:var(--text-muted)">
+        End-to-end: query in → full agent response out<br>Includes Snowflake round-trip + LLM inference + Neo4j
+      </div>
+    </div>
+
+    <!-- Cost -->
+    <div class="ev-card" style="border-top:2px solid #14b8a6">
+      <div class="ev-head">
+        <span class="ev-icon">💰</span>
+        <div>
+          <h3>Cost Estimates</h3>
+          <div class="ev-script">cost_eval.py · static token budgets</div>
+        </div>
+      </div>
+      <div class="mrow"><span class="mlbl">Avg cost per query</span><span class="mval" style="color:#5eead4">$0.0012</span></div>
+      <div class="mrow"><span class="mlbl">Projected per 1,000</span><span class="mval" style="color:#5eead4">$1.19</span></div>
+      <div class="mrow"><span class="mlbl">Cheapest type</span><span class="mval" style="color:#6ee7b7">SEARCH / GRAPH $0.000018</span></div>
+      <div class="mrow"><span class="mlbl">Most expensive type</span><span class="mval" style="color:#fca5a5">SUMMARIZE $0.0022</span></div>
+      <div style="font-size:.65rem;color:var(--text-muted);margin-top:10px;line-height:1.6">
+        Pricing: llama3.1-70b $0.00060/1k · llama3.1-8b $0.00006/1k · arctic-embed $0.00010/1k
+      </div>
+    </div>
+
+    <!-- Domain KPIs -->
+    <div class="ev-card" style="border-top:2px solid #10b981">
+      <div class="ev-head">
+        <span class="ev-icon">📋</span>
+        <div>
+          <h3>Domain KPIs</h3>
+          <div class="ev-script">domain_kpis.py · 7/7 checks PASS</div>
+        </div>
+      </div>
+      <div class="mrow"><span class="mlbl">✅ Chunks ≥ 6,000</span><span class="mval" style="color:#6ee7b7">13,807</span></div>
+      <div class="mrow"><span class="mlbl">✅ Claims ≥ 1,000</span><span class="mval" style="color:#6ee7b7">84,260</span></div>
+      <div class="mrow"><span class="mlbl">✅ Evolution pairs ≥ 100</span><span class="mval" style="color:#6ee7b7">823</span></div>
+      <div class="mrow"><span class="mlbl">✅ Claims with speaker ≥ 50%</span><span class="mval" style="color:#6ee7b7">100%</span></div>
+      <div class="mrow"><span class="mlbl">✅ Embedding coverage ≥ 90%</span><span class="mval" style="color:#6ee7b7">100%</span></div>
+      <div class="mrow"><span class="mlbl">✅ Evolution pairs valid ≥ 90%</span><span class="mval" style="color:#6ee7b7">100%</span></div>
+      <div class="mrow"><span class="mlbl">✅ YouTube URLs valid ≥ 95%</span><span class="mval" style="color:#6ee7b7">100%</span></div>
+    </div>
+
+  </div><!-- /eval-g -->
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     SECTION 9 — DATA REFERENCE TABLES
+═══════════════════════════════════════════════════════ -->
+<div id="tables" class="section">
+  <div class="sec-label">REFERENCE TABLES</div>
+  <h2 class="sec-title">Data Volumes & Model Reference</h2>
+  <p class="sec-sub">Complete reference for every table, model, and tool in the pipeline</p>
+
+  <div class="two-col" style="margin-bottom:20px">
+
+    <!-- Data volumes -->
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Stage / Table</th><th>Object</th><th>Volume</th></tr></thead>
+        <tbody>
+          <tr><td>Extraction</td><td class="mono">YouTube (25 channels)</td><td class="num">286 episodes · 44 months</td></tr>
+          <tr><td>Raw</td><td class="mono">RAW.EPISODES</td><td class="num">286 VARIANT rows</td></tr>
+          <tr><td>Curated</td><td class="mono">CUR_CHUNKS</td><td class="num">13,807 chunks</td></tr>
+          <tr><td>Embeddings</td><td class="mono">SEM_CHUNK_EMBEDDINGS</td><td class="num">13,807 × 768-dim</td></tr>
+          <tr><td>Claims</td><td class="mono">SEM_CLAIMS</td><td class="num">84,260 rows</td></tr>
+          <tr><td>Evolution</td><td class="mono">SEM_CLAIM_EVOLUTION</td><td class="num">823 pairs</td></tr>
+          <tr><td>Participants</td><td class="mono">SEM_EPISODE_PARTICIPANTS</td><td class="num">683 records</td></tr>
+          <tr><td>Graph nodes</td><td class="mono">Neo4j</td><td class="num">88,823 nodes</td></tr>
+          <tr><td>Graph edges</td><td class="mono">Neo4j</td><td class="num">253,740 relationships</td></tr>
+          <tr><td>Search index</td><td class="mono">PODCASTIQ_SEARCH</td><td class="num">Hybrid BM25 + vector</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Model reference -->
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Agent / Step</th><th>Model</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>Router</td><td class="mono">llama3.1-8b</td><td>Query classification (8 types)</td></tr>
+          <tr><td>Embedding</td><td class="mono">arctic-embed-m</td><td>768-dim dense vectors</td></tr>
+          <tr><td>Retrieval re-rank</td><td class="mono">Cortex built-in</td><td>Hybrid BM25 + vector re-rank</td></tr>
+          <tr><td>Summarization</td><td class="mono">llama3.1-70b</td><td>Synthesis from retrieved chunks</td></tr>
+          <tr><td>Comparison</td><td class="mono">llama3.1-70b</td><td>Cross-speaker claim analysis</td></tr>
+          <tr><td>Temporal</td><td class="mono">llama3.1-70b</td><td>Evolution narrative generation</td></tr>
+          <tr><td>Fact-check Stage 1</td><td class="mono">llama3.1-70b</td><td>Pre-filter from training knowledge</td></tr>
+          <tr><td>Fact-check Stage 2</td><td class="mono">Brave Search MCP + 70b</td><td>Web retrieval + verdict synthesis</td></tr>
+          <tr><td>Insight</td><td class="mono">llama3.1-70b</td><td>Meta-analysis narrative</td></tr>
+          <tr><td>Claim extraction</td><td class="mono">llama3.1-70b</td><td>Structured claim + speaker attr.</td></tr>
+          <tr><td>LLM judge (eval)</td><td class="mono">llama3.1-70b</td><td>Faithfulness / Relevance / Groundedness</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Router accuracy breakdown -->
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Query Type</th><th>Trigger Pattern</th><th>8b Accuracy</th><th>70b Accuracy</th><th>Primary Data Source</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge b-blue">SEARCH</span></td><td>"Find clips / What did X say about Y?"</td><td class="num">66.7%</td><td class="num">100.0%</td><td>Cortex Search SEARCH_PREVIEW</td></tr>
+        <tr><td><span class="badge b-purple">SUMMARIZE</span></td><td>"What are strategies/tips/advice about X?"</td><td class="num">83.3%</td><td class="num">83.3%</td><td>Cortex Search + llama3.1-70b</td></tr>
+        <tr><td><span class="badge b-sky">RECOMMEND</span></td><td>"Recommend/suggest/show me episodes about X"</td><td class="num">83.3%</td><td class="num">100.0%</td><td>SEM_EPISODE_PARTICIPANTS + CUR_CHUNKS</td></tr>
+        <tr><td><span class="badge b-teal">COMPARE</span></td><td>"Compare X vs Y on Z"</td><td class="num">100.0%</td><td class="num">100.0%</td><td>SEM_CLAIMS WHERE speaker IN (A,B)</td></tr>
+        <tr><td><span class="badge b-amber">TEMPORAL</span></td><td>"How has X changed / who changed their mind?"</td><td class="num">100.0%</td><td class="num">83.3%</td><td>SEM_CLAIM_EVOLUTION</td></tr>
+        <tr><td><span class="badge b-red">FACTCHECK</span></td><td>"Fact check: … / Is it true that …?"</td><td class="num">100.0%</td><td class="num">100.0%</td><td>Cortex LLM + Brave Search MCP</td></tr>
+        <tr><td><span class="badge b-pink">INSIGHT</span></td><td>"Which channel has most X / credibility report"</td><td class="num">83.3%</td><td class="num">100.0%</td><td>SEM_CLAIMS GROUP BY channel</td></tr>
+        <tr><td><span class="badge b-green">GRAPH</span></td><td>"Who appeared with X / show X's network"</td><td class="num">83.3%</td><td class="num">83.3%</td><td>Neo4j CO_APPEARED_WITH edges</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /tables -->
+
+<!-- FOOTER -->
+<div style="border-top:1px solid var(--border);padding:28px;text-align:center;color:var(--text-muted);font-size:.75rem">
+  PodcastIQ &nbsp;·&nbsp; Data Flow Diagrams &nbsp;·&nbsp; Generated April 2026
+  &nbsp;·&nbsp; 286 episodes · 25 channels · 84,260 claims · 9 agents · Snowflake Cortex + Neo4j
+</div>
+
+</body>
+</html>

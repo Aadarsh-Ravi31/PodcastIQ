@@ -13,6 +13,7 @@ class SearchResult(TypedDict):
     chunk_text: str
     youtube_url: str
     publish_date: str
+    relevance_score: float
 
 
 class PodcastIQState(TypedDict):

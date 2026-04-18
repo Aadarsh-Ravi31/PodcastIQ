@@ -1,0 +1,369 @@
+{
+  "mean_precision_at_1": 0.65,
+  "mean_precision_at_3": 0.5333,
+  "mean_precision_at_8": 0.4188,
+  "mean_mrr": 0.775,
+  "num_queries": 20,
+  "per_query": [
+    {
+      "query": "Sam Altman on the future of OpenAI",
+      "num_results": 8,
+      "relevance": [
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
+        true,
+        false
+      ],
+      "precision_at_1": 0.0,
+      "precision_at_3": 0.6666666666666666,
+      "precision_at_8": 0.5,
+      "mrr": 0.5
+    },
+    {
+      "query": "Andrew Huberman sleep optimization protocols",
+      "num_results": 8,
+      "relevance": [
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "precision_at_1": 0.0,
+      "precision_at_3": 0.3333333333333333,
+      "precision_at_8": 0.25,
+      "mrr": 0.5
+    },
+    {
+      "query": "Marc Andreessen views on software and innovation",
+      "num_results": 8,
+      "relevance": [
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "precision_at_1": 0.0,
+      "precision_at_3": 0.3333333333333333,
+      "precision_at_8": 0.125,
+      "mrr": 0.5
+    },
+    {
+      "query": "Lex Fridman discussing artificial general intelligence",
+      "num_results": 8,
+      "relevance": [
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 0.6666666666666666,
+      "precision_at_8": 0.5,
+      "mrr": 1.0
+    },
+    {
+      "query": "intermittent fasting and longevity research",
+      "num_results": 8,
+      "relevance": [
+        true,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 0.6666666666666666,
+      "precision_at_8": 0.5,
+      "mrr": 1.0
+    },
+    {
+      "query": "startup fundraising advice from founders",
+      "num_results": 8,
+      "relevance": [
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "precision_at_8": 0.25,
+      "mrr": 1.0
+    },
+    {
+      "query": "AI safety risks and alignment",
+      "num_results": 8,
+      "relevance": [
+        false,
+        true,
+        true,
+        true,
+        true,
+        false,
+        true,
+        true
+      ],
+      "precision_at_1": 0.0,
+      "precision_at_3": 0.6666666666666666,
+      "precision_at_8": 0.75,
+      "mrr": 0.5
+    },
+    {
+      "query": "crypto and blockchain future predictions",
+      "num_results": 8,
+      "relevance": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "precision_at_1": 0.0,
+      "precision_at_3": 0.0,
+      "precision_at_8": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "query": "cold exposure and dopamine benefits",
+      "num_results": 8,
+      "relevance": [
+        true,
+        true,
+        false,
+        false,
+        true,
+        true,
+        false,
+        false
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 0.6666666666666666,
+      "precision_at_8": 0.5,
+      "mrr": 1.0
+    },
+    {
+      "query": "GPT models and language model capabilities",
+      "num_results": 8,
+      "relevance": [
+        true,
+        true,
+        true,
+        false,
+        true,
+        true,
+        false,
+        false
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 1.0,
+      "precision_at_8": 0.625,
+      "mrr": 1.0
+    },
+    {
+      "query": "exercise and cognitive performance",
+      "num_results": 8,
+      "relevance": [
+        true,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 0.6666666666666666,
+      "precision_at_8": 0.5,
+      "mrr": 1.0
+    },
+    {
+      "query": "venture capital and startup valuation",
+      "num_results": 8,
+      "relevance": [
+        false,
+        true,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false
+      ],
+      "precision_at_1": 0.0,
+      "precision_at_3": 0.6666666666666666,
+      "precision_at_8": 0.5,
+      "mrr": 0.5
+    },
+    {
+      "query": "Elon Musk on autonomous vehicles and Tesla",
+      "num_results": 8,
+      "relevance": [
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "precision_at_8": 0.25,
+      "mrr": 1.0
+    },
+    {
+      "query": "mental health and meditation practices",
+      "num_results": 8,
+      "relevance": [
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "precision_at_8": 0.625,
+      "mrr": 1.0
+    },
+    {
+      "query": "protein intake and muscle building research",
+      "num_results": 8,
+      "relevance": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 1.0,
+      "precision_at_8": 0.75,
+      "mrr": 1.0
+    },
+    {
+      "query": "remote work productivity and company culture",
+      "num_results": 8,
+      "relevance": [
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "precision_at_8": 0.25,
+      "mrr": 1.0
+    },
+    {
+      "query": "geopolitics and technology competition",
+      "num_results": 8,
+      "relevance": [
+        true,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 0.6666666666666666,
+      "precision_at_8": 0.5,
+      "mrr": 1.0
+    },
+    {
+      "query": "podcast industry growth and creator economy",
+      "num_results": 8,
+      "relevance": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "precision_at_1": 0.0,
+      "precision_at_3": 0.0,
+      "precision_at_8": 0.0,
+      "mrr": 0.0
+    },
+    {
+      "query": "climate change and energy transition",
+      "num_results": 8,
+      "relevance": [
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 0.3333333333333333,
+      "precision_at_8": 0.25,
+      "mrr": 1.0
+    },
+    {
+      "query": "consciousness and neuroscience research",
+      "num_results": 8,
+      "relevance": [
+        true,
+        true,
+        true,
+        false,
+        true,
+        true,
+        false,
+        true
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 1.0,
+      "precision_at_8": 0.75,
+      "mrr": 1.0
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+{
+  "coverage_stats": {
+    "curated_chunks": 13807,
+    "sem_claims": 84260,
+    "sem_claim_evolution": 823,
+    "sem_participants": 683,
+    "sem_embeddings": 13807,
+    "unique_channels": 25,
+    "unique_speakers": 450,
+    "unique_episodes": 286
+  },
+  "pipeline_completeness": {
+    "claims_with_speaker_pct": 100.0,
+    "chunks_with_embeddings_pct": 100.0,
+    "drift_type_distribution": {
+      "CONTRADICTED": 396,
+      "ESCALATED": 237,
+      "CONFIRMED": 128,
+      "SOFTENED": 39,
+      "REVISED": 23
+    }
+  },
+  "claim_evolution_validity": {
+    "sampled": 20,
+    "identical_pairs": 0,
+    "identity_rate_pct": 0.0,
+    "valid_rate_pct": 100.0,
+    "analysis_coverage": 95.0
+  },
+  "youtube_url_validity": {
+    "sampled": 50,
+    "valid_urls": 50,
+    "invalid_urls": 0,
+    "valid_pct": 100.0,
+    "malformed_examples": []
+  },
+  "temporal_freshness": {
+    "oldest_episode": "2022-01-03 06:00:01",
+    "newest_episode": "2026-02-16 15:01:05",
+    "months_covered": 44
+  },
+  "threshold_checks": {
+    "passed": 7,
+    "total": 7,
+    "score": "7/7",
+    "checks": [
+      {
+        "check": "chunks indexed >= 6000",
+        "passed": true
+      },
+      {
+        "check": "claims extracted >= 1000",
+        "passed": true
+      },
+      {
+        "check": "evolution pairs >= 100",
+        "passed": true
+      },
+      {
+        "check": "claims with speaker >= 50%",
+        "passed": true
+      },
+      {
+        "check": "chunks with embeddings >= 90%",
+        "passed": true
+      },
+      {
+        "check": "evolution pairs valid >= 90%",
+        "passed": true
+      },
+      {
+        "check": "YouTube URLs valid >= 95%",
+        "passed": true
+      }
+    ]
+  }
+}

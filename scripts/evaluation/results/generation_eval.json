@@ -1,0 +1,212 @@
+{
+  "num_queries": 10,
+  "mean_rouge1_f": 0.282,
+  "mean_rouge2_f": 0.0664,
+  "mean_rougeL_f": 0.1263,
+  "mean_bertscore_f1": 0.7744,
+  "mean_faithfulness": 2.4,
+  "mean_relevance": 4.4,
+  "mean_groundedness": 2.7,
+  "per_query": [
+    {
+      "query": "What are the best strategies for building a startup?",
+      "summary_len": 1413,
+      "rouge": {
+        "rouge1_f": 0.3029,
+        "rouge2_f": 0.0425,
+        "rougeL_f": 0.1075
+      },
+      "bertscore": {
+        "bertscore_precision": 0.7551,
+        "bertscore_recall": 0.7654,
+        "bertscore_f1": 0.7602
+      },
+      "llm_judge": {
+        "faithfulness": 2,
+        "relevance": 4,
+        "groundedness": 2,
+        "reasoning": "The response contains some claims that are not directly supported by the source context and misattributes positions, but still addresses the user's query about startup strategies."
+      }
+    },
+    {
+      "query": "What do experts say about sleep and cognitive performance?",
+      "summary_len": 1171,
+      "rouge": {
+        "rouge1_f": 0.2351,
+        "rouge2_f": 0.098,
+        "rougeL_f": 0.1736
+      },
+      "bertscore": {
+        "bertscore_precision": 0.7601,
+        "bertscore_recall": 0.7906,
+        "bertscore_f1": 0.7751
+      },
+      "llm_judge": {
+        "faithfulness": 4,
+        "relevance": 5,
+        "groundedness": 4,
+        "reasoning": "The response accurately addresses the user's query and mostly represents the podcast speakers' positions, but includes an unrelated reference to Andrew Huberman, PhD, and a YouTube video that is not present in the source context."
+      }
+    },
+    {
+      "query": "What is the consensus on AI safety risks?",
+      "summary_len": 1476,
+      "rouge": {
+        "rouge1_f": 0.3283,
+        "rouge2_f": 0.0695,
+        "rougeL_f": 0.1235
+      },
+      "bertscore": {
+        "bertscore_precision": 0.7598,
+        "bertscore_recall": 0.7698,
+        "bertscore_f1": 0.7648
+      },
+      "llm_judge": {
+        "faithfulness": 2,
+        "relevance": 4,
+        "groundedness": 2,
+        "reasoning": "The response introduces external information and misattributes positions, but attempts to address the query and provides some relevant context."
+      }
+    },
+    {
+      "query": "How does intermittent fasting affect longevity?",
+      "summary_len": 1388,
+      "rouge": {
+        "rouge1_f": 0.2438,
+        "rouge2_f": 0.0709,
+        "rougeL_f": 0.0989
+      },
+      "bertscore": {
+        "bertscore_precision": 0.7811,
+        "bertscore_recall": 0.7875,
+        "bertscore_f1": 0.7843
+      },
+      "llm_judge": {
+        "faithfulness": 4,
+        "relevance": 5,
+        "groundedness": 4,
+        "reasoning": "The response accurately addresses the user's query and mostly represents the podcast speakers' positions, but includes some external references and minor inferences not directly supported by the source context."
+      }
+    },
+    {
+      "query": "What advice do founders give about hiring and company culture?",
+      "summary_len": 1321,
+      "rouge": {
+        "rouge1_f": 0.288,
+        "rouge2_f": 0.0519,
+        "rougeL_f": 0.1521
+      },
+      "bertscore": {
+        "bertscore_precision": 0.7701,
+        "bertscore_recall": 0.7698,
+        "bertscore_f1": 0.77
+      },
+      "llm_judge": {
+        "faithfulness": 2,
+        "relevance": 5,
+        "groundedness": 2,
+        "reasoning": "The response includes claims and quotes from external sources not present in the provided source context, and misattributes positions to speakers not mentioned in the context."
+      }
+    },
+    {
+      "query": "What do podcasters say about the future of work and remote teams?",
+      "summary_len": 1043,
+      "rouge": {
+        "rouge1_f": 0.2847,
+        "rouge2_f": 0.0836,
+        "rougeL_f": 0.1389
+      },
+      "bertscore": {
+        "bertscore_precision": 0.7802,
+        "bertscore_recall": 0.7713,
+        "bertscore_f1": 0.7757
+      },
+      "llm_judge": {
+        "faithfulness": 2,
+        "relevance": 4,
+        "groundedness": 3,
+        "reasoning": "The response contains some claims that are not directly supported by the source context, and misattributes quotes to incorrect speakers, but still addresses the user's query about the future of work and remote teams."
+      }
+    },
+    {
+      "query": "What are the main arguments about crypto and blockchain?",
+      "summary_len": 1138,
+      "rouge": {
+        "rouge1_f": 0.2291,
+        "rouge2_f": 0.024,
+        "rougeL_f": 0.0923
+      },
+      "bertscore": {
+        "bertscore_precision": 0.7691,
+        "bertscore_recall": 0.758,
+        "bertscore_f1": 0.7635
+      },
+      "llm_judge": {
+        "faithfulness": 2,
+        "relevance": 4,
+        "groundedness": 3,
+        "reasoning": "The response attempts to address the query but makes claims that go beyond the provided source context and misattributes some positions."
+      }
+    },
+    {
+      "query": "How do experts approach mental health and stress management?",
+      "summary_len": 1069,
+      "rouge": {
+        "rouge1_f": 0.2577,
+        "rouge2_f": 0.0729,
+        "rougeL_f": 0.1416
+      },
+      "bertscore": {
+        "bertscore_precision": 0.7771,
+        "bertscore_recall": 0.7743,
+        "bertscore_f1": 0.7757
+      },
+      "llm_judge": {
+        "faithfulness": 2,
+        "relevance": 4,
+        "groundedness": 3,
+        "reasoning": "The response partially supports claims with the source context, but also introduces unrelated information and misattributes positions to speakers not present in the provided context."
+      }
+    },
+    {
+      "query": "What do health experts say about exercise and brain health?",
+      "summary_len": 1263,
+      "rouge": {
+        "rouge1_f": 0.3291,
+        "rouge2_f": 0.0871,
+        "rougeL_f": 0.1193
+      },
+      "bertscore": {
+        "bertscore_precision": 0.7931,
+        "bertscore_recall": 0.8105,
+        "bertscore_f1": 0.8017
+      },
+      "llm_judge": {
+        "faithfulness": 2,
+        "relevance": 5,
+        "groundedness": 2,
+        "reasoning": "The response contains some claims that are not directly supported by the source context and misattributes positions to Dr. Rhonda Patrick and Dr. Andrew Huberman, who are not even mentioned in the source context."
+      }
+    },
+    {
+      "query": "What are common views on venture capital and startup valuations?",
+      "summary_len": 1629,
+      "rouge": {
+        "rouge1_f": 0.3217,
+        "rouge2_f": 0.0639,
+        "rougeL_f": 0.1153
+      },
+      "bertscore": {
+        "bertscore_precision": 0.7627,
+        "bertscore_recall": 0.7836,
+        "bertscore_f1": 0.773
+      },
+      "llm_judge": {
+        "faithfulness": 2,
+        "relevance": 4,
+        "groundedness": 2,
+        "reasoning": "The response introduces external information and quotes from unrelated sources, while only partially addressing the query and misrepresenting the podcast speakers' positions."
+      }
+    }
+  ]
+}

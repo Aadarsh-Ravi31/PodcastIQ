@@ -1,5 +1,5 @@
 # PodcastIQ Dependencies
-# Python 3.13 | Last Updated: February 19, 2026
+# Python 3.13 | Last Updated: April 17, 2026
 
 # Data Source
 youtube-transcript-api>=1.2.4
@@ -29,3 +29,8 @@ pandas>=2.2.0
 python-dotenv>=1.0.0
 mcp>=0.1.0
 google-api-python-client>=2.150.0
+
+# Evaluation
+openai>=1.0.0
+rouge-score>=0.1.2
+bert-score>=0.3.13

@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 SEARCH_SERVICE = "PODCASTIQ.SEMANTIC.PODCASTIQ_SEARCH"
 RETURN_COLUMNS = ["CHUNK_TEXT", "EPISODE_TITLE", "CHANNEL_NAME", "YOUTUBE_URL", "PUBLISH_DATE", "CHUNK_ID"]
-DEFAULT_LIMIT  = 8
+DEFAULT_LIMIT  = 5
 
 
 def search_agent(state: PodcastIQState) -> dict:
@@ -44,12 +44,13 @@ def search_agent(state: PodcastIQState) -> dict:
 
     results: list[SearchResult] = [
         SearchResult(
-            chunk_id      = r.get("CHUNK_ID", ""),
-            episode_title = r.get("EPISODE_TITLE", ""),
-            channel_name  = r.get("CHANNEL_NAME", ""),
-            chunk_text    = r.get("CHUNK_TEXT", ""),
-            youtube_url   = r.get("YOUTUBE_URL", ""),
-            publish_date  = str(r.get("PUBLISH_DATE", "")),
+            chunk_id        = r.get("CHUNK_ID", ""),
+            episode_title   = r.get("EPISODE_TITLE", ""),
+            channel_name    = r.get("CHANNEL_NAME", ""),
+            chunk_text      = r.get("CHUNK_TEXT", ""),
+            youtube_url     = r.get("YOUTUBE_URL", ""),
+            publish_date    = str(r.get("PUBLISH_DATE", "")),
+            relevance_score = round(float((r.get("@scores") or {}).get("cosine_similarity", 0)), 3),
         )
         for r in raw_results
     ]

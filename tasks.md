@@ -17,7 +17,7 @@
 | 5 | Neo4j Knowledge Graph + Graph Agent | ⬜ Not Started |
 | 6 | Temporal Analysis + Claim Evolution | ✅ Completed |
 | 7 | Hybrid Fact-Checking + MCP + Remaining Agents | ✅ Completed |
-| 8 | Streamlit UI (search, graph explorer, timeline, dashboard) | ⬜ Not Started |
+| 8 | Streamlit UI + Demo Prep + Guardrails | ✅ Completed |
 | 9 | Airflow Orchestration + Integration Testing | ⬜ Not Started |
 | 10 | Testing, Optimization, Documentation | ⬜ Not Started |
 | 11 | Final Demo + Presentation | ⬜ Not Started |
@@ -496,7 +496,7 @@ python -m langgraph_agents.graph "your question here"
 | 5 | ✅ Completed | Mar 20 | Mar 20 | Neo4j: 10,610 nodes, 27,807 relationships. Graph agent working. |
 | 6 | ✅ Completed | Mar 20 | Mar 21 | Temporal: 243 pairs (144 CONTRADICTED). Comparison/Recommendation/Insight agents built. |
 | 7 | ✅ Completed | Mar 21 | Apr 11 | Fact-checking + Brave Search (direct API) + all 9 agents complete |
-| 8 | ⬜ Not Started | — | — | Streamlit UI |
+| 8 | ✅ Completed | Apr 11 | Apr 17 | Full Streamlit UI: Chat (9 agents), Graph Explorer, Channel Dashboard. All agents tested end-to-end. Input guardrails implemented (length, injection, scope, language). Real person disclaimer on all responses. demo_queries.md created. |
 | 9 | ⬜ Not Started | — | — | Airflow orchestration |
 | 10 | ⬜ Not Started | — | — | Testing + optimization + docs |
 | 11 | ⬜ Not Started | — | — | Final demo + presentation |
@@ -522,16 +522,47 @@ python -m langgraph_agents.graph "your question here"
 
 ---
 
-## 📝 Current Focus: Week 7
+## 📝 Current Focus: Week 8 — COMPLETED (Apr 17)
 
-**Priority order:**
-1. Build fact-check agent (`langgraph_agents/agents/fact_check.py`) ← NEXT
-2. Build batch fact-checker script (`scripts/fact_checker.py`)
-3. Wire FACTCHECK into router + graph
-4. Run MCP web search setup (Brave API key already in .env)
-5. Re-run claim extractor + temporal_analyzer after extractor finishes
+### Streamlit UI — Done
+- [x] Chat interface with 9-agent routing (`streamlit_app/app.py`)
+- [x] Knowledge Graph Explorer (`pages/1_Graph_Explorer.py`)
+- [x] Channel Dashboard with dark HTML tables, topics chart, guests (`pages/3_Channel_Dashboard.py`)
+- [x] Removed Timeline page (sparse temporal data)
+- [x] Removed Episodes page (VIDEO_ID mismatch)
 
-**Blockers:** None (Brave Search API key in .env: BRAVE_SEARCH)
+### Agent UI Fixes — Done
+- [x] Search / Summarize: source cards with YouTube links
+- [x] Temporal: same-speaker only cards, key case fix
+- [x] Fact-Check: no duplicate rendering, Brave Search path verified
+- [x] Comparison: grouped by speaker, CLAIM_TYPE badge instead of PENDING
+- [x] Recommend: deduped by title+channel, no URL dump in text
+- [x] Insight: dark HTML table (no white iframe)
+- [x] Knowledge Graph: clean node/edge count, no st.status icon overlap
 
-**Background tasks running:**
-- Claim extractor (bdcbe75) — ~51% complete (5,420/10,561 remaining chunks processed)
+### Input Guardrails — Done (Apr 17)
+- [x] Created `streamlit_app/components/guardrails.py`
+  - 1.1 Query length (3–500 chars)
+  - 1.2 Prompt injection detection (regex patterns)
+  - 1.4 Scope classification (medical/legal/financial/private info)
+  - 1.8 Language detection (non-English script rejection)
+- [x] Wired into `app.py` before `agent_run()` — blocks bad queries instantly
+- [x] Real person disclaimer on every assistant response (Layer 13.4)
+- [x] `demo_queries.md` created with all confirmed working queries
+
+### Guardrails deferred (post-demo / future work)
+- [ ] 1.7 Rate limiting (needs user identity system)
+- [ ] 11.1 Router confidence scoring
+- [ ] 12.1 Search relevance thresholding
+- [ ] 13.6 User feedback flags (needs SEM_USER_FLAGS table)
+- [ ] Layers 2–8 (pipeline guardrails — require reprocessing corpus)
+
+### Evaluation Suite — Done (Apr 17)
+- [x] `scripts/evaluation/router_eval.py` — 48 test queries (6×8 types), accuracy + 8b vs 70b ablation
+- [x] `scripts/evaluation/retrieval_eval.py` — Precision@1/3/8 + MRR, LLM-as-relevance-judge (20 queries)
+- [x] `scripts/evaluation/generation_eval.py` — ROUGE-1/2/L, BERTScore F1, LLM-as-judge faithfulness/relevance/groundedness (10 queries)
+- [x] `scripts/evaluation/latency_eval.py` — end-to-end timing all 8 agent types, mean + p95 (3 runs each)
+- [x] `scripts/evaluation/cost_eval.py` — static token budget × Cortex pricing per agent, projected $/1k queries
+- [x] `scripts/evaluation/domain_kpis.py` — corpus coverage stats, pipeline completeness, evolution validity, YouTube URL check
+- [x] `scripts/evaluation/run_all.py` — master runner, consolidated report, `--quick` flag, saves `eval_summary.json`
+- Note: BLEU skipped (weak for abstractive summarization)

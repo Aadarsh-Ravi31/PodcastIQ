@@ -1,0 +1,1046 @@
+{
+  "run_log": [
+    {
+      "name": "router",
+      "success": true,
+      "elapsed_s": 231.1
+    },
+    {
+      "name": "retrieval",
+      "success": false,
+      "elapsed_s": 258.1
+    },
+    {
+      "name": "cost",
+      "success": true,
+      "elapsed_s": 98.1
+    },
+    {
+      "name": "domain",
+      "success": false,
+      "elapsed_s": 7.0
+    }
+  ],
+  "total_elapsed_s": 594.3,
+  "results": {
+    "router": {
+      "llama3.1-8b": {
+        "model": "llama3.1-8b",
+        "overall_accuracy": 0.875,
+        "correct": 42,
+        "total": 48,
+        "per_type": {
+          "SEARCH": {
+            "accuracy": 0.6666666666666666,
+            "correct": 4,
+            "total": 6,
+            "common_errors": {
+              "SUMMARIZE": 2
+            }
+          },
+          "SUMMARIZE": {
+            "accuracy": 0.8333333333333334,
+            "correct": 5,
+            "total": 6,
+            "common_errors": {
+              "INSIGHT": 1
+            }
+          },
+          "RECOMMEND": {
+            "accuracy": 0.8333333333333334,
+            "correct": 5,
+            "total": 6,
+            "common_errors": {
+              "SUMMARIZE": 1
+            }
+          },
+          "COMPARE": {
+            "accuracy": 1.0,
+            "correct": 6,
+            "total": 6,
+            "common_errors": {}
+          },
+          "TEMPORAL": {
+            "accuracy": 1.0,
+            "correct": 6,
+            "total": 6,
+            "common_errors": {}
+          },
+          "FACTCHECK": {
+            "accuracy": 1.0,
+            "correct": 6,
+            "total": 6,
+            "common_errors": {}
+          },
+          "INSIGHT": {
+            "accuracy": 0.8333333333333334,
+            "correct": 5,
+            "total": 6,
+            "common_errors": {
+              "SUMMARIZE": 1
+            }
+          },
+          "GRAPH": {
+            "accuracy": 0.8333333333333334,
+            "correct": 5,
+            "total": 6,
+            "common_errors": {
+              "INSIGHT": 1
+            }
+          }
+        },
+        "predictions": [
+          {
+            "query": "Find clips where Sam Altman talks about GPT-5",
+            "expected": "SEARCH",
+            "predicted": "SEARCH",
+            "correct": true
+          },
+          {
+            "query": "What did Lex Fridman say about consciousness?",
+            "expected": "SEARCH",
+            "predicted": "SUMMARIZE",
+            "correct": false
+          },
+          {
+            "query": "Show me moments where Huberman discusses cold exposure",
+            "expected": "SEARCH",
+            "predicted": "SEARCH",
+            "correct": true
+          },
+          {
+            "query": "Find quotes about AI alignment from podcast episodes",
+            "expected": "SEARCH",
+            "predicted": "SEARCH",
+            "correct": true
+          },
+          {
+            "query": "What did Marc Andreessen say about software eating the world?",
+            "expected": "SEARCH",
+            "predicted": "SUMMARIZE",
+            "correct": false
+          },
+          {
+            "query": "Find clips about longevity research from FoundMyFitness",
+            "expected": "SEARCH",
+            "predicted": "SEARCH",
+            "correct": true
+          },
+          {
+            "query": "What are the best strategies for building a startup?",
+            "expected": "SUMMARIZE",
+            "predicted": "SUMMARIZE",
+            "correct": true
+          },
+          {
+            "query": "What do experts say about intermittent fasting?",
+            "expected": "SUMMARIZE",
+            "predicted": "SUMMARIZE",
+            "correct": true
+          },
+          {
+            "query": "How does sleep affect cognitive performance according to podcasts?",
+            "expected": "SUMMARIZE",
+            "predicted": "SUMMARIZE",
+            "correct": true
+          },
+          {
+            "query": "What is the consensus on AI safety across podcasts?",
+            "expected": "SUMMARIZE",
+            "predicted": "INSIGHT",
+            "correct": false
+          },
+          {
+            "query": "Explain the main arguments for and against crypto",
+            "expected": "SUMMARIZE",
+            "predicted": "SUMMARIZE",
+            "correct": true
+          },
+          {
+            "query": "What advice do successful founders give about hiring?",
+            "expected": "SUMMARIZE",
+            "predicted": "SUMMARIZE",
+            "correct": true
+          },
+          {
+            "query": "Recommend episodes about longevity and health",
+            "expected": "RECOMMEND",
+            "predicted": "RECOMMEND",
+            "correct": true
+          },
+          {
+            "query": "What should I watch about AI and the future?",
+            "expected": "RECOMMEND",
+            "predicted": "SUMMARIZE",
+            "correct": false
+          },
+          {
+            "query": "Suggest episodes with Sam Altman",
+            "expected": "RECOMMEND",
+            "predicted": "RECOMMEND",
+            "correct": true
+          },
+          {
+            "query": "Show me the best episodes from Huberman Lab",
+            "expected": "RECOMMEND",
+            "predicted": "RECOMMEND",
+            "correct": true
+          },
+          {
+            "query": "What podcast episodes should I listen to about startups?",
+            "expected": "RECOMMEND",
+            "predicted": "RECOMMEND",
+            "correct": true
+          },
+          {
+            "query": "Recommend something from the Lex Fridman podcast",
+            "expected": "RECOMMEND",
+            "predicted": "RECOMMEND",
+            "correct": true
+          },
+          {
+            "query": "Compare Sam Altman and Elon Musk on AI",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "How do Lex Fridman and Andrew Huberman differ on sleep?",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "Compare a16z and All-In Podcast on startup advice",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "What are the differences between Peter Thiel and Marc Andreessen on startups?",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "Compare views of Sam Altman vs Demis Hassabis on AGI",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "How do different podcasters disagree on crypto?",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "How has opinion on AGI changed over time?",
+            "expected": "TEMPORAL",
+            "predicted": "TEMPORAL",
+            "correct": true
+          },
+          {
+            "query": "Who changed their mind about crypto?",
+            "expected": "TEMPORAL",
+            "predicted": "TEMPORAL",
+            "correct": true
+          },
+          {
+            "query": "How has Marc Andreessen evolved his views on innovation?",
+            "expected": "TEMPORAL",
+            "predicted": "TEMPORAL",
+            "correct": true
+          },
+          {
+            "query": "Show contradicted predictions from 2022",
+            "expected": "TEMPORAL",
+            "predicted": "TEMPORAL",
+            "correct": true
+          },
+          {
+            "query": "What claims about AI have been revised over the years?",
+            "expected": "TEMPORAL",
+            "predicted": "TEMPORAL",
+            "correct": true
+          },
+          {
+            "query": "How has the discourse on remote work shifted?",
+            "expected": "TEMPORAL",
+            "predicted": "TEMPORAL",
+            "correct": true
+          },
+          {
+            "query": "Fact check: GPT-5 was released in 2024",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Is it true that Sam Altman was fired from OpenAI?",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Fact check: Intermittent fasting reverses aging",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Verify: OpenAI is valued at over $80 billion",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Did Elon Musk say AGI will arrive by 2025?",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Fact check: Andrew Huberman claimed cold showers boost testosterone",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Which podcast channel has the most contradicted claims?",
+            "expected": "INSIGHT",
+            "predicted": "INSIGHT",
+            "correct": true
+          },
+          {
+            "query": "What are the most debated topics across all podcasts?",
+            "expected": "INSIGHT",
+            "predicted": "INSIGHT",
+            "correct": true
+          },
+          {
+            "query": "Give me a credibility report on Huberman Lab",
+            "expected": "INSIGHT",
+            "predicted": "INSIGHT",
+            "correct": true
+          },
+          {
+            "query": "Which speakers make the most predictions?",
+            "expected": "INSIGHT",
+            "predicted": "INSIGHT",
+            "correct": true
+          },
+          {
+            "query": "What topics does the All-In Podcast cover most?",
+            "expected": "INSIGHT",
+            "predicted": "SUMMARIZE",
+            "correct": false
+          },
+          {
+            "query": "Show me statistics about claim types across channels",
+            "expected": "INSIGHT",
+            "predicted": "INSIGHT",
+            "correct": true
+          },
+          {
+            "query": "Who has Sam Altman appeared with across podcasts?",
+            "expected": "GRAPH",
+            "predicted": "GRAPH",
+            "correct": true
+          },
+          {
+            "query": "Which guests appeared on multiple shows?",
+            "expected": "GRAPH",
+            "predicted": "GRAPH",
+            "correct": true
+          },
+          {
+            "query": "Show Lex Fridman's guest network",
+            "expected": "GRAPH",
+            "predicted": "GRAPH",
+            "correct": true
+          },
+          {
+            "query": "Who discussed AI safety across different podcasts?",
+            "expected": "GRAPH",
+            "predicted": "INSIGHT",
+            "correct": false
+          },
+          {
+            "query": "Which channels have the most shared guests?",
+            "expected": "GRAPH",
+            "predicted": "GRAPH",
+            "correct": true
+          },
+          {
+            "query": "Find all people connected to Marc Andreessen in podcasts",
+            "expected": "GRAPH",
+            "predicted": "GRAPH",
+            "correct": true
+          }
+        ]
+      },
+      "llama3.1-70b": {
+        "model": "llama3.1-70b",
+        "overall_accuracy": 0.9375,
+        "correct": 45,
+        "total": 48,
+        "per_type": {
+          "SEARCH": {
+            "accuracy": 1.0,
+            "correct": 6,
+            "total": 6,
+            "common_errors": {}
+          },
+          "SUMMARIZE": {
+            "accuracy": 0.8333333333333334,
+            "correct": 5,
+            "total": 6,
+            "common_errors": {
+              "INSIGHT": 1
+            }
+          },
+          "RECOMMEND": {
+            "accuracy": 1.0,
+            "correct": 6,
+            "total": 6,
+            "common_errors": {}
+          },
+          "COMPARE": {
+            "accuracy": 1.0,
+            "correct": 6,
+            "total": 6,
+            "common_errors": {}
+          },
+          "TEMPORAL": {
+            "accuracy": 0.8333333333333334,
+            "correct": 5,
+            "total": 6,
+            "common_errors": {
+              "SEARCH": 1
+            }
+          },
+          "FACTCHECK": {
+            "accuracy": 1.0,
+            "correct": 6,
+            "total": 6,
+            "common_errors": {}
+          },
+          "INSIGHT": {
+            "accuracy": 1.0,
+            "correct": 6,
+            "total": 6,
+            "common_errors": {}
+          },
+          "GRAPH": {
+            "accuracy": 0.8333333333333334,
+            "correct": 5,
+            "total": 6,
+            "common_errors": {
+              "SEARCH": 1
+            }
+          }
+        },
+        "predictions": [
+          {
+            "query": "Find clips where Sam Altman talks about GPT-5",
+            "expected": "SEARCH",
+            "predicted": "SEARCH",
+            "correct": true
+          },
+          {
+            "query": "What did Lex Fridman say about consciousness?",
+            "expected": "SEARCH",
+            "predicted": "SEARCH",
+            "correct": true
+          },
+          {
+            "query": "Show me moments where Huberman discusses cold exposure",
+            "expected": "SEARCH",
+            "predicted": "SEARCH",
+            "correct": true
+          },
+          {
+            "query": "Find quotes about AI alignment from podcast episodes",
+            "expected": "SEARCH",
+            "predicted": "SEARCH",
+            "correct": true
+          },
+          {
+            "query": "What did Marc Andreessen say about software eating the world?",
+            "expected": "SEARCH",
+            "predicted": "SEARCH",
+            "correct": true
+          },
+          {
+            "query": "Find clips about longevity research from FoundMyFitness",
+            "expected": "SEARCH",
+            "predicted": "SEARCH",
+            "correct": true
+          },
+          {
+            "query": "What are the best strategies for building a startup?",
+            "expected": "SUMMARIZE",
+            "predicted": "SUMMARIZE",
+            "correct": true
+          },
+          {
+            "query": "What do experts say about intermittent fasting?",
+            "expected": "SUMMARIZE",
+            "predicted": "SUMMARIZE",
+            "correct": true
+          },
+          {
+            "query": "How does sleep affect cognitive performance according to podcasts?",
+            "expected": "SUMMARIZE",
+            "predicted": "SUMMARIZE",
+            "correct": true
+          },
+          {
+            "query": "What is the consensus on AI safety across podcasts?",
+            "expected": "SUMMARIZE",
+            "predicted": "INSIGHT",
+            "correct": false
+          },
+          {
+            "query": "Explain the main arguments for and against crypto",
+            "expected": "SUMMARIZE",
+            "predicted": "SUMMARIZE",
+            "correct": true
+          },
+          {
+            "query": "What advice do successful founders give about hiring?",
+            "expected": "SUMMARIZE",
+            "predicted": "SUMMARIZE",
+            "correct": true
+          },
+          {
+            "query": "Recommend episodes about longevity and health",
+            "expected": "RECOMMEND",
+            "predicted": "RECOMMEND",
+            "correct": true
+          },
+          {
+            "query": "What should I watch about AI and the future?",
+            "expected": "RECOMMEND",
+            "predicted": "RECOMMEND",
+            "correct": true
+          },
+          {
+            "query": "Suggest episodes with Sam Altman",
+            "expected": "RECOMMEND",
+            "predicted": "RECOMMEND",
+            "correct": true
+          },
+          {
+            "query": "Show me the best episodes from Huberman Lab",
+            "expected": "RECOMMEND",
+            "predicted": "RECOMMEND",
+            "correct": true
+          },
+          {
+            "query": "What podcast episodes should I listen to about startups?",
+            "expected": "RECOMMEND",
+            "predicted": "RECOMMEND",
+            "correct": true
+          },
+          {
+            "query": "Recommend something from the Lex Fridman podcast",
+            "expected": "RECOMMEND",
+            "predicted": "RECOMMEND",
+            "correct": true
+          },
+          {
+            "query": "Compare Sam Altman and Elon Musk on AI",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "How do Lex Fridman and Andrew Huberman differ on sleep?",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "Compare a16z and All-In Podcast on startup advice",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "What are the differences between Peter Thiel and Marc Andreessen on startups?",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "Compare views of Sam Altman vs Demis Hassabis on AGI",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "How do different podcasters disagree on crypto?",
+            "expected": "COMPARE",
+            "predicted": "COMPARE",
+            "correct": true
+          },
+          {
+            "query": "How has opinion on AGI changed over time?",
+            "expected": "TEMPORAL",
+            "predicted": "TEMPORAL",
+            "correct": true
+          },
+          {
+            "query": "Who changed their mind about crypto?",
+            "expected": "TEMPORAL",
+            "predicted": "TEMPORAL",
+            "correct": true
+          },
+          {
+            "query": "How has Marc Andreessen evolved his views on innovation?",
+            "expected": "TEMPORAL",
+            "predicted": "TEMPORAL",
+            "correct": true
+          },
+          {
+            "query": "Show contradicted predictions from 2022",
+            "expected": "TEMPORAL",
+            "predicted": "TEMPORAL",
+            "correct": true
+          },
+          {
+            "query": "What claims about AI have been revised over the years?",
+            "expected": "TEMPORAL",
+            "predicted": "SEARCH",
+            "correct": false
+          },
+          {
+            "query": "How has the discourse on remote work shifted?",
+            "expected": "TEMPORAL",
+            "predicted": "TEMPORAL",
+            "correct": true
+          },
+          {
+            "query": "Fact check: GPT-5 was released in 2024",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Is it true that Sam Altman was fired from OpenAI?",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Fact check: Intermittent fasting reverses aging",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Verify: OpenAI is valued at over $80 billion",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Did Elon Musk say AGI will arrive by 2025?",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Fact check: Andrew Huberman claimed cold showers boost testosterone",
+            "expected": "FACTCHECK",
+            "predicted": "FACTCHECK",
+            "correct": true
+          },
+          {
+            "query": "Which podcast channel has the most contradicted claims?",
+            "expected": "INSIGHT",
+            "predicted": "INSIGHT",
+            "correct": true
+          },
+          {
+            "query": "What are the most debated topics across all podcasts?",
+            "expected": "INSIGHT",
+            "predicted": "INSIGHT",
+            "correct": true
+          },
+          {
+            "query": "Give me a credibility report on Huberman Lab",
+            "expected": "INSIGHT",
+            "predicted": "INSIGHT",
+            "correct": true
+          },
+          {
+            "query": "Which speakers make the most predictions?",
+            "expected": "INSIGHT",
+            "predicted": "INSIGHT",
+            "correct": true
+          },
+          {
+            "query": "What topics does the All-In Podcast cover most?",
+            "expected": "INSIGHT",
+            "predicted": "INSIGHT",
+            "correct": true
+          },
+          {
+            "query": "Show me statistics about claim types across channels",
+            "expected": "INSIGHT",
+            "predicted": "INSIGHT",
+            "correct": true
+          },
+          {
+            "query": "Who has Sam Altman appeared with across podcasts?",
+            "expected": "GRAPH",
+            "predicted": "GRAPH",
+            "correct": true
+          },
+          {
+            "query": "Which guests appeared on multiple shows?",
+            "expected": "GRAPH",
+            "predicted": "GRAPH",
+            "correct": true
+          },
+          {
+            "query": "Show Lex Fridman's guest network",
+            "expected": "GRAPH",
+            "predicted": "GRAPH",
+            "correct": true
+          },
+          {
+            "query": "Who discussed AI safety across different podcasts?",
+            "expected": "GRAPH",
+            "predicted": "SEARCH",
+            "correct": false
+          },
+          {
+            "query": "Which channels have the most shared guests?",
+            "expected": "GRAPH",
+            "predicted": "GRAPH",
+            "correct": true
+          },
+          {
+            "query": "Find all people connected to Marc Andreessen in podcasts",
+            "expected": "GRAPH",
+            "predicted": "GRAPH",
+            "correct": true
+          }
+        ]
+      },
+      "ablation_delta": 0.0625
+    },
+    "retrieval": {
+      "mean_precision_at_1": 0,
+      "mean_precision_at_3": 0,
+      "mean_precision_at_8": 0,
+      "mean_mrr": 0,
+      "num_queries": 0,
+      "per_query": []
+    },
+    "generation": null,
+    "latency": null,
+    "cost": {
+      "per_agent": {
+        "SEARCH": {
+          "query": "What did Sam Altman say about GPT-5?",
+          "static_model_estimate": {
+            "total_input_tokens": 250,
+            "total_output_tokens": 10,
+            "total_tokens": 260,
+            "total_cost_usd": 1.8e-05,
+            "breakdown": [
+              {
+                "step": "routing",
+                "model": "llama3.1-8b",
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cost_usd": 1.3e-05
+              },
+              {
+                "step": "retrieval",
+                "model": "arctic-embed",
+                "input_tokens": 50,
+                "output_tokens": 0,
+                "cost_usd": 5e-06
+              }
+            ]
+          },
+          "live_validation": {
+            "elapsed_s": 14.88,
+            "approx_output_tokens": 2507,
+            "summary_chars": 624,
+            "num_chunks_returned": 8
+          }
+        },
+        "SUMMARIZE": {
+          "query": "What are the best strategies for building a startup?",
+          "static_model_estimate": {
+            "total_input_tokens": 3250,
+            "total_output_tokens": 610,
+            "total_tokens": 3860,
+            "total_cost_usd": 0.002178,
+            "breakdown": [
+              {
+                "step": "routing",
+                "model": "llama3.1-8b",
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cost_usd": 1.3e-05
+              },
+              {
+                "step": "retrieval",
+                "model": "arctic-embed",
+                "input_tokens": 50,
+                "output_tokens": 0,
+                "cost_usd": 5e-06
+              },
+              {
+                "step": "summarization",
+                "model": "llama3.1-70b",
+                "input_tokens": 3000,
+                "output_tokens": 600,
+                "cost_usd": 0.00216
+              }
+            ]
+          },
+          "live_validation": {
+            "elapsed_s": 9.63,
+            "approx_output_tokens": 3072,
+            "summary_chars": 1175,
+            "num_chunks_returned": 8
+          }
+        },
+        "RECOMMEND": {
+          "query": "Recommend episodes about longevity and health",
+          "static_model_estimate": {
+            "total_input_tokens": 2250,
+            "total_output_tokens": 410,
+            "total_tokens": 2660,
+            "total_cost_usd": 0.001458,
+            "breakdown": [
+              {
+                "step": "routing",
+                "model": "llama3.1-8b",
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cost_usd": 1.3e-05
+              },
+              {
+                "step": "retrieval",
+                "model": "arctic-embed",
+                "input_tokens": 50,
+                "output_tokens": 0,
+                "cost_usd": 5e-06
+              },
+              {
+                "step": "recommendation",
+                "model": "llama3.1-70b",
+                "input_tokens": 2000,
+                "output_tokens": 400,
+                "cost_usd": 0.00144
+              }
+            ]
+          },
+          "live_validation": {
+            "elapsed_s": 26.42,
+            "approx_output_tokens": 127,
+            "summary_chars": 511,
+            "num_chunks_returned": 0
+          }
+        },
+        "COMPARE": {
+          "query": "Compare Sam Altman and Elon Musk on AI",
+          "static_model_estimate": {
+            "total_input_tokens": 3250,
+            "total_output_tokens": 510,
+            "total_tokens": 3760,
+            "total_cost_usd": 0.002118,
+            "breakdown": [
+              {
+                "step": "routing",
+                "model": "llama3.1-8b",
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cost_usd": 1.3e-05
+              },
+              {
+                "step": "retrieval",
+                "model": "arctic-embed",
+                "input_tokens": 50,
+                "output_tokens": 0,
+                "cost_usd": 5e-06
+              },
+              {
+                "step": "comparison",
+                "model": "llama3.1-70b",
+                "input_tokens": 3000,
+                "output_tokens": 500,
+                "cost_usd": 0.0021
+              }
+            ]
+          },
+          "live_validation": {
+            "elapsed_s": 10.42,
+            "approx_output_tokens": 304,
+            "summary_chars": 1216,
+            "num_chunks_returned": 0
+          }
+        },
+        "TEMPORAL": {
+          "query": "How has opinion on AGI changed over time?",
+          "static_model_estimate": {
+            "total_input_tokens": 1800,
+            "total_output_tokens": 430,
+            "total_tokens": 2230,
+            "total_cost_usd": 0.00116,
+            "breakdown": [
+              {
+                "step": "routing",
+                "model": "llama3.1-8b",
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cost_usd": 1.3e-05
+              },
+              {
+                "step": "keyword-extract",
+                "model": "llama3.1-8b",
+                "input_tokens": 100,
+                "output_tokens": 20,
+                "cost_usd": 7e-06
+              },
+              {
+                "step": "temporal-summary",
+                "model": "llama3.1-70b",
+                "input_tokens": 1500,
+                "output_tokens": 400,
+                "cost_usd": 0.00114
+              }
+            ]
+          },
+          "live_validation": {
+            "elapsed_s": 10.13,
+            "approx_output_tokens": 259,
+            "summary_chars": 1037,
+            "num_chunks_returned": 0
+          }
+        },
+        "FACTCHECK": {
+          "query": "Fact check: GPT-5 was released in 2024",
+          "static_model_estimate": {
+            "total_input_tokens": 2250,
+            "total_output_tokens": 310,
+            "total_tokens": 2560,
+            "total_cost_usd": 0.001398,
+            "breakdown": [
+              {
+                "step": "routing",
+                "model": "llama3.1-8b",
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cost_usd": 1.3e-05
+              },
+              {
+                "step": "retrieval",
+                "model": "arctic-embed",
+                "input_tokens": 50,
+                "output_tokens": 0,
+                "cost_usd": 5e-06
+              },
+              {
+                "step": "fact-check",
+                "model": "llama3.1-70b",
+                "input_tokens": 2000,
+                "output_tokens": 300,
+                "cost_usd": 0.00138
+              }
+            ]
+          },
+          "live_validation": {
+            "elapsed_s": 5.75,
+            "approx_output_tokens": 40,
+            "summary_chars": 161,
+            "num_chunks_returned": 0
+          }
+        },
+        "INSIGHT": {
+          "query": "Which podcast channel has the most contradicted claims?",
+          "static_model_estimate": {
+            "total_input_tokens": 1700,
+            "total_output_tokens": 410,
+            "total_tokens": 2110,
+            "total_cost_usd": 0.001153,
+            "breakdown": [
+              {
+                "step": "routing",
+                "model": "llama3.1-8b",
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cost_usd": 1.3e-05
+              },
+              {
+                "step": "insight-summary",
+                "model": "llama3.1-70b",
+                "input_tokens": 1500,
+                "output_tokens": 400,
+                "cost_usd": 0.00114
+              }
+            ]
+          },
+          "live_validation": {
+            "elapsed_s": 9.53,
+            "approx_output_tokens": 175,
+            "summary_chars": 703,
+            "num_chunks_returned": 0
+          }
+        },
+        "GRAPH": {
+          "query": "Who has Sam Altman appeared with across podcasts?",
+          "static_model_estimate": {
+            "total_input_tokens": 250,
+            "total_output_tokens": 10,
+            "total_tokens": 260,
+            "total_cost_usd": 1.8e-05,
+            "breakdown": [
+              {
+                "step": "routing",
+                "model": "llama3.1-8b",
+                "input_tokens": 200,
+                "output_tokens": 10,
+                "cost_usd": 1.3e-05
+              },
+              {
+                "step": "retrieval",
+                "model": "arctic-embed",
+                "input_tokens": 50,
+                "output_tokens": 0,
+                "cost_usd": 5e-06
+              }
+            ]
+          },
+          "live_validation": {
+            "elapsed_s": 8.85,
+            "approx_output_tokens": 55,
+            "summary_chars": 221,
+            "num_chunks_returned": 0
+          }
+        }
+      },
+      "total_cost_usd": 0.009501,
+      "avg_cost_per_query": 0.001188,
+      "projected_per_1k": 1.1876,
+      "pricing_model": {
+        "llama3.1-70b": 0.0006,
+        "llama3.1-8b": 6e-05,
+        "llama3.1-405b": 0.0035,
+        "arctic-embed": 0.0001
+      },
+      "note": "Token counts are estimated from prompt templates. Actual Cortex billing depends on model-specific tokenization. See Snowflake ACCOUNT_USAGE.QUERY_HISTORY for exact credit usage."
+    },
+    "domain": null
+  }
+}
